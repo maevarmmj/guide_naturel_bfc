@@ -1,4 +1,35 @@
-body{
-	background-color : purple;
-	
+body {
+  background:
+    url(foret.png) center / contain no-repeat,
+    linear-gradient(to bottom, white, #32a852);
+  background-attachment: fixed;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.BFC {
+	color: #061f0d;
+
+	line-height: 1.5em;
+
+}
+
+.LeGuideNaturel {
+	color: #061f0d;
+	line-height: 1em;
+	font-size:1.2em
+
+}
+
+.Recherche, .Stat, .AjoutDonnees {
+  border-radius: 25px;
+  border: 2px solid #04AA6D;
+  background: #04AA6D;
+  color: white;
+  padding: 10px 25px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 13px;
+  margin: 4px;
 }
