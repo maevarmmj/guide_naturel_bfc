@@ -1,32 +1,49 @@
 body {
-  background: url(ressources/foret2.png) center / cover no-repeat, linear-gradient(to bottom, white, #8ebd93);
+  background:
+          url(ressources/anna.png) right bottom no-repeat,
+          url(ressources/background.jpg) center / cover no-repeat,
+          linear-gradient(to bottom, #234a27, #172e1a);
   background-attachment: fixed;
   min-height: 100vh;
   margin: 0;
 }
 
+
+
+
 .BFC {
-	color: #061f0d;
-	line-height: 1.5em;
+	color: white;
+	line-height: 0.5em;
+    font: 1em "Georgia", serif;
+    text-shadow: 1px 2px #000000;
 }
 
 .LeGuideNaturel {
-	color: #061f0d;
-	line-height: 1em;
-	font-size:1.2em
+	color: white;
+	line-height: 0.5em;
+    font: 1.7em "Georgia", serif;
+    text-shadow: 1px 2px #000000;
 }
 
 .Recherche, .Stat, .AjoutDonnees {
   border-radius: 25px;
-  border: 2px solid #8ebd93;
-  background: #8ebd93;
+  border: 2px solid #4fcdf7;
+  background: #4fcdf7;
   color: white;
   padding: 10px 25px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 13px;
-  margin: 4px;
+  font: 15px "Georgia", serif;
+  font-weight: bold;
+  margin: 10px;
+  transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+  box-shadow: 0 1px 1px 0 rgba(0,0,0,1);
+}
+
+.Recherche:hover, .Stat:hover, .AjoutDonnees:hover {
+  border: 2px solid #299177;
+  background: #299177;
 }
 
 
@@ -40,7 +57,7 @@ body {
   width: 100%;
 }
 
-.overlay-image {
+.overlay-image, .overlay-text {
   position: absolute;
   top: 0;
   left: 0;
