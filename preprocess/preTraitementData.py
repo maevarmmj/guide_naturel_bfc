@@ -57,6 +57,7 @@ def add_code_statut(out: Path):
     codes_df_unique.rename(columns={'CD_NOM': 'cdNom', 'CODE_STATUT': 'codeStatut'}, inplace=True)
 
     merged_df = pd.merge(main_df, codes_df_unique, on='cdNom', how='left')
+    merged_df = merged_df.drop('cdNom', axis=1)
 
     print("Writing merged CSV file...")
     merged_df.to_csv(out, index=False)
