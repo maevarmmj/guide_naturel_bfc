@@ -1,12 +1,37 @@
 body {
-  background:
-          url(ressources/anna.png) right bottom no-repeat,
-          url(ressources/background.jpg) center / cover no-repeat,
-          linear-gradient(to bottom, #234a27, #172e1a);
-  background-attachment: fixed;
-  min-height: 100vh;
-  margin: 0;
+    background:
+        url(ressources/background.jpg) center / cover no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+    margin: 0;
 }
+
+body.index, body.stats {
+    background: inherit; /* Hérite du background défini pour body */
+    background-attachment: fixed;
+    margin: 0;
+}
+
+body.index {
+    background-image:
+        url(ressources/anna.png),
+        url(ressources/background.jpg); /* Ajoute une image en plus du background */
+    background-position: right bottom, center;
+    background-repeat: no-repeat, no-repeat;
+    background-size: auto, cover;
+}
+
+body.stats {
+    background-image:
+        url(ressources/statistiques/anna_stat.png),
+        url(ressources/background.jpg);
+    background-position: right bottom, center;
+    background-repeat: no-repeat, no-repeat;
+    background-size: auto, cover;
+}
+
+
+
 
 #info-box {
     position: absolute;
