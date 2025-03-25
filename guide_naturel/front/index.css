@@ -8,7 +8,6 @@ body {
   margin: 0;
 }
 
-
 #info-box {
     position: absolute;
     background-color: rgba(255, 255, 255, 0.8); /* Fond semi-transparent pour rendre l'infoBox visible */
