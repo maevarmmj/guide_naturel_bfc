@@ -9,7 +9,16 @@ body {
 }
 
 
-
+#info-box {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.8); /* Fond semi-transparent pour rendre l'infoBox visible */
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5); /* Ombre portée pour le contraste */
+    z-index: 100; /* S'assurer que l'infoBox est au-dessus des autres éléments */
+    display: none; /* Caché par défaut */
+    max-width: 300px; /* Limiter la largeur pour que le texte ne soit pas trop long */
+}
 
 .BFC {
 	color: white;
@@ -69,3 +78,7 @@ body {
   z-index: 10;
 
 }
+
+
+
+
