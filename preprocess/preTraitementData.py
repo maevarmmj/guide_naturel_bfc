@@ -50,6 +50,8 @@ def add_code_statut(out: Path):
     codes_df = pd.read_csv(code_csv, low_memory=False)
 
     print("Adding code statut...")
+    masque = ~main_df['codeInseeDepartement'].str.contains(" ", na=False)
+    main_df = main_df[masque]
     codes_df.dropna(subset=['CODE_STATUT'], inplace=True)
     codes_df = codes_df[codes_df['CODE_STATUT'] != 'true']
     codes_df_unique = codes_df.drop_duplicates(subset='CD_NOM', keep='first')
@@ -75,4 +77,3 @@ if __name__ == '__main__':
     if not FinalPath.is_file():
         add_code_statut(FinalPath)
     exit(0)
-
