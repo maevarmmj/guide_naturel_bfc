@@ -1,102 +1,118 @@
-:root {
-  --arrow-bg: rgba(255, 255, 255, 0.3);
-  --arrow-icon: url(https://upload.wikimedia.org/wikipedia/commons/9/9d/Caret_down_font_awesome_whitevariation.svg);
-  --option-bg: white;
-  --select-bg: rgba(255, 255, 255, 0.2);
+header {
+    background-color: #4fcdf7;
+    text-align: center; /* Pour centrer les boutons dans le header */
+    padding: 10px 0; /* Ajout d'un peu de padding vertical pour l'esthétique */
 }
-* {
-  box-sizing: border-box;
-}
-
 
 body {
-    background:
-        url(ressources/background.jpg) center / cover no-repeat;
-    background-attachment: fixed;
+    background: url(ressources/background.jpg) no-repeat fixed center/cover; /* Raccourci pour background-size: cover */
     min-height: 100vh;
     margin: 0;
 }
 
+/* Style commun pour les pages index et stats */
 body.index, body.stats {
-    background: inherit; /* Hérite du background défini pour body */
+    background-image: url(ressources/background.jpg);
     background-attachment: fixed;
-    margin: 0;
 }
-
-body.index {
-    background-image:
-        url(ressources/anna.png),
-        url(ressources/background.jpg); /* Ajoute une image en plus du background */
-    background-position: right bottom, center;
-    background-repeat: no-repeat, no-repeat;
-    background-size: auto, cover;
-}
-
-body.stats {
-    background-image:
-        url(ressources/statistiques/anna_stat.png),
-        url(ressources/background.jpg);
-    background-position: right bottom, center;
-    background-repeat: no-repeat, no-repeat;
-    background-size: auto, cover;
-}
-
 
 #info-box {
     position: absolute;
-    background-color: rgba(255, 255, 255, 0.8); /* Fond semi-transparent pour rendre l'infoBox visible */
+    background-color: rgba(255, 255, 255, 0.8);
     padding: 15px;
     border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5); /* Ombre portée pour le contraste */
-    z-index: 100; /* S'assurer que l'infoBox est au-dessus des autres éléments */
-    display: none; /* Caché par défaut */
-    max-width: 300px; /* Limiter la largeur pour que le texte ne soit pas trop long */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    display: none;
+    max-width: 300px;
 }
 
 .BFC {
 	color: white;
-	line-height: 0.5em;
-    font: 1em "Georgia", serif;
-    text-shadow: 1px 2px #000000;
+    font: 1.1em "Fira Sans", sans-serif;
+    text-shadow: 1px 1px #2c302d;
+    margin-bottom: 5px; /* Ajout d'un peu d'espace sous le titre BFC */
 }
 
-.LeGuideNaturel {
-	color: white;
-	line-height: 0.5em;
-    font: 1.7em "Georgia", serif;
-    text-shadow: 1px 2px #000000;
+.LeGuideNaturel{
+    color: white;
+    font: 2.5em "Fira Sans", sans-serif;
+    text-shadow: 1px 1px #2c302d;
 }
 
-.Recherche, .Stat, .AjoutDonnees {
-  border-radius: 25px;
+.BFCcarte{
+    max-width: 100%; /* Prend 100% de la largeur du parent .CarteBFC */
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Augmentation de l'espacement entre texte et carte */
+    max-width: 1200px; /* Ajuste la largeur maximale du container */
+    margin: 20px auto; /* Centre le container horizontalement et ajoute un peu de marge verticale */
+    padding: 20px; /* Ajout de padding interne au container pour espacer du bord */
+}
+
+.text-container {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    flex: 1; /* Permet au text-container de prendre de l'espace disponible */
+}
+
+.CarteBFC {
+    flex: 1; /* Permet à la carte de prendre de l'espace disponible */
+    max-width: 60%; /* La carte prendra au maximum 60% de l'espace disponible dans .container */
+    display: flex; /* Pour centrer l'image à l'intérieur si besoin */
+    justify-content: center; /* Pour centrer l'image horizontalement */
+}
+
+.header_button {
   border: 2px solid #4fcdf7;
   background: #4fcdf7;
+  color: white;
+  padding: 5px 30px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font: 15px "Fira Sans", sans-serif;
+  font-weight: bold;
+  transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+  margin: 5px; /* Ajout de marge pour séparer les boutons */
+}
+
+.header_button:hover {
+  border: 2px solid #299177;
+  background: #299177;
+}
+
+.footer_button {
+  border-radius: 25px;
+  border: 2px solid #64e386;
+  background: #64e386;
   color: white;
   padding: 10px 25px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font: 15px "Georgia", serif;
+  font: 15px "Fira Sans", sans-serif;
   font-weight: bold;
   margin: 10px;
   transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
   box-shadow: 0 1px 1px 0 rgba(0,0,0,1);
 }
 
-.Recherche:hover, .Stat:hover, .AjoutDonnees:hover {
+.footer_button:hover {
   border: 2px solid #299177;
   background: #299177;
 }
 
-
 .image-container {
   position: relative;
   display: inline-block;
-}
-
-.BFCcarte {
-  display: block;
-  width: 100%;
 }
 
 .overlay-image, .overlay-text {
@@ -109,9 +125,7 @@ body.stats {
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
   z-index: 10;
-
 }
-
 
 .selectregion{
     color: white;
@@ -120,31 +134,56 @@ body.stats {
 }
 
 .regionbox {
- /* Reset */
   appearance: none;
   border: 0;
   outline: 0;
   font: inherit;
-  /* Personalize */
   width: 20rem;
   padding: 1rem 4rem 1rem 1rem;
-  background: var(--arrow-icon) no-repeat right 0.8em center / 1.4em,
-    linear-gradient(to left, var(--arrow-bg) 3em, var(--select-bg) 3em);
+  background: var(--arrow-icon) no-repeat right 0.8em center / 1.4em, linear-gradient(to left, var(--arrow-bg) 3em, var(--select-bg) 3em);
   color: white;
   border-radius: 0.25em;
   box-shadow: 0 0 0.5em 0 rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  /* Remove IE arrow */
   &::-ms-expand {
     display: none;
   }
-  /* Remove focus outline */
   &:focus {
     outline: none;
   }
-  /* <option> colors */
   option {
     color: inherit;
     background-color: var(--option-bg);
   }
+}
+
+footer {
+    background-color: #5bc0de;
+    padding: 20px 0;
+    font: 15px "Fira Sans", sans-serif;
+    text-align: center; /* Pour centrer le contenu du footer */
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    max-width: 1200px; /* Aligne la largeur max du footer avec le container principal */
+    margin: auto;
+}
+
+.footer-item {
+    text-align: center;
+}
+
+.footer-item img {
+    width: 70px;
+    height: auto;
+    margin-bottom: 5px;
+}
+
+.footer-item p {
+    font-size: 15px;
+    color: #333;
+    margin: 1px;
 }

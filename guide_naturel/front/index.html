@@ -5,20 +5,32 @@
   <title>Le Guide Naturel</title>
   <link href = "index.css" rel = "stylesheet">
 </head>
+
+<header>
+<div>
+<div>
+<button onclick="location.href='recherche.html'" class = "header_button">EXPLORE AVEC ANNA !</button>
+  <button onclick="location.href='statistiques.html'" class = "header_button">STATISTIQUES</button>
+  <button onclick="location.href='ajoutdonnees.html'" class = "header_button">A PROPOS DE NOUS !</button>
+</div>
+</div>
+</header>
+
+
 <body class = "index">
-<div align = CENTER class = "BFC">
-  <h2>
-B O U R G O G N E - F R A N C H E - C O M T É </h2></div>
-<div align = CENTER class = "LeGuideNaturel">
-  <h1>
-  LE GUIDE NATUREL</h1>
-</div>
-<div align = CENTER>
-<button onclick="location.href='recherche.html'" class = "Recherche">EXPLORE AVEC ANNA</button>
-  <button onclick="location.href='statistiques.html'" class = "Stat">STATISTIQUES</button>
-  <button onclick="location.href='ajoutdonnees.html'" class = "AjoutDonnees">A PROPOS DE NOUS !</button>
-</div>
-<div align = CENTER class = "CarteBFC">
+
+<div class="container">
+
+<div class="text-container">
+        <div class="BFC">
+            <p>B O U R G O G N E - F R A N C H E - C O M T É</p>
+        </div>
+        <div class="LeGuideNaturel">
+            <p>LE GUIDE NATUREL</p>
+        </div>
+    </div>
+
+<div class = "CarteBFC">
   <div class="image-container">
     <img src = "ressources/carte_bfc.png" alt = "Departement BFC" usemap = '#departements_bfc' class = 'BFCcarte'>
     <img src="" alt="" class="overlay-image">
@@ -69,10 +81,33 @@ B O U R G O G N E - F R A N C H E - C O M T É </h2></div>
   </map>
 
 </div>
-
-
-
+  </div>
 <script src="script.js"></script>
 <div id="info-box"></div>
+
 </body>
+
+
+<footer>
+    <div class="footer-container">
+        <div class="footer-item">
+            <img src="ressources/footer/recherche.png" alt="Analyse">
+            <p>Recherche ce que tu veux</p>
+          <p>avec Anna !</p>
+          <button onclick="location.href='recherche.html'" class = "footer_button">EXPLORE AVEC ANNA !</button>
+        </div>
+        <div class="footer-item">
+            <img src="ressources/footer/stats.png" alt="Statistiques">
+            <p>Veux-tu des statistiques</p>
+             <p> précises sur la région ?</p>
+          <button onclick="location.href='statistiques.html'" class = "footer_button">STATISTIQUES</button>
+        </div>
+        <div class="footer-item">
+            <img src="ressources/footer/team.png" alt="Communauté">
+            <p>Pour en savoir plus sur</p>
+              <p>les créateurs du site !</p>
+          <button onclick="location.href='ajoutdonnees.html'" class = "footer_button">A PROPOS DE NOUS !</button>
+        </div>
+    </div>
+</footer>
 </html>
