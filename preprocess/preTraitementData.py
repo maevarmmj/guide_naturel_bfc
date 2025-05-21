@@ -5,17 +5,20 @@ from pathlib import Path
 
 
 def agg_all_csvs(out: Path):
-    base_dir = r"../extractINPN_bourgogneFrancheComte_04112024"
+    base_dir = r"../data/extractINPN_bourgogneFrancheComte_04112024"
 
     csv_files = glob.glob(os.path.join(base_dir, "*.csv"))
 
-    header = ["cdNom", "nomScientifiqueRef", "nomVernaculaire", "regne", "espece",
+    header = ["cdNom", "nomScientifiqueRef", "nomVernaculaire", "regne",
               "groupeTaxoSimple", "groupeTaxoAvance", "commune", "codeInseeDepartement"]
 
     first_file = True
     for file_path in csv_files:
         print("Extracting data from CSV file...")
         df = pd.read_csv(file_path, low_memory=False)
+
+        masque = ~df['codeInseeDepartement'].str.contains(" ", na=False)
+        df = df[masque]
 
         df_filtered = df.filter(items=header)
 
@@ -33,25 +36,24 @@ def merge_espece(out: Path):
     df = pd.read_csv(csv, low_memory=False)
     print("Done")
     df = df.dropna(subset=["commune", "nomScientifiqueRef"], how="any")
+    df = df[~df['regne'].isin(["Bacteria", "Chromista", "Protozoa"])]
     df_grouped = df.groupby(["commune", "nomScientifiqueRef"], as_index=False).size().rename(
         columns={'size': 'nombreObservations'})
     # Merge the counts back into the original DataFrame
     df_final = pd.merge(df, df_grouped, on=["commune", "nomScientifiqueRef"], how="left")
     df_final = df_final.drop_duplicates(subset=["commune", "nomScientifiqueRef"])
-    print("Writing merged CSV file...")
+    print("Writing CSV file...")
     df_final.to_csv(out, index=False)
     print("Done")
 
 
 def add_code_statut(out: Path):
     main_csv = r"..\data\merge_espece.csv"
-    code_csv = r"..\BDC-Statuts-v18 1\bdc_statuts_18.csv"
+    code_csv = r"..\data\bdc_statuts_18.csv"
     main_df = pd.read_csv(main_csv, low_memory=False)
     codes_df = pd.read_csv(code_csv, low_memory=False)
 
     print("Adding code statut...")
-    masque = ~main_df['codeInseeDepartement'].str.contains(" ", na=False)
-    main_df = main_df[masque]
     codes_df.dropna(subset=['CODE_STATUT'], inplace=True)
     codes_df = codes_df[codes_df['CODE_STATUT'] != 'true']
     codes_df_unique = codes_df.drop_duplicates(subset='CD_NOM', keep='first')
@@ -59,9 +61,13 @@ def add_code_statut(out: Path):
     codes_df_unique.rename(columns={'CD_NOM': 'cdNom', 'CODE_STATUT': 'codeStatut'}, inplace=True)
 
     merged_df = pd.merge(main_df, codes_df_unique, on='cdNom', how='left')
+
+    codes_officiel = ['LC', 'NT', 'VU', 'EN', 'CR', 'EW', 'EX']
+    merged_df.loc[~merged_df['codeStatut'].isin(codes_officiel), 'codeStatut'] = None
+
     merged_df = merged_df.drop('cdNom', axis=1)
 
-    print("Writing merged CSV file...")
+    print("Writing CSV file...")
     merged_df.to_csv(out, index=False)
     print("Done")
 
@@ -73,7 +79,7 @@ if __name__ == '__main__':
     mergeEspecePath: Path = Path(r"..\data\merge_espece.csv")
     if not mergeEspecePath.is_file():
         merge_espece(mergeEspecePath)
-    FinalPath: Path = Path(r"..\data\Final_data.csv")
+    FinalPath: Path = Path(r"..\data\Final_data2.csv")
     if not FinalPath.is_file():
         add_code_statut(FinalPath)
     exit(0)
