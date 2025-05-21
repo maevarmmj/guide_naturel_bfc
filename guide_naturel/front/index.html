@@ -2,18 +2,17 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Le Guide Naturel</title>
+  <title>Le Guide Naturel de la BFC</title>
   <link href = "index.css" rel = "stylesheet">
 </head>
 
-<header>
-<div>
-<div>
-<button onclick="location.href='recherche.html'" class = "header_button">EXPLORE AVEC ANNA !</button>
-  <button onclick="location.href='statistiques.html'" class = "header_button">STATISTIQUES</button>
-  <button onclick="location.href='ajoutdonnees.html'" class = "header_button">A PROPOS DE NOUS !</button>
-</div>
-</div>
+<header class="header">
+  <img src="ressources/eseo_logo.png" class="header_logo" alt="Logo">
+  <div class="header_center">
+    <button onclick="location.href='recherche.html'" class="header_button">EXPLORE AVEC ANNA !</button>
+    <button onclick="location.href='statistiques.html'" class="header_button">STATISTIQUES</button>
+    <button onclick="location.href='apropos.html'" class="header_button">A PROPOS DE NOUS !</button>
+  </div>
 </header>
 
 
@@ -22,67 +21,88 @@
 <div class="container">
 
 <div class="text-container">
-        <div class="BFC">
+        <div class="BFC_titre">
             <p>B O U R G O G N E - F R A N C H E - C O M T É</p>
         </div>
-        <div class="LeGuideNaturel">
+        <div class="LeGuideNaturel_titre">
             <p>LE GUIDE NATUREL</p>
         </div>
     </div>
 
-<div class = "CarteBFC">
-  <div class="image-container">
-    <img src = "ressources/carte_bfc.png" alt = "Departement BFC" usemap = '#departements_bfc' class = 'BFCcarte'>
-    <img src="" alt="" class="overlay-image">
-    <img src="" alt="" class="overlay-text">
-    </div>
-  <map name = 'departements_bfc'>
+  <div class="content-below">
+    <div class="Carte">
+      <div class="image-container">
+        <img src="ressources/carte_bfc.png" alt="Departement BFC" usemap="#departements_bfc">
+        <img src="" alt="" class="overlay-image">
+        <img src="" alt="" class="overlay-text">
+      </div>
+      <map name="departements_bfc">
     <area
             shape="poly"
-            coords="423,375,476,251,466,199,391,195,350,128,299,63,221,61,192,117,220,181,177,261,198,305,277,334,307,315,325,345,376,359"
+            coords="422,374,456,271,471,227,449,187,394,200,298,60,213,69,196,127,226,181,202,243,174,258,197,304"
+            data-original-coords = "422,374,456,271,471,227,449,187,394,200,298,60,213,69,196,127,226,181,202,243,174,258,197,304"
             href=""
             alt="Yonne" class="departement-area yonne">
     <area
             shape="poly"
-            coords="306,308,301,323,256,329,227,303,176,310,191,338,178,371,199,390,209,445,215,503,208,540,243,574,289,559,294,582,323,553,357,551,369,566,418,537,414,477,417,439,450,427,448,405,430,402,432,371,410,381,398,363,351,352"
+            coords="190,307,310,327,422,379,439,430,421,536,362,554,295,580,204,543,205,440,180,366"
+            data-original-coords = "190,307,310,327,422,379,439,430,421,536,362,554,295,580,204,543,205,440,180,366"
             href=""
             alt="Nievre" class="departement-area nievre">
     <area
             shape="poly"
-            coords="662,294,605,265,605,233,579,191,525,166,519,187,469,188,470,252,457,258,418,353,449,413,433,434,456,435,546,502,618,481,667,476,698,437,711,370,689,337,709,313,697,292"
+            coords="426,342,456,278,479,200,549,157,640,281,711,306,714,374,697,437,653,482,545,502,520,475,470,447,436,408"
+            data-original-coords = "426,342,456,278,479,200,549,157,640,281,711,306,714,374,697,437,653,482,545,502,520,475,470,447,436,408"
             href=""
             alt="Cote_dor"
             class="departement-area cote_dor">
     <area
             shape="poly"
-            coords="539,491,523,479,499,460,470,434,419,441,416,494,414,540,368,561,332,553,353,617,404,642,379,713,467,731,487,690,545,697,561,727,598,621,645,630,671,649,699,634,686,606,699,585,683,534,705,526,660,479,613,483,549,504"
+            coords="325,557,352,618,389,643,382,721,470,732,514,697,564,729,616,628,668,648,704,613,692,519,660,487,546,500,495,465,465,441,421,438,419,539"
+            data-original-coords = "325,557,352,618,389,643,382,721,470,732,514,697,564,729,616,628,668,648,704,613,692,519,660,487,546,500,495,465,465,441,421,438,419,539"
             href=""
             alt="Saone_et_Loire" class="departement-area saone_et_loire">
     <area
             shape="poly"
-            coords="905,209,889,190,854,198,832,171,746,235,747,279,682,286,705,294,708,315,687,336,711,390,749,403,777,387,803,380,821,369,855,353,877,327,915,330,946,312,974,311,962,251,980,234,926,191"
+            coords="719,393,786,383,831,368,870,334,919,325,954,310,968,309,961,283,958,251,971,233,953,213,926,193,880,191,847,193,830,172,793,193,744,240,741,272,712,272,677,287,700,299,692,334"
+            data-original-coords = "719,393,786,383,831,368,870,334,919,325,954,310,968,309,961,283,958,251,971,233,953,213,926,193,880,191,847,193,830,172,793,193,744,240,741,272,712,272,677,287,700,299,692,334"
             href=""
             alt="Haute_Saone" class="departement-area haute_saone">
     <area
             shape="poly"
-            coords="949,305,925,328,882,318,856,351,800,378,764,393,753,398,774,432,762,467,803,477,819,513,849,542,821,576,836,607,906,542,911,488,981,432,999,401,1019,363,990,364,993,336,1000,322,975,313"
+            coords="769,468,808,502,852,541,826,583,835,601,885,563,900,536,905,490,953,457,1000,396,1020,362,995,330,976,309,899,320,818,374,752,394"
+            data-original-coords = "769,468,808,502,852,541,826,583,835,601,885,563,900,536,905,490,953,457,1000,396,1020,362,995,330,976,309,899,320,818,374,752,394"
             href=""
             alt="Doubs" class="departement-area doubs">
     <area
             shape="poly"
-            coords="764,469,774,431,745,396,713,388,698,432,669,459,661,483,702,522,677,533,698,577,683,616,696,623,675,645,710,700,741,676,759,693,791,698,832,641,842,611,822,591,830,566,850,551,841,529,821,520,806,481,781,469"
+            coords="672,643,705,699,734,677,764,694,791,699,826,652,838,603,831,563,850,539,803,489,759,462,771,430,747,396,710,384,663,457,673,507,698,521,678,531,695,600"
+            data-original-coords = "672,643,705,699,734,677,764,694,791,699,826,652,838,603,831,563,850,539,803,489,759,462,771,430,747,396,710,384,663,457,673,507,698,521,678,531,695,600"
             href=""
             alt="Jura" class="departement-area jura">
     <area
             shape="poly"
-            coords="1015,289,1019,271,1016,251,978,231,964,258,971,286,978,307,999,324,993,339,1003,345,1013,335,1013,323,1033,324,1039,314,1032,294"
+            coords="1000,341,1028,325,1033,309,1017,285,1022,253,1005,231,974,230,961,248,961,287,968,307,991,314"
+            data-original-coords = "1000,341,1028,325,1033,309,1017,285,1022,253,1005,231,974,230,961,248,961,287,968,307,991,314"
             href=""
             alt="Territoire_de_Belfort" class="departement-area territoire_de_belfort">
   </map>
 
 </div>
-  </div>
+
+ <div class="main-content">
+        <div class="Carte">
+            <!-- Ton code de carte ici (inchangé) -->
+        </div>
+        <div class="contenu-droite">
+            <!-- Vide pour l’instant -->
+        </div>
+    </div>
+        </div>
+</div>
 <script src="script.js"></script>
+<script src="https://unpkg.com/image-map-resizer@1.0.10/js/imageMapResizer.min.js"></script>
+
 <div id="info-box"></div>
 
 </body>

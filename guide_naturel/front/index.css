@@ -1,20 +1,181 @@
-header {
-    background-color: #4fcdf7;
-    text-align: center; /* Pour centrer les boutons dans le header */
-    padding: 10px 0; /* Ajout d'un peu de padding vertical pour l'esthétique */
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(79, 205, 247, 0.5);
+  padding: 10px 20px;
+  flex-wrap: wrap;
+  border-radius: 15px;
+  overflow: hidden;
 }
 
-body {
-    background: url(ressources/background.jpg) no-repeat fixed center/cover; /* Raccourci pour background-size: cover */
-    min-height: 100vh;
+
+.header_logo {
+  width: 120px;
+  height: auto;
+}
+
+.header_center {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex: 1; /* prend toute la largeur restante */
+}
+
+/* Boutons stylisés */
+.header_button {
+  border: 2px solid rgba(79, 205, 247, 0.5);
+  border-radius: 10px;
+  background-color: rgba(79, 205, 247, 0.5);
+  color: white;
+  padding: 5px 30px;
+  text-align: center;
+  text-decoration: none;
+  font: 16px "Georgia", serif;
+  transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+  margin: 5px;
+  box-shadow: 1px 2px #127596;
+  cursor: pointer;
+}
+
+.header_button:hover {
+  border: 2px solid #339fa3;
+  background: #339fa3;
+}
+
+/* RESPONSIVE : en dessous de 600px */
+@media screen and (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .header_center {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .header_logo {
+    margin-bottom: 10px;
+  }
+}
+
+/* *************************************** */
+
+/* BODY : BOURGOGNE FRANCHE - COMTÉ */
+
+
+body, html {
     margin: 0;
+    padding: 0;
+       background: url("ressources/background/background4.png") no-repeat fixed center/cover;
+    min-height: 100%;
+    height: auto;
+    font-family: "Fira Sans", sans-serif;
 }
 
-/* Style commun pour les pages index et stats */
-body.index, body.stats {
-    background-image: url(ressources/background.jpg);
-    background-attachment: fixed;
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
 }
+
+.text-container {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.BFC_titre p, .LeGuideNaturel_titre p {
+  margin: 0;
+}
+
+.BFC_titre {
+    color: white;
+    font-size: 1.2em;
+    text-shadow: 1px 1px #2c302d;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.LeGuideNaturel_titre {
+    color: white;
+    font-size: 2.8em;
+    text-shadow: 1px 1px #2c302d;
+    text-align: center;
+}
+
+@media screen and (max-width: 600px) {
+  .BFC_titre {
+    font-size: 1em;
+  }
+
+  .LeGuideNaturel_titre {
+    font-size: 2em;
+  }
+
+  .text-container {
+    padding: 0 10px;
+  }
+}
+
+/* ********************************** */
+
+/* BODY : CARTE BFC */
+
+/* CARTE + FUTURS GRAPHES */
+
+.text-container {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.content-below {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1200px;
+  gap: 2rem;
+}
+
+/* La carte prend jusqu'à 70% de l'espace */
+.Carte {
+  flex: 0 1 70%;
+}
+
+.Carte img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Espace réservé pour contenu à droite */
+.contenu-droite {
+    flex: 1 1 35%;
+    max-width: 35%;
+    min-height: 300px;
+    background-color: rgba(255,255,255,0.1); /* Juste pour visualiser */
+}
+
+@media screen and (max-width: 768px) {
+  .content-below {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .Carte,
+  .espace-droit {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+
 
 #info-box {
     position: absolute;
@@ -27,88 +188,6 @@ body.index, body.stats {
     max-width: 300px;
 }
 
-.BFC {
-	color: white;
-    font: 1.1em "Fira Sans", sans-serif;
-    text-shadow: 1px 1px #2c302d;
-    margin-bottom: 5px; /* Ajout d'un peu d'espace sous le titre BFC */
-}
-
-.LeGuideNaturel{
-    color: white;
-    font: 2.5em "Fira Sans", sans-serif;
-    text-shadow: 1px 1px #2c302d;
-}
-
-.BFCcarte{
-    max-width: 100%; /* Prend 100% de la largeur du parent .CarteBFC */
-    height: auto;
-    display: block;
-    margin: 0 auto;
-}
-
-.container {
-    display: flex;
-    align-items: center;
-    gap: 20px; /* Augmentation de l'espacement entre texte et carte */
-    max-width: 1200px; /* Ajuste la largeur maximale du container */
-    margin: 20px auto; /* Centre le container horizontalement et ajoute un peu de marge verticale */
-    padding: 20px; /* Ajout de padding interne au container pour espacer du bord */
-}
-
-.text-container {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    flex: 1; /* Permet au text-container de prendre de l'espace disponible */
-}
-
-.CarteBFC {
-    flex: 1; /* Permet à la carte de prendre de l'espace disponible */
-    max-width: 60%; /* La carte prendra au maximum 60% de l'espace disponible dans .container */
-    display: flex; /* Pour centrer l'image à l'intérieur si besoin */
-    justify-content: center; /* Pour centrer l'image horizontalement */
-}
-
-.header_button {
-  border: 2px solid #4fcdf7;
-  background: #4fcdf7;
-  color: white;
-  padding: 5px 30px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font: 15px "Fira Sans", sans-serif;
-  font-weight: bold;
-  transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
-  margin: 5px; /* Ajout de marge pour séparer les boutons */
-}
-
-.header_button:hover {
-  border: 2px solid #299177;
-  background: #299177;
-}
-
-.footer_button {
-  border-radius: 25px;
-  border: 2px solid #64e386;
-  background: #64e386;
-  color: white;
-  padding: 10px 25px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font: 15px "Fira Sans", sans-serif;
-  font-weight: bold;
-  margin: 10px;
-  transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
-  box-shadow: 0 1px 1px 0 rgba(0,0,0,1);
-}
-
-.footer_button:hover {
-  border: 2px solid #299177;
-  background: #299177;
-}
 
 .image-container {
   position: relative;
@@ -127,41 +206,19 @@ body.index, body.stats {
   z-index: 10;
 }
 
-.selectregion{
-    color: white;
-    font: 1.2em "Georgia", serif;
-    text-shadow: 0.5px 1px #000000;
-}
 
-.regionbox {
-  appearance: none;
-  border: 0;
-  outline: 0;
-  font: inherit;
-  width: 20rem;
-  padding: 1rem 4rem 1rem 1rem;
-  background: var(--arrow-icon) no-repeat right 0.8em center / 1.4em, linear-gradient(to left, var(--arrow-bg) 3em, var(--select-bg) 3em);
-  color: white;
-  border-radius: 0.25em;
-  box-shadow: 0 0 0.5em 0 rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  &::-ms-expand {
-    display: none;
-  }
-  &:focus {
-    outline: none;
-  }
-  option {
-    color: inherit;
-    background-color: var(--option-bg);
-  }
-}
+
+/* ******************************* */
+
+/* FOOTER */
 
 footer {
-    background-color: #5bc0de;
-    padding: 20px 0;
-    font: 15px "Fira Sans", sans-serif;
-    text-align: center; /* Pour centrer le contenu du footer */
+    background-color: rgba(63, 191, 110, 0.6);
+    padding: 2px 0;
+    font: 15px "Georgia", serif;
+    text-align: center;
+    border-radius: 15px;
+  overflow: hidden;
 }
 
 .footer-container {
@@ -180,10 +237,55 @@ footer {
     width: 70px;
     height: auto;
     margin-bottom: 5px;
+
 }
 
 .footer-item p {
     font-size: 15px;
-    color: #333;
+    color: white;
     margin: 1px;
+    text-shadow: 2px 1px #1a783d;
+}
+
+.footer_button{
+  border: 2px solid rgba(63, 191, 110, 0.5);
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 1);
+  color: rgba(23, 143, 47);
+  padding: 5px 30px;
+  text-align: center;
+  text-decoration: none;
+  font: 13px "Georgia", serif;
+  transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+  margin: 5px;
+  box-shadow: 1px 2px #1a783d;
+  cursor: pointer;
+}
+
+.footer_button:hover {
+  border: 2px solid #32ab70;
+  background: #32ab70;
+    color: rgba(255, 255, 255);
+
+}
+
+@media screen and (max-width: 768px) {
+  .footer-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .footer-item {
+    width: 80%; /* Pour que chaque bloc ne prenne pas toute la largeur */
+  }
+
+  .footer-item img {
+    width: 60px; /* Légèrement plus petit sur mobile */
+  }
+
+  .footer_button {
+    width: 100%;
+    max-width: 250px;
+  }
 }

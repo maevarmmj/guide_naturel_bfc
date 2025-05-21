@@ -78,3 +78,40 @@ document.addEventListener('DOMContentLoaded', function() {
         return infos;
     }
 });
+
+function resizeMapAreas() {
+    const image = document.querySelector('.BFCcarte');
+    const areas = document.querySelectorAll('area.departement-area');
+
+    if (!image.complete) {
+        image.addEventListener('load', resizeMapAreas);
+        return;
+    }
+
+    const originalWidth = image.naturalWidth;
+    const currentWidth = image.offsetWidth;
+    const scale = currentWidth / originalWidth;
+
+    areas.forEach(area => {
+        const originalCoords = area.dataset.originalCoords;
+        if (!originalCoords) return;
+
+        const scaledCoords = originalCoords
+            .split(',')
+            .map(coord => Math.round(Number(coord) * scale))
+            .join(',');
+
+        area.coords = scaledCoords;
+    });
+}
+
+// Initial call on load
+window.addEventListener('load', resizeMapAreas);
+// Recalculate on resize
+window.addEventListener('resize', resizeMapAreas);
+
+window.addEventListener('load', function () {
+    if (typeof imageMapResize === 'function') {
+        imageMapResize();
+    }
+});
