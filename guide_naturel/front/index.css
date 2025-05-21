@@ -72,10 +72,9 @@
 body, html {
     margin: 0;
     padding: 0;
-       background: url("ressources/background/background4.png") no-repeat fixed center/cover;
+    background: url("ressources/background/background4.png") no-repeat fixed center/cover;
     min-height: 100%;
     height: auto;
-    font-family: "Fira Sans", sans-serif;
 }
 
 .container {
@@ -145,7 +144,7 @@ body, html {
 
 /* La carte prend jusqu'à 70% de l'espace */
 .Carte {
-  flex: 0 1 70%;
+  flex: 0 1 45%;
 }
 
 .Carte img {
@@ -213,6 +212,7 @@ body, html {
 /* FOOTER */
 
 footer {
+
     background-color: rgba(63, 191, 110, 0.6);
     padding: 2px 0;
     font: 15px "Georgia", serif;
