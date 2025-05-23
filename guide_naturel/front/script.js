@@ -115,3 +115,46 @@ window.addEventListener('load', function () {
         imageMapResize();
     }
 });
+document.addEventListener('DOMContentLoaded', function () {
+  const ctx = document.getElementById('camembert').getContext('2d');
+
+  const camembertChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ['Forêt', 'Zones humides', 'Prairies'],
+      datasets: [{
+        label: 'Répartition des zones naturelles',
+        data: [0.2, 0.5, 0.3],
+        backgroundColor: ['#48d962', '#73dea5', '#21cca4'],
+        borderColor: '#fff',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      layout: {
+        padding: {
+          top: 0,
+          bottom: 0
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            color: '#ffffff',
+            font: {
+              family: 'Georgia'
+            }
+          }
+        },
+        title: {
+          display: false
+        }
+      }
+    }
+  });
+});
+
+
+
