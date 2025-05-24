@@ -1,10 +1,23 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // ==========================================================================
+    // ======================= SELECTEURS DOM COMMUNS ===========================
+    // ==========================================================================
     const departementAreas = document.querySelectorAll('area.departement-area');
     const overlayImage = document.querySelector('.overlay-image');
     const overlayText = document.querySelector('.overlay-text');
-    const infoBox = document.getElementById('info-box');
 
-    // Survol des images
+    const canvasElement = document.getElementById('camembert');
+    const departementChartContainer = document.getElementById('departement-chart-container');
+    const miniDepartementChartCanvas = document.getElementById('mini-departement-chart');
+    const closeMiniChartButton = document.getElementById('close-mini-chart');
+
+    let camembertChart;
+    let miniChartInstance;
+    let currentActiveChartKey = 'default'; // Clé par défaut
+
+    // ==========================================================================
+    // ======================= SURVOL DES DEPARTEMENTS (OVERLAYS) ===============
+    // ==========================================================================
     if (overlayImage && overlayText) {
         departementAreas.forEach(area => {
             const departementName = area.alt.toLowerCase();
@@ -27,236 +40,57 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("Erreur : Élément .overlay-image ou .overlay-text non trouvé.");
     }
 
-    // Description des dep
-    fetch('ressources/departements.txt')
-        .then(response => response.text())
-        .then(data => {
-            // Convertions données -> clé-valeur
-            const departementInfos = parseDepartementInfos(data);
-
-            departementAreas.forEach(area => {
-                area.addEventListener('click', function(event) {
-                    // Empêche le comportement par défaut de l'élément <area>
-                    event.preventDefault();
-
-                    const departementKey = this.alt.toLowerCase();
-                    const x = event.pageX;
-                    const y = event.pageY;
-
-                    // Maj contenu avec le bon département
-                    infoBox.innerHTML = `<strong>${departementKey.replace(/_/g, ' ').toUpperCase()}</strong><br>${departementInfos[departementKey] || "Pas d'information disponible"}`;
-
-                    // Position du cadre
-                    infoBox.style.left = `${x + 15}px`;
-                    infoBox.style.top = `${y}px`;
-                    infoBox.style.display = 'block';
-                });
-            });
-
-            // Cache cadre qd on clique ailleurs
-            document.addEventListener('click', function(event) {
-                if (!event.target.closest('area.departement-area')) {
-                    infoBox.style.display = 'none';
-                }
-            });
-
-        })
-        .catch(error => console.error('Erreur lors du chargement du fichier :', error));
-
-    // Fonction de conversion clé -> valeur
-    function parseDepartementInfos(data) {
-        const infos = {};
-        const lines = data.split('\n');
-
-        lines.forEach(line => {
-            const [key, value] = line.split('=');
-            if (key && value) {
-                infos[key.trim()] = value.trim();
-            }
-        });
-
-        return infos;
-    }
-});
-
-function resizeMapAreas() {
-    const image = document.querySelector('.BFCcarte');
-    const areas = document.querySelectorAll('area.departement-area');
-
-    if (!image.complete) {
-        image.addEventListener('load', resizeMapAreas);
-        return;
-    }
-
-    const originalWidth = image.naturalWidth;
-    const currentWidth = image.offsetWidth;
-    const scale = currentWidth / originalWidth;
-
-    areas.forEach(area => {
-        const originalCoords = area.dataset.originalCoords;
-        if (!originalCoords) return;
-
-        const scaledCoords = originalCoords
-            .split(',')
-            .map(coord => Math.round(Number(coord) * scale))
-            .join(',');
-
-        area.coords = scaledCoords;
-    });
-}
-
-// Initial call on load
-window.addEventListener('load', resizeMapAreas);
-// Recalculate on resize
-window.addEventListener('resize', resizeMapAreas);
-
-window.addEventListener('load', function () {
-    if (typeof imageMapResize === 'function') {
-        imageMapResize();
-    }
-});
-
-
-
-document.addEventListener('DOMContentLoaded', function() {
     // ==========================================================================
-    // ============== PARTIE EXISTANTE : CARTE, OVERLAYS, INFOBOX ===============
+    // ======================= PARTIE CHART.JS PRINCIPAL (CAMEMBERT) ============
     // ==========================================================================
-    const departementAreas = document.querySelectorAll('area.departement-area');
-    const overlayImage = document.querySelector('.overlay-image');
-    const overlayText = document.querySelector('.overlay-text');
-    const infoBox = document.getElementById('info-box');
-
-    // Survol des images
-    if (overlayImage && overlayText) {
-        departementAreas.forEach(area => {
-            const departementName = area.alt.toLowerCase();
-            const overlayImageURL = `ressources/dep/${departementName}.png`;
-            const overlayTextURL = `ressources/dep/${departementName}_text.png`;
-
-            area.addEventListener('mouseenter', function() {
-                overlayImage.src = overlayImageURL;
-                overlayText.src = overlayTextURL;
-                overlayImage.style.opacity = 1;
-                overlayText.style.opacity = 1;
-            });
-
-            area.addEventListener('mouseleave', function() {
-                overlayImage.style.opacity = 0;
-                overlayText.style.opacity = 0;
-                // Optionnel: réinitialiser src pour éviter de garder l'image chargée en mémoire
-                // overlayImage.src = "";
-                // overlayText.src = "";
-            });
-        });
-    } else {
-        console.error("Erreur : Élément .overlay-image ou .overlay-text non trouvé.");
+    if (!canvasElement) {
+        console.error("L'élément Canvas avec l'ID 'camembert' n'a pas été trouvé. Le graphique principal ne sera pas initialisé.");
     }
 
-    // Description des dep
-    fetch('ressources/departements.txt')
-        .then(response => response.text())
-        .then(data => {
-            const departementInfos = parseDepartementInfos(data);
-
-            departementAreas.forEach(area => {
-                area.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    const departementKey = this.alt.toLowerCase();
-                    const x = event.pageX;
-                    const y = event.pageY;
-                    infoBox.innerHTML = `<strong>${departementKey.replace(/_/g, ' ').toUpperCase()}</strong><br>${departementInfos[departementKey] || "Pas d'information disponible"}`;
-                    infoBox.style.left = `${x + 15}px`;
-                    infoBox.style.top = `${y}px`;
-                    infoBox.style.display = 'block';
-                });
-            });
-
-            // Cache cadre qd on clique ailleurs que sur une area ou l'infobox elle-même
-            document.addEventListener('click', function(event) {
-                if (!event.target.closest('area.departement-area') && !event.target.closest('#info-box')) {
-                    if (infoBox) infoBox.style.display = 'none';
-                }
-            });
-        })
-        .catch(error => console.error('Erreur lors du chargement du fichier departements.txt:', error));
-
-    // Fonction de conversion clé -> valeur pour departements.txt
-    function parseDepartementInfos(data) {
-        const infos = {};
-        const lines = data.split('\n');
-        lines.forEach(line => {
-            const [key, value] = line.split('=');
-            if (key && value) {
-                infos[key.trim()] = value.trim();
-            }
-        });
-        return infos;
-    }
-
-    // ==========================================================================
-    // ======================= PARTIE AJOUTÉE : CHART.JS ========================
-    // ==========================================================================
-
-    const ctx = document.getElementById('camembert').getContext('2d');
-    let camembertChart; // Déclarer ici pour qu'elle soit accessible dans les fonctions
-
-    // Données initiales et pour chaque type de graphique
-    // REMPLISSEZ CECI AVEC VOS VRAIES DONNÉES !
     const chartDataSets = {
-        default: {
-            labels: ['Forêt', 'Zones humides', 'Prairies'],
-            data: [40, 30, 30], // Exemple de données
-            backgroundColor: ['#48d962', '#73dea5', '#21cca4'],
-            title: 'Répartition des zones naturelles (Défaut)'
-        },
-        especesParRegne: {
-            labels: ['Animalia', 'Plantae', 'Fungi', 'Bacteria', 'Chromista'],
-            data: [1200, 850, 300, 500, 150],
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
-            title: "Nombre d'espèces par règne"
-        },
-        especesDansChaqueRegne: {
-            labels: ['Mammifères (Animalia)', 'Oiseaux (Animalia)', 'Angiospermes (Plantae)', 'Champignons (Fungi)'],
-            data: [150, 350, 700, 300],
-            backgroundColor: ['#FF9F40', '#FFCD56', '#4BC0C0', '#36A2EB'],
-            title: "Nombre d'espèces spécifiques"
-        },
-        statutsConservation: {
-            labels: ['Préoccupation mineure', 'Quasi menacée', 'Vulnérable', 'En danger', 'En danger critique'],
-            data: [500, 120, 80, 40, 15],
-            backgroundColor: ['#A1E8A1', '#F9E79F', '#F5CBA7', '#F1948A', '#EC7063'],
-            title: "Statuts de conservation"
-        },
-        groupesTaxoParRegne: {
-            labels: ['Classes (Animalia)', 'Ordres (Plantae)', 'Familles (Fungi)'],
-            data: [30, 50, 120],
-            backgroundColor: ['#85C1E9', '#7DCEA0', '#F8C471'],
-            title: "Nombre de groupes taxonomiques par règne"
-        },
-        especesParStatutConservation: {
-            labels: ['LC', 'NT', 'VU', 'EN', 'CR', 'DD'],
-            data: [60, 25, 15, 10, 5, 20],
-            backgroundColor: ['#76D7C4', '#F7DC6F', '#F0B27A', '#E74C3C', '#C0392B', '#BFC9CA'],
-            title: "Nombre d'espèces par statut de conservation"
+        default: { labels: ['Animalia', 'Plantae', 'Fungi', 'Bacteria', 'Chromista'], data: [1200, 850, 300, 500, 150], backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'], legendLabel: "Nombre d'espèces par règne" }, // Note: 'title' a été renommé 'legendLabel'
+        especesParRegne: { labels: ['Animalia', 'Plantae', 'Fungi', 'Bacteria', 'Chromista'], data: [1200, 850, 300, 500, 150], backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'], legendLabel: "Nombre d'espèces par règne" },
+        especesDansChaqueRegne: { labels: ['Mammifères', 'Oiseaux', 'Angiospermes', 'Champignons Ascomycètes'], data: [150, 350, 700, 250], backgroundColor: ['#FF9F40', '#FFCD56', '#4BC0C0', '#36A2EB', '#C9CBCF'], legendLabel: "Exemples d'espèces par groupes" },
+        statutsConservation: { labels: ['Préoccupation mineure (LC)', 'Quasi menacée (NT)', 'Vulnérable (VU)', 'En danger (EN)', 'En danger critique (CR)'], data: [500, 120, 80, 40, 15], backgroundColor: ['#A1E8A1', '#F9E79F', '#F5CBA7', '#F1948A', '#EC7063'], legendLabel: "Statuts de conservation (Tous règnes)" },
+        groupesTaxoParRegne: { labels: ['Classes (Animalia)', 'Divisions (Plantae)', 'Phyla (Fungi)'], data: [30, 15, 25], backgroundColor: ['#85C1E9', '#7DCEA0', '#F8C471'], legendLabel: "Diversité des groupes taxonomiques" },
+        especesParStatutConservation: { labels: ['LC', 'NT', 'VU', 'EN', 'CR', 'DD', 'NE'], data: [600, 250, 150, 100, 50, 200, 30], backgroundColor: ['#76D7C4', '#F7DC6F', '#F0B27A', '#E74C3C', '#C0392B', '#BFC9CA', '#AAB7B8'], legendLabel: "Nombre d'espèces par statut UICN" }
+    };
+
+    // Options communes pour le graphique principal avec un titre FIXE
+    const chartOptionsConfig = {
+        responsive: true, maintainAspectRatio: true, layout: { padding: { top: 10, right: 10, bottom: 10, left: 10 } },
+        plugins: {
+            legend: { position: 'right', align: 'center', labels: { color: '#ffffff', font: { family: 'Georgia', size: 10 }, boxWidth: 15, padding: 10 } },
+            title: {
+                display: true,
+                text: "Statistiques en BFC :", // VOTRE TITRE FIXE ICI
+                color: '#ffffff',
+                font: { size: 16, family: 'Georgia', weight: 'bold' }, // Taille de police un peu augmentée
+                padding: { top: 0, bottom: 15 } // Un peu plus de padding en bas
+            },
+            tooltip: { callbacks: { label: function(context) { let label = context.label || ''; if (label) label += ': '; if (context.parsed !== null) label += context.raw.toLocaleString(); return label; } } }
         }
     };
 
     function updateChart(dataSetKey) {
+        if (!canvasElement) return;
         const newDataSet = chartDataSets[dataSetKey];
         if (!newDataSet) {
-            console.error("Jeu de données non trouvé pour :", dataSetKey);
+            console.error("Jeu de données pour le graphique principal non trouvé :", dataSetKey);
             return;
         }
+        currentActiveChartKey = dataSetKey;
 
+        // Les options du graphique (y compris le titre) sont maintenant fixes et définies dans chartOptionsConfig
+        // Nous n'avons plus besoin de cloner et de modifier currentChartOptions.plugins.title.text ici.
+
+        const ctx = canvasElement.getContext('2d');
         if (camembertChart) {
             camembertChart.data.labels = newDataSet.labels;
             camembertChart.data.datasets[0].data = newDataSet.data;
             camembertChart.data.datasets[0].backgroundColor = newDataSet.backgroundColor;
-            camembertChart.data.datasets[0].label = newDataSet.title;
-            if (camembertChart.options.plugins.title) { // Vérifier si le plugin title est configuré
-                 camembertChart.options.plugins.title.text = newDataSet.title;
-            }
+            camembertChart.data.datasets[0].label = newDataSet.legendLabel; // Utilise legendLabel pour le dataset
+            // camembertChart.options = chartOptionsConfig; // Pas besoin de réassigner si elles ne changent pas
             camembertChart.update();
         } else {
             camembertChart = new Chart(ctx, {
@@ -264,102 +98,262 @@ document.addEventListener('DOMContentLoaded', function() {
                 data: {
                     labels: newDataSet.labels,
                     datasets: [{
-                        label: newDataSet.title,
+                        label: newDataSet.legendLabel, // Utilise legendLabel pour le dataset
                         data: newDataSet.data,
                         backgroundColor: newDataSet.backgroundColor,
                         borderColor: '#fff',
                         borderWidth: 1
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true, // Garder true pour que le camembert reste rond, Chart.js gère l'espace avec la légende
-                    // aspectRatio: 1, // Généralement pas nécessaire si maintainAspectRatio est true pour 'pie'
-                    layout: {
-                        padding: { // Ajustez ces valeurs pour contrôler l'espacement global
-                            top: 10,
-                            right: 10, // L'espace pour la légende à droite sera géré par Chart.js
-                            bottom: 10,
-                            left: 10
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'right', // 'top', 'bottom', 'left', 'right'
-                            align: 'center', // 'start', 'center', 'end' pour la position verticale/horizontale
-                            labels: {
-                                color: '#ffffff',
-                                font: {
-                                    family: 'Georgia',
-                                    size: 10
-                                },
-                                boxWidth: 15, // Taille des carrés de couleur
-                                padding: 10 // Espace entre les items de la légende
-                            }
-                        },
-                        title: {
-                            display: true,
-                            text: newDataSet.title,
-                            color: '#ffffff',
-                            font: {
-                                size: 14, // Taille du titre un peu réduite
-                                family: 'Georgia'
-                            },
-                            padding: {
-                                top: 0,
-                                bottom: 10 // Espace sous le titre
-                            }
-                        },
-                        tooltip: {
-                             callbacks: {
-                                label: function(context) {
-                                    let label = context.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed !== null) {
-                                        label += context.raw;
-                                    }
-                                    return label;
-                                }
-                            }
-                        }
-                    }
-                }
+                options: chartOptionsConfig // Utilise les options fixes
             });
         }
     }
 
-    // Initialiser le graphique avec les données par défaut
-    updateChart('default');
-
     const chartButtons = document.querySelectorAll('.button_right1');
-    chartButtons.forEach(button => {
-        // Utiliser un data-attribute sur les boutons HTML est plus robuste
-        // Exemple: <a href="#" class="button_base button_right1" data-chartkey="especesParRegne">...</a>
-        const chartKey = button.dataset.chartkey; // Lire depuis data-chartkey
 
-        if (chartKey) { // Si l'attribut data-chartkey existe
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-                updateChart(chartKey);
-            });
+    function setActiveButton(clickedButton) {
+        chartButtons.forEach(button => button.classList.remove('button_active'));
+        if (clickedButton) {
+            clickedButton.classList.add('button_active');
+        }
+    }
+
+    // Initialisation du graphique principal et activation du bouton par défaut
+    if (canvasElement) {
+        // S'assurer que la clé 'default' existe ou prendre la première
+        if (!chartDataSets[currentActiveChartKey] && Object.keys(chartDataSets).length > 0) {
+            currentActiveChartKey = Object.keys(chartDataSets)[0]; // Fallback sur la première clé disponible
+            console.warn(`Clé 'default' non trouvée pour chartDataSets. Initialisation avec '${currentActiveChartKey}'.`);
+        }
+
+        if (chartDataSets[currentActiveChartKey]) {
+            updateChart(currentActiveChartKey); // Charge le graphique avec la clé initiale
+
+            // Activer le bouton correspondant à la clé initiale (par data-chartkey ou le premier)
+            let initialActiveButton = Array.from(chartButtons).find(btn => btn.dataset.chartkey === currentActiveChartKey);
+
+            if (!initialActiveButton && chartButtons.length > 0) {
+                // Si aucun bouton n'a le data-chartkey "default" (ou la clé initiale), on prend le premier bouton de la liste
+                initialActiveButton = chartButtons[0];
+                // On s'assure que ce premier bouton a un data-chartkey valide et met à jour le graphique en conséquence
+                if (initialActiveButton.dataset.chartkey && chartDataSets[initialActiveButton.dataset.chartkey]) {
+                    currentActiveChartKey = initialActiveButton.dataset.chartkey;
+                    updateChart(currentActiveChartKey);
+                } else {
+                    console.warn("Le premier bouton n'a pas de data-chartkey valide. Le graphique pourrait ne pas correspondre au premier bouton.")
+                }
+            }
+
+            if (initialActiveButton) {
+                setActiveButton(initialActiveButton);
+            } else if (chartButtons.length > 0) {
+                // Si toujours pas de bouton actif (très peu probable si on prend le premier), on prend le premier de la liste
+                // et on essaie d'afficher le graphique 'default'
+                setActiveButton(chartButtons[0]);
+                currentActiveChartKey = chartButtons[0].dataset.chartkey || 'default';
+                updateChart(currentActiveChartKey);
+
+            } else {
+                console.warn("Aucun bouton '.button_right1' trouvé pour l'activation initiale.");
+            }
+
         } else {
-            // Fallback si data-chartkey n'est pas utilisé (moins recommandé)
-             button.addEventListener('click', function(event) {
-                event.preventDefault();
-                const buttonText = this.textContent.trim();
-                let dataSetKeyToUse = 'default';
+            console.error("Aucune donnée disponible dans chartDataSets pour initialiser le graphique principal.");
+        }
+    }
 
-                if (buttonText.includes("espèces par règne")) dataSetKeyToUse = 'especesParRegne';
-                else if (buttonText.includes("espèces dans chaque règne")) dataSetKeyToUse = 'especesDansChaqueRegne';
-                else if (buttonText.includes("Statuts de conservation")) dataSetKeyToUse = 'statutsConservation'; // Simplifié
-                else if (buttonText.includes("groupes taxonomiques par règne")) dataSetKeyToUse = 'groupesTaxoParRegne';
-                else if (buttonText.includes("espèces par statut de conservation")) dataSetKeyToUse = 'especesParStatutConservation';
 
-                updateChart(dataSetKeyToUse);
-            });
+    chartButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            const chartKey = this.dataset.chartkey;
+            if (chartKey && chartDataSets[chartKey]) {
+                updateChart(chartKey);
+                setActiveButton(this);
+            } else {
+                console.warn(`Clé de graphique "${chartKey}" non valide ou jeu de données manquant pour le bouton : "${this.textContent.trim()}".`);
+            }
+        });
+    });
+
+    // ==========================================================================
+    // ================= MINI-GRAPHIQUES DÉPARTEMENTAUX (POPUP) =================
+    // ==========================================================================
+
+    function getRandomColor() {
+        const r = Math.floor(Math.random() * 200 + 55);
+        const g = Math.floor(Math.random() * 200 + 55);
+        const b = Math.floor(Math.random() * 200 + 55);
+        return `rgb(${r},${g},${b})`;
+    }
+
+    function generateRandomPieData(numSegments = 3) {
+        const labels = [];
+        const data = [];
+        const backgroundColor = [];
+        for (let i = 0; i < numSegments; i++) {
+            labels.push(`Segment ${String.fromCharCode(65 + i)}`);
+            data.push(Math.floor(Math.random() * 100) + 10);
+            backgroundColor.push(getRandomColor());
+        }
+        return { labels, data, backgroundColor };
+    }
+
+    const departementalChartData = {};
+    const departementAltNames = Array.from(departementAreas).map(area => area.alt.toLowerCase());
+    const chartKeysForDepartments = Object.keys(chartDataSets);
+
+    departementAltNames.forEach(deptAltName => {
+        departementalChartData[deptAltName] = {};
+        const deptDisplayName = deptAltName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+        chartKeysForDepartments.forEach(chartKey => {
+            let numSegments;
+            if (chartKey === 'especesParRegne' || chartKey === 'default' || chartKey === 'especesParStatutConservation') {
+                numSegments = Math.floor(Math.random() * 3) + 3;
+            } else if (chartKey === 'statutsConservation') {
+                numSegments = 5;
+            } else {
+                numSegments = Math.floor(Math.random() * 2) + 2;
+            }
+
+            const randomData = generateRandomPieData(numSegments);
+            departementalChartData[deptAltName][chartKey] = {
+                labels: randomData.labels,
+                data: randomData.data,
+                backgroundColor: randomData.backgroundColor,
+                titleSuffix: `pour ${deptDisplayName}`
+            };
+        });
+    });
+    // console.log("Données départementales générées:", departementalChartData);
+
+    departementAreas.forEach(area => {
+        area.addEventListener('click', function(event) {
+            event.preventDefault();
+            const departementKey = this.alt.toLowerCase();
+
+            if (!departementChartContainer || !miniDepartementChartCanvas) {
+                console.error("Conteneur (#departement-chart-container) ou canvas (#mini-departement-chart) pour le mini-graphique non trouvé.");
+                return;
+            }
+
+            const deptDataSetsForCurrentType = departementalChartData[departementKey];
+            const specificDeptData = deptDataSetsForCurrentType ? deptDataSetsForCurrentType[currentActiveChartKey] : null;
+
+            // Récupérer le legendLabel du graphique principal pour l'utiliser dans le mini-graphique
+            const mainChartInfo = chartDataSets[currentActiveChartKey];
+            const mainChartLegendLabelBase = mainChartInfo ? (mainChartInfo.legendLabel || "Données") : "Données";
+
+
+            if (specificDeptData) {
+                if (miniChartInstance) {
+                    miniChartInstance.destroy();
+                }
+
+                // Le titre du mini-graphique sera basé sur le legendLabel du graphique principal + le suffixe du département
+                const miniChartTitle = `${mainChartLegendLabelBase.replace(/\s*\(Tous règnes\)\s*$/i, '').replace(/\s*par règne\s*$/i, '')} ${specificDeptData.titleSuffix || ''}`;
+
+                const miniCtx = miniDepartementChartCanvas.getContext('2d');
+                miniChartInstance = new Chart(miniCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: specificDeptData.labels,
+                        datasets: [{
+                            label: mainChartLegendLabelBase, // Le label du dataset peut être le legendLabel du graphique principal
+                            data: specificDeptData.data,
+                            backgroundColor: specificDeptData.backgroundColor,
+                            borderColor: '#FFFFFF',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: specificDeptData.labels.length > 1 && specificDeptData.labels.length < 8,
+                                position: 'bottom',
+                                labels: { font: { size: 10, family: 'Georgia' }, boxWidth: 12, padding: 8, color: '#FFFFFF' }
+                            },
+                            title: { // Le titre affiché DANS le mini-graphique
+                                display: true,
+                                text: miniChartTitle,
+                                font: { size: 12, family: 'Georgia', weight: 'bold' },
+                                color: '#0a7353',
+                                padding: { top: 8, bottom: 8 }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        // Pour le tooltip, on veut le label du segment + sa valeur
+                                        let tooltipLabel = context.label || ''; // Nom du segment (ex: 'Segment A')
+                                        if (tooltipLabel) {
+                                            tooltipLabel += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            tooltipLabel += context.formattedValue; // Valeur du segment
+                                        }
+                                        return tooltipLabel;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                const popupWidth = departementChartContainer.offsetWidth || 320;
+                const popupHeight = departementChartContainer.offsetHeight || 300;
+
+                let x = event.pageX + 15;
+                let y = event.pageY + 15;
+
+                if (x + popupWidth > window.innerWidth) x = window.innerWidth - popupWidth - 10;
+                if (y + popupHeight > window.innerHeight) y = window.innerHeight - popupHeight - 10;
+                if (x < 0) x = 10;
+                if (y < 0) y = 10;
+
+                departementChartContainer.style.left = `${x}px`;
+                departementChartContainer.style.top = `${y}px`;
+                departementChartContainer.style.display = 'block';
+
+            } else {
+                console.warn(`Pas de données de graphique disponibles pour le département "${departementKey}" et le type de graphique "${currentActiveChartKey}".`);
+                departementChartContainer.style.display = 'none';
+            }
+        });
+    });
+
+    if (closeMiniChartButton && departementChartContainer) {
+        closeMiniChartButton.addEventListener('click', function() {
+            departementChartContainer.style.display = 'none';
+            if (miniChartInstance) {
+                miniChartInstance.destroy();
+                miniChartInstance = null;
+            }
+        });
+    }
+
+    document.addEventListener('click', function(event) {
+        if (departementChartContainer && departementChartContainer.style.display === 'block' &&
+            !event.target.closest('area.departement-area') &&
+            !event.target.closest('#departement-chart-container')) {
+
+            departementChartContainer.style.display = 'none';
+            if (miniChartInstance) {
+                miniChartInstance.destroy();
+                miniChartInstance = null;
+            }
         }
     });
 
 }); // FIN DE DOMContentLoaded
+
+window.addEventListener('load', function () {
+    if (typeof imageMapResize === 'function') {
+        imageMapResize();
+    } else {
+        console.warn("La fonction imageMapResize n'a pas été trouvée.");
+    }
+});

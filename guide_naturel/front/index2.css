@@ -213,7 +213,7 @@ body, html {
   padding-left: 15px; /* MODIFIÉ : Peut-être un peu plus petit */
 }
 
-.button_right1:hover, .button_right1:focus {
+.button_right1:hover, .button_right1:focus, .button_right1.button_active {
   border-color: #19b09e;
   background-color: #19b09e;
 }
@@ -268,19 +268,6 @@ body, html {
     }
 }
 
-/* INFO-BOX */
-#info-box {
-    position: absolute;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
-    z-index: 1100;
-    display: none;
-    max-width: 280px; /* MODIFIÉ : Peut-être un peu plus petit si tout le reste est plus petit */
-    font-size: 0.9rem;
-    line-height: 1.4;
-}
 
 /* FOOTER */
 .footer {
@@ -357,4 +344,34 @@ body, html {
     max-width: 280px;
     padding: 10px 15px;
   }
+}
+
+
+/**********************************/
+
+/****** MINI CAMEMBERTS BOUTON FERMER *********/
+/* index2.css */
+
+#close-mini-chart {
+    display: block;
+    margin: 1px auto 1px auto; /* Un peu plus de marge en haut, moins en bas */
+    padding: 3px 5px;
+    font-family: "Georgia", serif; /* Pour correspondre au reste */
+    font-size: 0.8rem;
+    color: white;
+    background-color: #e86f3f; /* Rouge pour "fermer" ou "annuler" */
+    border: 1px solid #ff7c2b; /* Bordure un peu plus foncée */
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+}
+
+#close-mini-chart:hover,
+#close-mini-chart:focus {
+    background-color: #c94b3c; /* Rouge plus foncé au survol */
+    border-color: #c94b3c;
+    box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.3);
 }
