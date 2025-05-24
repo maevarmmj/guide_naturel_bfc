@@ -19,7 +19,7 @@ body, html {
   justify-content: space-between;
   align-items: center;
   background-color: rgba(79, 205, 247, 0.5);
-  padding: 10px 20px;
+  padding: 5px 20px;
   flex-wrap: wrap;
   border-radius: 15px;
 }
@@ -92,8 +92,11 @@ body, html {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
-  width: 100%;
+  padding-top: 2rem;
+  padding-right: 2rem;
+  padding-bottom: 1rem; /* MODIFIÉ : Réduit le padding en bas */
+  padding-left: 2rem;
+    width: 100%;
 }
 
 .text-container {
@@ -133,7 +136,7 @@ body, html {
 }
 
 .Carte {
-  flex: 0 1 50%; /* MODIFIÉ : Ajuste la part de la carte. Ex: 50% pour la rendre un peu plus petite proportionnellement */
+  flex: 0 1 55%; /* MODIFIÉ : Ajuste la part de la carte. Ex: 50% pour la rendre un peu plus petite proportionnellement */
   /* max-width: 450px; */ /* AJOUTÉ (Optionnel) : Si vous voulez une limite stricte pour la carte */
 }
 
@@ -165,8 +168,8 @@ body, html {
 .contenu-droite {
   flex: 1; /* Prend l'espace restant, sera donc plus petit si .Carte prend 50% d'un .content-below plus petit */
   /* Ou spécifier une base plus petite : flex: 0 1 45%; */
-  min-width: 250px; /* MODIFIÉ : Peut-être réduire légèrement si nécessaire, mais attention à la lisibilité */
-  max-width: 350px; /* AJOUTÉ : Limite la largeur maximale du conteneur du camembert */
+  min-width: 300px; /* MODIFIÉ : Peut-être réduire légèrement si nécessaire, mais attention à la lisibilité */
+  max-width: 359px; /* AJOUTÉ : Limite la largeur maximale du conteneur du camembert */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -176,7 +179,7 @@ body, html {
 
 #camembert {
   max-width: 100%; /* Le canvas prendra 100% de .contenu-droite (qui est maintenant limité à 350px max) */
-  height: auto !important;
+  height: auto;
   margin-bottom: 1rem;
 }
 
@@ -189,7 +192,6 @@ body, html {
   flex-direction: column;
   gap: 0.5rem;
   z-index: 1000;
-  background-color: rgba(255, 255, 255, 0.1);
   padding: 0.5rem 0 0.5rem 0.5rem;
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
@@ -283,12 +285,12 @@ body, html {
 /* FOOTER */
 .footer {
     background-color: rgba(63, 191, 110, 0.6);
-    padding: 20px 0;
+    padding: 0;
     font-family: "Georgia", serif;
     text-align: center;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
-    margin-top: 2rem;
+    margin-top: 0;
     width: 100%;
 }
 
@@ -299,7 +301,7 @@ body, html {
     flex-wrap: wrap;
     max-width: 1200px; /* Le footer peut rester large */
     margin: 0 auto;
-    padding: 0 1px;
+    padding: 0 20px;
     gap: 20px;
 }
 
@@ -311,7 +313,7 @@ body, html {
 }
 
 .footer-item img {
-    width: 70px;
+    width: 50px;
     height: auto;
     margin-bottom: 10px;
 }
@@ -319,7 +321,7 @@ body, html {
 .footer-item p {
     font-size: 1rem;
     color: white;
-    margin: 5px 0;
+    margin: 0px 0;
     text-shadow: 1px 1px 2px #1a783d;
 }
 
@@ -327,7 +329,7 @@ body, html {
   border: 2px solid rgba(63, 191, 110, 0.5);
   background-color: white;
   color: #178f2f;
-  font-size: 14px;
+  font-size: 12px;
   box-shadow: 1px 2px #1a783d;
   padding: 8px 25px;
 }
