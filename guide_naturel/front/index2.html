@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ajouté pour la responsivité -->
+  <title>Le Guide Naturel de la BFC</title>
+  <link href="index2.css" rel="stylesheet">
+</head>
+
+<body class="index">
+
+<header class="header">
+  <img src="ressources/eseo_logo.png" class="header_logo" alt="Logo ESEO - Le Guide Naturel BFC">
+  <nav class="header_center"> <!-- Utilisation de <nav> pour un groupe de liens de navigation -->
+    <a href="recherche.html" class="button_base header_button">EXPLORE AVEC ANNA !</a>
+    <a href="statistiques.html" class="button_base header_button">STATISTIQUES</a>
+    <a href="apropos.html" class="button_base header_button">A PROPOS DE NOUS !</a>
+  </nav>
+</header>
+
+<main class="container"> <!-- <main> pour le contenu principal de la page -->
+
+  <div class="text-container">
+      <!-- Utilisation de balises de titre sémantiques -->
+      <h2 class="bfc_subtitle">B O U R G O G N E - F R A N C H E - C O M T É</h2>
+      <h1 class="bfc_title">LE GUIDE NATUREL</h1>
+  </div>
+
+  <div class="content-below">
+    <section class="Carte"> <!-- <section> pour une section thématique -->
+      <div class="image-container">
+        <img src="ressources/carte_bfc.png" alt="Carte de la région Bourgogne-Franche-Comté avec ses départements cliquables" usemap="#departements_bfc">
+        <!-- Ces images sont prévues pour être mises à jour par JavaScript au survol des départements -->
+        <img src="" alt="" class="overlay-image">
+        <img src="" alt="" class="overlay-text">
+      </div>
+      <map name="departements_bfc">
+        <!-- href="#" est un placeholder. S'ils ne naviguent pas, JS devrait gérer event.preventDefault() -->
+        <area
+            shape="poly"
+            coords="422,374,456,271,471,227,449,187,394,200,298,60,213,69,196,127,226,181,202,243,174,258,197,304"
+            data-original-coords = "422,374,456,271,471,227,449,187,394,200,298,60,213,69,196,127,226,181,202,243,174,258,197,304"
+            href="#"
+            alt="Yonne" class="departement-area yonne">
+        <area
+            shape="poly"
+            coords="190,307,310,327,422,379,439,430,421,536,362,554,295,580,204,543,205,440,180,366"
+            data-original-coords = "190,307,310,327,422,379,439,430,421,536,362,554,295,580,204,543,205,440,180,366"
+            href="#"
+            alt="Nievre" class="departement-area nievre">
+        <area
+            shape="poly"
+            coords="426,342,456,278,479,200,549,157,640,281,711,306,714,374,697,437,653,482,545,502,520,475,470,447,436,408"
+            data-original-coords = "426,342,456,278,479,200,549,157,640,281,711,306,714,374,697,437,653,482,545,502,520,475,470,447,436,408"
+            href="#"
+            alt="Cote_dor"
+            class="departement-area cote_dor">
+        <area
+            shape="poly"
+            coords="325,557,352,618,389,643,382,721,470,732,514,697,564,729,616,628,668,648,704,613,692,519,660,487,546,500,495,465,465,441,421,438,419,539"
+            data-original-coords = "325,557,352,618,389,643,382,721,470,732,514,697,564,729,616,628,668,648,704,613,692,519,660,487,546,500,495,465,465,441,421,438,419,539"
+            href="#"
+            alt="Saone_et_Loire" class="departement-area saone_et_loire">
+        <area
+            shape="poly"
+            coords="719,393,786,383,831,368,870,334,919,325,954,310,968,309,961,283,958,251,971,233,953,213,926,193,880,191,847,193,830,172,793,193,744,240,741,272,712,272,677,287,700,299,692,334"
+            data-original-coords = "719,393,786,383,831,368,870,334,919,325,954,310,968,309,961,283,958,251,971,233,953,213,926,193,880,191,847,193,830,172,793,193,744,240,741,272,712,272,677,287,700,299,692,334"
+            href="#"
+            alt="Haute_Saone" class="departement-area haute_saone">
+        <area
+            shape="poly"
+            coords="769,468,808,502,852,541,826,583,835,601,885,563,900,536,905,490,953,457,1000,396,1020,362,995,330,976,309,899,320,818,374,752,394"
+            data-original-coords = "769,468,808,502,852,541,826,583,835,601,885,563,900,536,905,490,953,457,1000,396,1020,362,995,330,976,309,899,320,818,374,752,394"
+            href="#"
+            alt="Doubs" class="departement-area doubs">
+        <area
+            shape="poly"
+            coords="672,643,705,699,734,677,764,694,791,699,826,652,838,603,831,563,850,539,803,489,759,462,771,430,747,396,710,384,663,457,673,507,698,521,678,531,695,600"
+            data-original-coords = "672,643,705,699,734,677,764,694,791,699,826,652,838,603,831,563,850,539,803,489,759,462,771,430,747,396,710,384,663,457,673,507,698,521,678,531,695,600"
+            href="#"
+            alt="Jura" class="departement-area jura">
+        <area
+            shape="poly"
+            coords="1000,341,1028,325,1033,309,1017,285,1022,253,1005,231,974,230,961,248,961,287,968,307,991,314"
+            data-original-coords = "1000,341,1028,325,1033,309,1017,285,1022,253,1005,231,974,230,961,248,961,287,968,307,991,314"
+            href="#"
+            alt="Territoire_de_Belfort" class="departement-area territoire_de_belfort">
+      </map>
+    </section>
+
+    <aside class="contenu-droite"> <!-- <aside> pour contenu tangentiel, comme une barre latérale -->
+      <canvas id="camembert"></canvas>
+      <div class="buttons_right">
+        <!-- Remplacé <button> par <a> pour la navigation -->
+        <a href="" class="button_base button_right1">Nombre d'espèces par règne</a>
+        <a href="" class="button_base button_right1">Nombre d'espèces dans chaque règne</a>
+        <a href="" class="button_base button_right1">Statuts de conservation par règne</a>
+        <a href="" class="button_base button_right1">Nombre de groupes taxonomiques par règne</a>
+        <a href="" class="button_base button_right1">Nombre d'espèces par statut de conservation</a>
+      </div>
+    </aside>
+  </div> <!-- Fin de .content-below -->
+  <!-- La div fermante en trop a été supprimée ici -->
+</main> <!-- Fin de .container / <main> -->
+
+<div id="info-box"></div> <!-- L'infobox peut rester en dehors de main si elle est positionnée de manière absolue/fixe par rapport au viewport -->
+
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-item">
+            <img src="ressources/footer/recherche.png" alt="Icône loupe pour recherche">
+            <p>Recherche ce que tu veux</p>
+            <p>avec Anna !</p>
+            <a href="recherche.html" class="button_base footer_button">EXPLORE AVEC ANNA !</a>
+        </div>
+        <div class="footer-item">
+            <img src="ressources/footer/stats.png" alt="Icône graphique pour statistiques">
+            <p>Veux-tu des statistiques</p>
+            <p>précises sur la région ?</p>
+            <a href="statistiques.html" class="button_base footer_button">STATISTIQUES</a>
+        </div>
+        <div class="footer-item">
+            <img src="ressources/footer/team.png" alt="Icône équipe">
+            <p>Pour en savoir plus sur</p>
+            <p>les créateurs du site !</p>
+            <!-- Lien corrigé pour pointer vers apropos.html comme dans le header -->
+            <a href="apropos.html" class="button_base footer_button">A PROPOS DE NOUS !</a>
+        </div>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+<script src="https://unpkg.com/image-map-resizer@1.0.10/js/imageMapResizer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Initialisation de imageMapResizer après le chargement du DOM
+  // Il est préférable de mettre ce genre d'initialisation dans votre fichier script.js
+  // mais pour l'exemple, je le laisse ici pour montrer où imageMapResizer() devrait être appelé.
+  // window.onload = function() {
+  //   imageMapResize();
+  // };
+  // Note: Si vous avez déjà un appel à imageMapResize() dans script.js, c'est parfait.
+</script>
+
+</body>
+</html>

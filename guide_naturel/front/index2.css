@@ -1,0 +1,360 @@
+/* GLOBAL & BODY */
+body, html {
+    margin: 0;
+    padding: 0;
+    background: url("ressources/background/background4.png") no-repeat fixed center/cover;
+    min-height: 100vh;
+    font-family: "Georgia", serif;
+    color: #333;
+    box-sizing: border-box;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(79, 205, 247, 0.5);
+  padding: 5px 20px;
+  flex-wrap: wrap;
+  border-radius: 15px;
+}
+
+.header_logo {
+  width: 120px;
+  height: auto;
+  display: block;
+}
+
+.header_center {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex: 1;
+  padding: 0 10px;
+}
+
+/* STYLES DE BASE POUR TOUS LES BOUTONS */
+.button_base {
+    border-radius: 10px;
+    padding: 5px 30px;
+    text-align: center;
+    text-decoration: none;
+    font-family: "Georgia", serif;
+    transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    margin: 5px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.header_button {
+  border: 2px solid rgba(79, 205, 247, 0.5);
+  background-color: rgba(79, 205, 247, 0.5);
+  color: white;
+  font-size: 16px;
+  box-shadow: 1px 2px #127596;
+}
+
+.header_button:hover, .header_button:focus {
+  border-color: #339fa3;
+  background-color: #339fa3;
+  box-shadow: 1px 2px #0e5c70;
+}
+
+@media screen and (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .header_center {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  .header_logo {
+    margin-bottom: 10px;
+  }
+  .header_button {
+    width: calc(100% - 20px);
+    max-width: 300px;
+    padding: 10px 15px;
+  }
+}
+
+/* MAIN CONTENT AREA */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 2rem;
+  padding-right: 2rem;
+  padding-bottom: 1rem; /* MODIFIÉ : Réduit le padding en bas */
+  padding-left: 2rem;
+    width: 100%;
+}
+
+.text-container {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.bfc_subtitle, .bfc_title {
+  color: white;
+  text-shadow: 1px 1px 2px #2c302d;
+  margin: 0.2em 0;
+}
+
+.bfc_subtitle {
+    font-size: 1.2em;
+}
+
+.bfc_title {
+    font-size: 2.8em;
+}
+
+@media screen and (max-width: 600px) {
+  .bfc_subtitle { font-size: 1em; }
+  .bfc_title { font-size: 2em; }
+  .text-container { padding: 0 10px; }
+}
+
+/* CONTENU PRINCIPAL : CARTE BFC + CONTENU DROITE */
+.content-below {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 950px; /* MODIFIÉ : Réduit la largeur maximale de toute la section carte + camembert */
+  gap: 1.5rem; /* MODIFIÉ : Peut-être réduire un peu le gap si l'espace est plus contraint */
+  margin: 0 auto; /* Pour centrer .content-below s'il ne prend pas toute la largeur de .container */
+}
+
+.Carte {
+  flex: 0 1 55%; /* MODIFIÉ : Ajuste la part de la carte. Ex: 50% pour la rendre un peu plus petite proportionnellement */
+  /* max-width: 450px; */ /* AJOUTÉ (Optionnel) : Si vous voulez une limite stricte pour la carte */
+}
+
+.Carte .image-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.Carte .image-container img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.overlay-image, .overlay-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  z-index: 10;
+  object-fit: contain;
+}
+
+.contenu-droite {
+  flex: 1; /* Prend l'espace restant, sera donc plus petit si .Carte prend 50% d'un .content-below plus petit */
+  /* Ou spécifier une base plus petite : flex: 0 1 45%; */
+  min-width: 300px; /* MODIFIÉ : Peut-être réduire légèrement si nécessaire, mais attention à la lisibilité */
+  max-width: 359px; /* AJOUTÉ : Limite la largeur maximale du conteneur du camembert */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem; /* MODIFIÉ : Peut-être réduire le padding */
+  position: relative;
+}
+
+#camembert {
+  max-width: 100%; /* Le canvas prendra 100% de .contenu-droite (qui est maintenant limité à 350px max) */
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+.buttons_right {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 1000;
+  padding: 0.5rem 0 0.5rem 0.5rem;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.button_right1 {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  background-color: rgba(11, 189, 115, 0.6);
+  color: white;
+  border: 2px solid rgba(11, 189, 115, 0.5);
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  width: auto;
+  min-width: 170px; /* MODIFIÉ : Peut-être un peu plus petit */
+  text-align: left;
+  padding-left: 15px; /* MODIFIÉ : Peut-être un peu plus petit */
+}
+
+.button_right1:hover, .button_right1:focus {
+  border-color: #19b09e;
+  background-color: #19b09e;
+}
+
+/* RESPONSIVE POUR CARTE ET CONTENU DROITE */
+@media screen and (max-width: 992px) { /* Ce point de rupture devient plus pertinent maintenant */
+    .content-below {
+        gap: 1rem;
+        max-width: 100%; /* Permet de prendre toute la largeur disponible en dessous de 992px */
+        padding: 0 1rem; /* Ajoute un peu de padding sur les côtés */
+    }
+    /* Les flex-basis peuvent rester les mêmes, ils s'appliqueront à un conteneur plus petit */
+}
+
+@media screen and (max-width: 768px) {
+    .content-below {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .Carte,
+    .contenu-droite {
+        width: 100%;
+        max-width: 450px; /* MODIFIÉ : Réduit la largeur max quand ils sont empilés */
+        flex-basis: auto;
+    }
+
+    .contenu-droite {
+        min-width: unset;
+        max-width: 400px; /* MODIFIÉ : Pour le camembert quand il est seul sur sa ligne */
+    }
+
+    .buttons_right {
+        position: static;
+        transform: none;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+        padding: 0.5rem;
+        background-color: transparent;
+        border-radius: 0;
+        margin-top: 1rem;
+    }
+
+    .button_right1 {
+        flex-grow: 1;
+        min-width: 140px; /* MODIFIÉ */
+        text-align: center;
+        border-radius: 10px;
+        margin: 5px;
+    }
+}
+
+/* INFO-BOX */
+#info-box {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1100;
+    display: none;
+    max-width: 280px; /* MODIFIÉ : Peut-être un peu plus petit si tout le reste est plus petit */
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* FOOTER */
+.footer {
+    background-color: rgba(63, 191, 110, 0.6);
+    padding: 0;
+    font-family: "Georgia", serif;
+    text-align: center;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    margin-top: 0;
+    width: 100%;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    max-width: 1200px; /* Le footer peut rester large */
+    margin: 0 auto;
+    padding: 0 20px;
+    gap: 20px;
+}
+
+.footer-item {
+    text-align: center;
+    flex: 1;
+    min-width: 250px;
+    padding: 10px;
+}
+
+.footer-item img {
+    width: 50px;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.footer-item p {
+    font-size: 1rem;
+    color: white;
+    margin: 0px 0;
+    text-shadow: 1px 1px 2px #1a783d;
+}
+
+.footer_button {
+  border: 2px solid rgba(63, 191, 110, 0.5);
+  background-color: white;
+  color: #178f2f;
+  font-size: 12px;
+  box-shadow: 1px 2px #1a783d;
+  padding: 8px 25px;
+}
+
+.footer_button:hover, .footer_button:focus {
+  border-color: #32ab70;
+  background-color: #32ab70;
+  color: white;
+  box-shadow: 1px 2px #127550;
+}
+
+@media screen and (max-width: 768px) {
+  .footer-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  .footer-item {
+    width: 90%;
+    max-width: 350px;
+    min-width: unset;
+  }
+  .footer-item img { width: 60px; }
+  .footer_button {
+    width: 100%;
+    max-width: 280px;
+    padding: 10px 15px;
+  }
+}
