@@ -1,17 +1,9 @@
-/* apropos.css */
 
-/* apropos.css */
-
-/* Styles spécifiques à la page À Propos */
-
-/* Si .text-container sur la page apropos a besoin d'un espacement différent */
-/* Vous pouvez utiliser la classe .apropos sur le body pour cibler */
 .apropos .text-container {
-    margin-bottom: 3rem; /* Exemple d'ajustement spécifique */
+    margin-bottom: 3rem;
 }
 
-/* Les styles pour .h2_apropos, .team-introduction, .section-padding, etc. restent ici */
-.h2_apropos { /* Renommé depuis .apropos-main-content h2 pour plus de clarté */
+.h2_apropos {
     text-align: center;
     font-size: 2em;
     color: #FFFFFF;
@@ -31,21 +23,20 @@
 .section-padding {
     padding-top: 30px;
     padding-bottom: 30px;
-    width: 100%; /* S'assurer que les sections prennent la largeur du .container */
-    /* border-bottom: 1px solid #eee; -- Retiré si vous voulez un look plus épuré */
+    width: 100%;
 }
 
-.apropos .container section:not(:last-child) { /* Ajoute une bordure sauf à la dernière section */
+.apropos .container section:not(:last-child) {
     border-bottom: 1px solid #eee;
 }
 
-/* Optionnel: Ligne décorative sous les titres h2 */
+/* Ligne décorative sous les titres h2 */
 .apropos-main-content .h2_apropos::after {
     content: '';
     display: block;
     width: 60px;
     height: 3px;
-    background-color: rgb(79, 205, 247); /* Couleur de l'accent */
+    background-color: rgb(79, 205, 247);
     margin: 10px auto 0;
 }
 
@@ -53,10 +44,10 @@
 /* Section Équipe */
 .team-members {
     display: flex;
-    flex-wrap: wrap; /* Permet aux membres de passer à la ligne sur petits écrans */
-    justify-content: space-around; /* Espace bien les membres */
-    gap: 20px; /* Espace entre les cartes des membres */
-    text-align: center; /* Centre le texte à l'intérieur de chaque membre */
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px;
+    text-align: center;
 }
 
 .team-member {
@@ -64,8 +55,8 @@
     border-radius: 8px;
     padding: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    flex-basis: calc(33.333% - 20px); /* Vise 3 colonnes, ajuste avec le gap */
-    min-width: 250px; /* Empêche les cartes de devenir trop étroites */
+    flex-basis: calc(33.333% - 20px);
+    min-width: 250px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -75,11 +66,11 @@
 }
 
 .team-photo {
-    width: 120px; /* Taille de la photo */
+    width: 120px;
     height: 120px;
-    border-radius: 50%; /* Pour des photos rondes */
-    object-fit: cover; /* S'assure que l'image remplit bien sans se déformer */
-    border: 3px solid #FFFFFF; /* Bordure de la couleur d'accent */
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #FFFFFF;
 }
 
 .team-member h3 {
@@ -103,8 +94,7 @@
 
 /* Section Mission */
 .mission-text {
-    text-align: justify; /* Justifier le texte pour un look plus formel */
-    /* ou text-align: left; pour un alignement à gauche standard */
+    text-align: justify;
     line-height: 1.7;
     font-size: 1.1em;
     color: #FFFFFF;
@@ -142,7 +132,7 @@
 }
 
 .contact-methods a {
-    color: #FFFFFF; /* Couleur pour les liens */
+    color: #FFFFFF;
     text-decoration: none;
     font-weight: bold;
 }
@@ -152,7 +142,6 @@
     color: rgb(79, 205, 247);
 }
 
-/* Ajustements pour les petits écrans */
 @media screen and (max-width: 768px) {
     .apropos-header h1 {
         font-size: 2.2em;
@@ -167,7 +156,7 @@
 
 @media screen and (max-width: 500px) {
     .team-member {
-        flex-basis: 100%; /* 1 colonne sur mobiles */
+        flex-basis: 100%;
     }
 }
 

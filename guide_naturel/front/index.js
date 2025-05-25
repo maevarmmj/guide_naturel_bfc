@@ -438,7 +438,7 @@ window.addEventListener('load', function () {
     // Vérifie si la fonction 'imageMapResize' (de la bibliothèque image-map-resizer) est disponible
     if (typeof imageMapResize === 'function') {
         // Initialise la bibliothèque pour rendre les zones cliquables (<map>) de l'image responsives
-        imageMapResize();
+        imageMapResize(undefined);
     } else {
         console.warn("La fonction imageMapResize n'a pas été trouvée.");
     }

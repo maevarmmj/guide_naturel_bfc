@@ -12,24 +12,28 @@
 
 <div id="header-placeholder"></div>
 
-<main class="container"> <!-- <main> pour le contenu principal de la page -->
+<main class="container">
 
   <div class="text-container">
-      <!-- Utilisation de balises de titre sémantiques -->
       <h2 class="bfc_subtitle">B O U R G O G N E - F R A N C H E - C O M T É</h2>
       <h1 class="bfc_title">LE GUIDE NATUREL</h1>
   </div>
 
   <div class="content-below">
-    <section class="Carte"> <!-- <section> pour une section thématique -->
+
+    <section class="Carte">
+
       <div class="image-container">
+
         <img src="ressources/carte_bfc.png" alt="Carte de la région Bourgogne-Franche-Comté avec ses départements cliquables" usemap="#departements_bfc">
-        <!-- Ces images sont prévues pour être mises à jour par JavaScript au survol des départements -->
+        <!-- Mises à jour par index.js au survol des départements -->
         <img src="" alt="" class="overlay-image">
         <img src="" alt="" class="overlay-text">
+
       </div>
+
       <map name="departements_bfc">
-        <!-- href="#" est un placeholder. S'ils ne naviguent pas, JS devrait gérer event.preventDefault() -->
+        <!-- href="#" est un placeholder. S'ils ne naviguent pas, index.js devrait gérer event.preventDefault() -->
         <area
             shape="poly"
             coords="422,374,456,271,471,227,449,187,394,200,298,60,213,69,196,127,226,181,202,243,174,258,197,304"
@@ -80,22 +84,26 @@
             href="#"
             alt="Territoire_de_Belfort" class="departement-area territoire_de_belfort">
       </map>
+
     </section>
 
     <aside class="contenu-droite"> <!-- <aside> pour contenu tangentiel, comme une barre latérale -->
+
       <canvas id="camembert"></canvas>
+
       <div class="buttons_right">
-        <!-- Remplacé <button> par <a> pour la navigation -->
         <a href="" class="button_base button_right1" data-chartkey="especesParRegne">Nombre d'espèces par règne</a>
         <a href="" class="button_base button_right1" data-chartkey="especesDansChaqueRegne">Nombre d'espèces dans chaque règne</a>
         <a href="" class="button_base button_right1" data-chartkey="statutsConservation">Statuts de conservation par règne</a>
         <a href="" class="button_base button_right1" data-chartkey="groupesTaxoParRegne">Nombre de groupes taxonomiques par règne</a>
         <a href="" class="button_base button_right1" data-chartkey="especesParStatutConservation">Nombre d'espèces par statut de conservation</a>
       </div>
+
     </aside>
-  </div> <!-- Fin de .content-below -->
-  <!-- La div fermante en trop a été supprimée ici -->
-</main> <!-- Fin de .container / <main> -->
+
+  </div>
+
+</main>
 
 <div id="departement-chart-container"
      style="display: none;
@@ -110,7 +118,7 @@
 </div>
 
 
- <div id="footer-placeholder"></div>
+<div id="footer-placeholder"></div>
 
 <script src="index.js"></script>
 <script src="https://unpkg.com/image-map-resizer@1.0.10/js/imageMapResizer.min.js"></script>
