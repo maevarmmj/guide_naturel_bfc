@@ -92,18 +92,29 @@
       <canvas id="camembert"></canvas>
       <div class="buttons_right">
         <!-- Remplacé <button> par <a> pour la navigation -->
-        <a href="" class="button_base button_right1">Nombre d'espèces par règne</a>
-        <a href="" class="button_base button_right1">Nombre d'espèces dans chaque règne</a>
-        <a href="" class="button_base button_right1">Statuts de conservation par règne</a>
-        <a href="" class="button_base button_right1">Nombre de groupes taxonomiques par règne</a>
-        <a href="" class="button_base button_right1">Nombre d'espèces par statut de conservation</a>
+        <a href="" class="button_base button_right1" data-chartkey="especesParRegne">Nombre d'espèces par règne</a>
+        <a href="" class="button_base button_right1" data-chartkey="especesDansChaqueRegne">Nombre d'espèces dans chaque règne</a>
+        <a href="" class="button_base button_right1" data-chartkey="statutsConservation">Statuts de conservation par règne</a>
+        <a href="" class="button_base button_right1" data-chartkey="groupesTaxoParRegne">Nombre de groupes taxonomiques par règne</a>
+        <a href="" class="button_base button_right1" data-chartkey="especesParStatutConservation">Nombre d'espèces par statut de conservation</a>
       </div>
     </aside>
   </div> <!-- Fin de .content-below -->
   <!-- La div fermante en trop a été supprimée ici -->
 </main> <!-- Fin de .container / <main> -->
 
-<div id="info-box"></div> <!-- L'infobox peut rester en dehors de main si elle est positionnée de manière absolue/fixe par rapport au viewport -->
+<div id="departement-chart-container"
+     style="display: none;
+     position: absolute;
+     background-color: rgba(129, 252, 184,0.8);
+     border: 1px solid rgba(255, 255, 255,0.5);
+     border-radius: 10px;
+     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+     z-index: 1200;
+     width: 225px; ">
+    <canvas id="mini-departement-chart"></canvas>
+</div>
+
 
 <footer class="footer">
     <div class="footer-container">
