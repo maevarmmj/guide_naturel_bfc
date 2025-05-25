@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const canvasElement = document.getElementById('camembert');
     const departementChartContainer = document.getElementById('departement-chart-container');
     const miniDepartementChartCanvas = document.getElementById('mini-departement-chart');
-    const closeMiniChartButton = document.getElementById('close-mini-chart');
 
     let camembertChart;
     let miniChartInstance;
@@ -324,16 +323,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
-    if (closeMiniChartButton && departementChartContainer) {
-        closeMiniChartButton.addEventListener('click', function() {
-            departementChartContainer.style.display = 'none';
-            if (miniChartInstance) {
-                miniChartInstance.destroy();
-                miniChartInstance = null;
-            }
-        });
-    }
 
     document.addEventListener('click', function(event) {
         if (departementChartContainer && departementChartContainer.style.display === 'block' &&
