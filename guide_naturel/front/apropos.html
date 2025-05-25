@@ -1,10 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ajouté pour la responsivité -->
+  <title>Le Guide Naturel de la BFC</title>
+  <link href="global.css" rel="stylesheet">
+    <link href="apropos.css" rel="stylesheet">
 </head>
-<body class = "apropos">
-A propos de nous !
+
+<body class="apropos">
+
+<div id="header-placeholder"></div>
+
+<main class="container"> <!-- <main> pour le contenu principal de la page -->
+
+  <div class="text-container">
+      <!-- Utilisation de balises de titre sémantiques -->
+      <h2 class="bfc_subtitle">B O U R G O G N E - F R A N C H E - C O M T É</h2>
+      <h1 class="bfc_title">LE GUIDE NATUREL</h1>
+  </div>
+
+        <section class="team-introduction section-padding">
+            <h2 class = "h2_apropos">Qui sommes-nous ?</h2>
+            <div class="team-members">
+                <!-- Membre 1 -->
+                <div class="team-member">
+                    <img src="ressources/team/mathis.jpg" alt="Photo de Mathis" class="team-photo">
+                    <h3>Mathis</h3>
+                    <p class="member-role">Gestionnaire de la base de données et Back-End</p>
+                </div>
+                <!-- Membre 2 -->
+                <div class="team-member">
+                    <img src="ressources/team/maeva.jpg" alt="Photo de Maeva" class="team-photo">
+                    <h3>Maeva</h3>
+                    <p class="member-role">Gestionnaire du Front-End et Back-End</p>
+                </div>
+                <!-- Membre 3 -->
+                <div class="team-member">
+                    <img src="ressources/team/jordan.jpg" alt="Photo de Jordan" class="team-photo">
+                    <h3>Jordan</h3>
+                    <p class="member-role">Gestionnaire des recherches</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="project-mission section-padding">
+            <h2 class = "h2_apropos">Notre Mission</h2>
+            <div class="mission-text">
+                <p>Nous sommes une équipe de <a>trois étudiants dynamiques de l'ESEO Dijon</a>, unis par notre attrait pour la nature. Ce site, dans le cadre de notre projet Big Data, est le fruit de notre travail et de notre désir de partager la richesse de la faune et la flore de notre belle région, la Bourgogne-Franche-Comté.</p>
+                <p>Notre objectif principal était de créer une <a>plateforme ludique et éducative</a>, spécialement conçue pour les enfants et les adolescents. Nous avons voulu rendre l'exploration de la biodiversité locale aussi simple et instructive que possible.</p>
+            </div>
+        </section>
+
+        <section class="contact-info section-padding">
+            <h2 class = "h2_apropos">Contactez-nous</h2>
+            <p class = "questions">Si vous avez des questions, des suggestions ou si vous souhaitez simplement en savoir plus sur notre projet, n'hésitez pas à nous contacter. Nous serions ravis d'échanger avec vous !</p>
+            <div class="contact-methods">
+                <p>
+                    <!-- Optionnel: Utiliser des icônes Font Awesome ou SVG ici -->
+                    Email : <a href="mailto:maeva.ramamonjyramboa@reseau.eseo.fr">equipe.guidebfc@reseau.eseo.fr</a>
+                </p>
+
+            </div>
+        </section>
+
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="app.js"></script>
 </body>
 </html>
