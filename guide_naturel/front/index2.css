@@ -9,6 +9,11 @@ body, html {
     box-sizing: border-box;
 }
 
+body { /* Ciblez body spécifiquement pour les propriétés flex */
+    display: flex;
+    flex-direction: column;
+}
+
 *, *::before, *::after {
     box-sizing: inherit;
 }
@@ -88,15 +93,20 @@ body, html {
 }
 
 /* MAIN CONTENT AREA */
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.container { /* Votre <main> */
+  display: flex; /* Déjà présent pour son contenu interne, c'est bien */
+  flex-direction: column; /* Déjà présent */
+  align-items: center; /* Déjà présent */
+
+  flex-grow: 1; /* AJOUTEZ CECI : Permet à main de s'étendre verticalement */
+  /* flex: 1; /* Alternative plus courte pour flex-grow: 1, flex-shrink: 1, flex-basis: 0% */
+               /* Dans ce cas, flex-grow: 1 suffit probablement. */
+
   padding-top: 2rem;
   padding-right: 2rem;
-  padding-bottom: 1rem; /* MODIFIÉ : Réduit le padding en bas */
+  padding-bottom: 1rem;
   padding-left: 2rem;
-    width: 100%;
+  width: 100%; /* Déjà présent */
 }
 
 .text-container {
@@ -130,14 +140,14 @@ body, html {
   flex-direction: row;
   align-items: flex-start;
   width: 100%;
-  max-width: 950px; /* MODIFIÉ : Réduit la largeur maximale de toute la section carte + camembert */
-  gap: 1.5rem; /* MODIFIÉ : Peut-être réduire un peu le gap si l'espace est plus contraint */
-  margin: 0 auto; /* Pour centrer .content-below s'il ne prend pas toute la largeur de .container */
+  max-width: 950px; /* Largeur maximale par défaut pour les écrans "normaux" */
+  gap: 1.5rem;
+  margin: 0 auto;
 }
 
 .Carte {
-  flex: 0 1 55%; /* MODIFIÉ : Ajuste la part de la carte. Ex: 50% pour la rendre un peu plus petite proportionnellement */
-  /* max-width: 450px; */ /* AJOUTÉ (Optionnel) : Si vous voulez une limite stricte pour la carte */
+  flex: 0 1 55%; /* Reste tel quel pour la proportion par défaut */
+  /* max-width: 450px; */ /* Commentez ou ajustez si vous l'aviez */
 }
 
 .Carte .image-container {
@@ -166,19 +176,18 @@ body, html {
 }
 
 .contenu-droite {
-  flex: 1; /* Prend l'espace restant, sera donc plus petit si .Carte prend 50% d'un .content-below plus petit */
-  /* Ou spécifier une base plus petite : flex: 0 1 45%; */
-  min-width: 300px; /* MODIFIÉ : Peut-être réduire légèrement si nécessaire, mais attention à la lisibilité */
-  max-width: 359px; /* AJOUTÉ : Limite la largeur maximale du conteneur du camembert */
+  flex: 1;
+  min-width: 300px;
+  max-width: 359px; /* Largeur maximale par défaut pour le camembert */
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0.5rem; /* MODIFIÉ : Peut-être réduire le padding */
+  padding: 0.5rem;
   position: relative;
 }
 
 #camembert {
-  max-width: 100%; /* Le canvas prendra 100% de .contenu-droite (qui est maintenant limité à 350px max) */
+  max-width: 100%;
   height: auto;
   margin-bottom: 1rem;
 }
@@ -269,6 +278,24 @@ body, html {
 }
 
 
+
+@media screen and (min-width: 1921px) {
+
+    .content-below {
+        max-width: 1400px; /* Exemple, ajustez selon vos préférences */
+    }
+
+    .bfc_subtitle {
+        font-size: 1.5em; /* Exemple */
+    }
+    .bfc_title {
+        font-size: 3.5em; /* Exemple */
+    }
+
+
+}
+
+
 /* FOOTER */
 .footer {
     background-color: rgba(63, 191, 110, 0.6);
@@ -277,7 +304,7 @@ body, html {
     text-align: center;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
-    margin-top: 0;
+    margin-top: auto;
     width: 100%;
 }
 
