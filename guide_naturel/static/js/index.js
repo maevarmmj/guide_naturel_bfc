@@ -31,8 +31,8 @@ document.addEventListener('DOMContentLoaded', function() {
         departementAreas.forEach(area => {
             const departementName = area.alt.toLowerCase();
             // Construit les URLs pour les images de survol (image et texte)
-            const overlayImageURL = `ressources/dep/${departementName}.png`;
-            const overlayTextURL = `ressources/dep/${departementName}_text.png`;
+            const overlayImageURL = `/static/ressources/dep/${departementName}.png`;
+            const overlayTextURL = `/static/ressources/dep/${departementName}_text.png`;
 
             // Ajoute un écouteur d'événement pour le survol de la souris ('mouseenter')
             area.addEventListener('mouseenter', function() {

@@ -1,0 +1,23 @@
+<!-- footer.html -->
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-item">
+            <img src="../static/ressources/footer/stats.png" alt="Icône graphique pour statistiques">
+            <p>Veux-tu des statistiques</p>
+            <p>précises sur la région ?</p>
+            <a href="{{ url_for('main_page') }}" id="footerBtnAccueil" class="button_base footer_button">ACCUEIL</a>
+        </div>
+        <div class="footer-item">
+            <img src="../static/ressources/footer/recherche.png" alt="Icône loupe pour recherche">
+            <p>Recherche ce que tu veux</p>
+            <p>avec Anna !</p>
+            <a href="{{ url_for('search') }}" id="footerBtnRecherche" class="button_base footer_button">EXPLORE AVEC ANNA !</a>
+        </div>
+        <div class="footer-item">
+            <img src="../static/ressources/footer/team.png" alt="Icône équipe">
+            <p>Pour en savoir plus sur</p>
+            <p>les créateurs du site !</p>
+            <a href="{{ url_for('about') }}" id="footerBtnApropos" class="button_base footer_button">A PROPOS DE NOUS !</a>
+        </div>
+    </div>
+</footer>

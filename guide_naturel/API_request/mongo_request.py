@@ -16,6 +16,13 @@ STATUS_INFO = {
     "EX": {"order": 8, "color": "#424242", "full_name": "Éteinte"}
 }
 
+REGNE_COLORS = {
+    'Animalia': '#FF6384',      # Rouge/rose
+    'Plantae': '#36A2EB',       # Bleu
+    'Fungi': '#FFCE56',         # Jaune
+    'Sans Règne': '#757575'      # Gris
+}
+
 
 # --- Fonctions utilitaires ---
 def get_mongo_collection(uri: str, db_name: str, collection_name: str) -> Collection:
@@ -32,15 +39,175 @@ def _format_key(key, default_label: str = "Non spécifié"):
     Formate une clé (règne, statut, groupe taxonomique) pour l'affichage,
     en remplaçant None par une étiquette par défaut.
     """
-    # Pour les statuts, on veut que None devienne une étiquette spécifique avant le mapping
-    # afin que la logique de traitement puisse l'identifier.
-    # On le mappera ensuite à "Autre" pour l'affichage final.
     if key is None:
-        return "Sans codeStatut" # Étiquette interne pour les statuts non spécifiés
+        return default_label
     return str(key)
 
 
 # --- Fonctions d'Agrégation (retournent les données structurées) ---
+def species_by_code_statut(col: Collection) -> dict:
+    """
+    Compte le nombre d'espèces uniques par codeStatut sur l'ensemble de la base de données.
+    Retourne les données formatées pour Chart.js.
+    """
+    pipeline = [
+        {
+            # Étape 1: Grouper par nom scientifique pour obtenir une entrée unique par espèce.
+            # On prend le premier codeStatut rencontré pour cette espèce.
+            "$group": {
+                "_id": "$nomScientifiqueRef",
+                "codeStatutSpecies": {"$first": "$codeStatut"}
+            }
+        },
+        {
+            # Étape 2: Grouper ces espèces uniques par leur codeStatut pour les compter.
+            "$group": {
+                "_id": "$codeStatutSpecies",
+                "nombreEspeces": {"$sum": 1}
+            }
+        },
+        {
+            # Étape 3: Reformater le document de sortie
+            "$project": {
+                "_id": 0,
+                "statut": "$_id",
+                "nombreEspeces": "$nombreEspeces"
+            }
+        },
+        {
+            # Étape 4 (Optionnel): Trier par statut pour la cohérence
+            "$sort": {"statut": 1}
+        }
+    ]
+
+    resultats_aggregation = list(col.aggregate(pipeline))
+
+    # --- Post-traitement Python pour formater les données Chart.js ---
+    chart_data_raw = []
+    total_global_species = 0
+
+    for res in resultats_aggregation:
+        statut = _format_key(res['statut'], "Sans codeStatut")
+        nombre = res['nombreEspeces']
+        total_global_species += nombre
+
+        # Mapper "Sans codeStatut" à "Autre" pour l'affichage et l'ordre/couleur
+        display_statut_key = "Autre" if statut == "Sans codeStatut" else statut
+        info = STATUS_INFO.get(display_statut_key, {"order": 999, "color": "#CCCCCC", "full_name": statut})
+
+        chart_data_raw.append({
+            "code": statut, # Code original du statut
+            "display_label": info["full_name"], # Nom complet pour l'affichage
+            "count": nombre,
+            "color": info["color"],
+            "sort_order": info["order"]
+        })
+
+    # Trier les statuts selon l'ordre défini
+    sorted_data = sorted(chart_data_raw, key=lambda x: x["sort_order"])
+
+    # Préparer le format final pour Chart.js
+    labels = []
+    data = [] # Pourcentages
+    background_colors = []
+    counts_raw = [] # Nombres bruts pour les tooltips
+
+    for item in sorted_data:
+        percentage = (item['count'] / total_global_species) * 100 if total_global_species > 0 else 0
+        labels.append(f"{item['display_label']}{f" ({item['code']})" if item['code'] != "Sans codeStatut" else ""}")
+        data.append(percentage)
+        background_colors.append(item['color'])
+        counts_raw.append(item['count'])
+
+    return {
+        "labels": labels,
+        "data": data,
+        "backgroundColor": background_colors,
+        "counts": counts_raw, # Nombres bruts
+        "title": "Répartition des espèces par codeStatut (Global)"
+    }
+
+
+# --- Nouvelle fonction d'agrégation globale par règne ---
+def species_by_regne(col: Collection) -> dict:
+    """
+    Compte le nombre d'espèces uniques par règne sur l'ensemble de la base de données.
+    Retourne les données formatées pour Chart.js.
+    """
+    pipeline = [
+        {
+            # Étape 1: Grouper par nom scientifique pour obtenir une entrée unique par espèce.
+            # On récupère le premier règne associé à cette espèce.
+            "$group": {
+                "_id": "$nomScientifiqueRef",
+                "regneSpecies": {"$first": "$regne"}
+            }
+        },
+        {
+            # Étape 2: Grouper ces espèces uniques par leur règne et compter le nombre d'espèces.
+            "$group": {
+                "_id": "$regneSpecies",
+                "nombreEspeces": {"$sum": 1}
+            }
+        },
+        {
+            # Étape 3: Reformater le document de sortie pour faciliter le traitement Python
+            "$project": {
+                "_id": 0,
+                "regne": "$_id",  # Renomme _id (qui est le règne) en 'regne'
+                "nombreEspeces": "$nombreEspeces"
+            }
+        },
+        {
+            # Étape 4 (Optionnel): Trier les résultats par règne pour une sortie cohérente
+            "$sort": {"regne": 1}
+        }
+    ]
+
+    resultats_aggregation = list(col.aggregate(pipeline))
+
+    # --- Post-traitement Python pour formater les données pour Chart.js ---
+    chart_data_raw = []
+    total_global_species = 0
+
+    for res in resultats_aggregation:
+        # Utilisez _format_key pour gérer les valeurs None de 'regne'
+        regne = _format_key(res['regne'], "Sans règne")  # 'Sans règne' sera l'étiquette par défaut
+        nombre = res['nombreEspeces']
+        total_global_species += nombre
+
+        chart_data_raw.append({
+            "label": regne,  # Le label sera le nom du règne (ou 'Sans règne')
+            "count": nombre,
+            "color": REGNE_COLORS.get(regne, '#CCCCCC')  # Récupère la couleur, ou gris par défaut
+        })
+
+    # Trier les données pour le graphique (ici alphabétiquement par label)
+    # Si vous avez un ordre spécifique pour les règnes, vous pouvez ajouter
+    # un "order" comme dans STATUS_INFO et trier dessus.
+    sorted_data = sorted(chart_data_raw, key=lambda x: x["label"])
+
+    # Préparer le format final que votre fonction `updateChart` JavaScript attend
+    labels = []
+    data = []  # Pourcentages
+    background_colors = []
+    counts_raw = []  # Nombres bruts pour les tooltips
+
+    for item in sorted_data:
+        percentage = (item['count'] / total_global_species) * 100 if total_global_species > 0 else 0
+        labels.append(item['label'])
+        data.append(percentage)
+        background_colors.append(item['color'])
+        counts_raw.append(item['count'])
+
+    return {
+        "labels": labels,
+        "data": data,
+        "backgroundColor": background_colors,
+        "counts": counts_raw,  # Nombres bruts
+        "title": "Répartition des espèces par Règne (Global)" # Titre pour le graphique
+    }
+
 
 def count_species_by_code_statut(col: Collection, departements: list) -> dict:
     """
