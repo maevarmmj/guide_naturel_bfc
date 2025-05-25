@@ -4,19 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ajouté pour la responsivité -->
   <title>Le Guide Naturel de la BFC</title>
-  <link href="index2.css" rel="stylesheet">
+  <link href="global.css" rel="stylesheet">
+    <link href="index.css" rel="stylesheet">
 </head>
 
 <body class="index">
 
-<header class="header">
-  <img src="ressources/eseo_logo.png" class="header_logo" alt="Logo ESEO - Le Guide Naturel BFC">
-  <nav class="header_center"> <!-- Utilisation de <nav> pour un groupe de liens de navigation -->
-    <a href="recherche.html" class="button_base header_button">EXPLORE AVEC ANNA !</a>
-    <a href="statistiques.html" class="button_base header_button">STATISTIQUES</a>
-    <a href="apropos.html" class="button_base header_button">A PROPOS DE NOUS !</a>
-  </nav>
-</header>
+<div id="header-placeholder"></div>
 
 <main class="container"> <!-- <main> pour le contenu principal de la page -->
 
@@ -111,47 +105,17 @@
      border-radius: 10px;
      box-shadow: 0 0 10px rgba(0,0,0,0.1);
      z-index: 1200;
-     width: 225px; ">
+     width: 230px; ">
     <canvas id="mini-departement-chart"></canvas>
 </div>
 
 
-<footer class="footer">
-    <div class="footer-container">
-        <div class="footer-item">
-            <img src="ressources/footer/recherche.png" alt="Icône loupe pour recherche">
-            <p>Recherche ce que tu veux</p>
-            <p>avec Anna !</p>
-            <a href="recherche.html" class="button_base footer_button">EXPLORE AVEC ANNA !</a>
-        </div>
-        <div class="footer-item">
-            <img src="ressources/footer/stats.png" alt="Icône graphique pour statistiques">
-            <p>Veux-tu des statistiques</p>
-            <p>précises sur la région ?</p>
-            <a href="statistiques.html" class="button_base footer_button">STATISTIQUES</a>
-        </div>
-        <div class="footer-item">
-            <img src="ressources/footer/team.png" alt="Icône équipe">
-            <p>Pour en savoir plus sur</p>
-            <p>les créateurs du site !</p>
-            <!-- Lien corrigé pour pointer vers apropos.html comme dans le header -->
-            <a href="apropos.html" class="button_base footer_button">A PROPOS DE NOUS !</a>
-        </div>
-    </div>
-</footer>
+ <div id="footer-placeholder"></div>
 
-<script src="script.js"></script>
+<script src="index.js"></script>
 <script src="https://unpkg.com/image-map-resizer@1.0.10/js/imageMapResizer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  // Initialisation de imageMapResizer après le chargement du DOM
-  // Il est préférable de mettre ce genre d'initialisation dans votre fichier script.js
-  // mais pour l'exemple, je le laisse ici pour montrer où imageMapResizer() devrait être appelé.
-  // window.onload = function() {
-  //   imageMapResize();
-  // };
-  // Note: Si vous avez déjà un appel à imageMapResize() dans script.js, c'est parfait.
-</script>
+<script src="app.js"></script>
 
 </body>
 </html>
