@@ -1,0 +1,112 @@
+[
+  {
+    "nomScientifiqueRef": "Sylvia atricapilla",
+    "nomVernaculaire": "Fauvette à tête noire",
+    "regne": "Animalia",
+    "groupeTaxoSimple": "Oiseaux",
+    "groupeTaxoAvance": "Passeriformes",
+    "commune": "Besançon",
+    "codeInseeDepartement": "25",
+    "nombreObservations": 120,
+    "codeStatut": "LC"
+  },
+  {
+    "nomScientifiqueRef": "Sciurus vulgaris",
+    "nomVernaculaire": "Écureuil roux",
+    "regne": "Animalia",
+    "groupeTaxoSimple": "Mammifères",
+    "groupeTaxoAvance": "Rongeurs",
+    "commune": "Dijon",
+    "codeInseeDepartement": "21",
+    "nombreObservations": 75,
+    "codeStatut": "LC"
+  },
+  {
+    "nomScientifiqueRef": "Lucanus cervus",
+    "nomVernaculaire": "Lucane cerf-volant",
+    "regne": "Animalia",
+    "groupeTaxoSimple": "Insectes",
+    "groupeTaxoAvance": "Coléoptères",
+    "commune": "Vesoul",
+    "codeInseeDepartement": "70",
+    "nombreObservations": 30,
+    "codeStatut": "NT"
+  },
+  {
+    "nomScientifiqueRef": "Anemone nemorosa",
+    "nomVernaculaire": "Anémone des bois",
+    "regne": "Plantae",
+    "groupeTaxoSimple": "Plantes à fleurs",
+    "groupeTaxoAvance": "Ranunculaceae",
+    "commune": "Lons-le-Saunier",
+    "codeInseeDepartement": "39",
+    "nombreObservations": 250,
+    "codeStatut": "LC"
+  },
+  {
+    "nomScientifiqueRef": "Erithacus rubecula",
+    "nomVernaculaire": "Rougegorge familier",
+    "regne": "Animalia",
+    "groupeTaxoSimple": "Oiseaux",
+    "groupeTaxoAvance": "Passeriformes",
+    "commune": "Auxerre",
+    "codeInseeDepartement": "89",
+    "nombreObservations": 90,
+    "codeStatut": "LC"
+  },
+  {
+    "nomScientifiqueRef": "Capreolus capreolus",
+    "nomVernaculaire": "Chevreuil européen",
+    "regne": "Animalia",
+    "groupeTaxoSimple": "Mammifères",
+    "groupeTaxoAvance": "Artiodactyles",
+    "commune": "Besançon",
+    "codeInseeDepartement": "25",
+    "nombreObservations": 55,
+    "codeStatut": "LC"
+  },
+  {
+    "nomScientifiqueRef": "Vipera berus",
+    "nomVernaculaire": "Vipère péliade",
+    "regne": "Animalia",
+    "groupeTaxoSimple": "Reptiles",
+    "groupeTaxoAvance": "Serpentes",
+    "commune": "Pontarlier",
+    "codeInseeDepartement": "25",
+    "nombreObservations": 15,
+    "codeStatut": "VU"
+  },
+  {
+    "nomScientifiqueRef": "Salamandra salamandra",
+    "nomVernaculaire": "Salamandre tachetée",
+    "regne": "Animalia",
+    "groupeTaxoSimple": "Amphibiens",
+    "groupeTaxoAvance": "Caudata",
+    "commune": "Dole",
+    "codeInseeDepartement": "39",
+    "nombreObservations": 40,
+    "codeStatut": "LC"
+  },
+  {
+    "nomScientifiqueRef": "Fagus sylvatica",
+    "nomVernaculaire": "Hêtre commun",
+    "regne": "Plantae",
+    "groupeTaxoSimple": "Arbres",
+    "groupeTaxoAvance": "Fagaceae",
+    "commune": "Autun",
+    "codeInseeDepartement": "71",
+    "nombreObservations": 500,
+    "codeStatut": "LC"
+  },
+  {
+    "nomScientifiqueRef": "Agaricus campestris",
+    "nomVernaculaire": "Agaric champêtre",
+    "regne": "Fungi",
+    "groupeTaxoSimple": "Champignons",
+    "groupeTaxoAvance": "Agaricales",
+    "commune": "Nevers",
+    "codeInseeDepartement": "58",
+    "nombreObservations": 65,
+    "codeStatut": "LC"
+  }
+]

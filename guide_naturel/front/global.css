@@ -199,9 +199,9 @@ body {
   border: 2px solid rgba(63, 191, 110, 0.5);
   background-color: white;
   color: #178f2f;
-  font-size: 12px;
+  font-size: 13px;
   box-shadow: 1px 2px #1a783d;
-  padding: 8px 25px;
+  padding: 8px 15px;
 }
 
 .footer_button:hover, .footer_button:focus {

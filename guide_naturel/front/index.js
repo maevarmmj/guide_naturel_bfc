@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     function setActiveButton(clickedButton) {
         // Retire la classe 'button_active' de tous les boutons
-        chartButtons.forEach(button => button.classList.remove('button_active'));
+       chartButtons.forEach(button => button.classList.remove('button_active'));
         // Si un bouton est fourni, lui ajoute la classe 'button_active'
         if (clickedButton) {
             clickedButton.classList.add('button_active');

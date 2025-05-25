@@ -2,10 +2,11 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ajouté pour la responsivité -->
-  <title>Le Guide Naturel de la BFC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recherche - Le Guide Naturel BFC</title>
   <link href="global.css" rel="stylesheet">
-    <link href="recherche.css" rel="stylesheet">
+  <link href="recherche.css" rel="stylesheet">
+
 </head>
 
 <body class="recherche">
@@ -19,17 +20,32 @@
       <h1 class="bfc_title">LE GUIDE NATUREL</h1>
   </div>
 
+  <div class="content-below-recherche">
+
+    <div class="chatbot-container">
+        <div id="chat-log" class="chat-log-area">
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Tapez votre réponse ici..." disabled>
+            <button id="send-chat-button" disabled>Envoyer</button>
+        </div>
+    </div>
+
+    <div class="chatbot-results">
+        <div id="final-chatbot-results-content">
+        </div>
+    </div>
+
+  </div>
 
 </main>
 
+<div id="footer-placeholder"></div>
 
-
- <div id="footer-placeholder"></div>
-
-<script src="script_recherche.js"></script>
+<script src="recherche.js"></script>
 <script src="https://unpkg.com/image-map-resizer@1.0.10/js/imageMapResizer.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="app.js"></script>
+
 
 </body>
 </html>
