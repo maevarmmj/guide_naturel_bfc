@@ -11,14 +11,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Sélectionne l'élément <canvas> où le graphique principal (camembert) sera dessiné
     const canvasElement = document.getElementById('camembert');
+    // Sélectionne les boutons du carousel
+    const prevChartBtn = document.querySelector('.carousel-prev');
+    const nextChartBtn = document.querySelector('.carousel-next');
     // Sélectionne le <div> qui contiendra le mini-graphique affiché au clic sur un département
     const departementChartContainer = document.getElementById('departement-chart-container');
     // Sélectionne l'élément <canvas> à l'intérieur du conteneur ci-dessus pour le mini-graphique
     const miniDepartementChartCanvas = document.getElementById('mini-departement-chart');
 
+    const chartDotsContainer = document.querySelector('.chart-dots-container');
+
     // Instances des graphiques Chart.js :
     let camembertChart;
     let miniChartInstance;
+    let chartKeys = Array;
+    let currentChartIndex = 0;
     // Variable pour suivre quel type de données le graphique principal (et donc le mini-graphique) doit afficher
     // Initialisée à 'default', qui correspond à une clé dans chartDataSets
     let currentActiveChartKey = 'default';
@@ -134,50 +141,166 @@ document.addEventListener('DOMContentLoaded', function() {
     /**
      * @function updateChart
      * @description Met à jour le graphique principal (camembert) avec un nouveau jeu de données
-     * @param {string} dataSetKey - La clé du jeu de données à utiliser (doit correspondre à une clé dans chartDataSets)
+     * @param newDataSet - Les nouvelles données pour nos camemberts
      */
 
-    function updateChart(dataSetKey) {
+    function updateChart(newDataSet) {
         // Ne fait rien si l'élément canvas n'a pas été trouvé
         if (!canvasElement) return;
 
-        const newDataSet = chartDataSets[dataSetKey];
         if (!newDataSet) {
-            console.error("Jeu de données pour le graphique principal non trouvé :", dataSetKey);
+            console.error("Jeu de données pour le graphique principal non trouvé!");
             return;
         }
-        // Met à jour la variable globale qui stocke la clé du graphique actuellement affiché
-        // Cette variable est utilisée par les mini-graphiques pour savoir quel type de données afficher
-        currentActiveChartKey = dataSetKey;
 
         // Récupère le contexte de dessin 2D du canvas
         const ctx = canvasElement.getContext('2d');
 
-        if (camembertChart) {
-            camembertChart.data.labels = newDataSet.labels;
-            camembertChart.data.datasets[0].data = newDataSet.data;
-            camembertChart.data.datasets[0].backgroundColor = newDataSet.backgroundColor;
-            camembertChart.data.datasets[0].label = newDataSet.legendLabel;
+        const chartData = {
+            labels: newDataSet.labels,
+            datasets: [{
+                label: newDataSet.title,
+                data: newDataSet.data, // Ce sont les pourcentages
+                backgroundColor: newDataSet.backgroundColor,
+                borderColor: '#fff',
+                borderWidth: 1
+            }]
+        };
 
+        chartOptionsConfig.plugins.title.text = newDataSet.title;
+        chartOptionsConfig.plugins.tooltip = {callbacks: {
+                                                    label: function(context) {
+                                                        let label = context.label || '';
+                                                        if (label) {
+                                                            label += ': ';
+                                                        }
+                                                        if (context.parsed !== null) {
+                                                            label += context.parsed.toFixed(2) + '%'; // Utilise le pourcentage
+                                                        }
+                                                        return label;
+                                                    },
+                                                    afterLabel: function(context) {
+                                                        // Afficher le nombre brut d'espèces
+                                                        const count = newDataSet.counts[context.dataIndex];
+                                                        return `(${count} espèces)`;
+                                                    }
+                                                }}
+
+        if (camembertChart) {
+            camembertChart.data = chartData;
             camembertChart.update();
         } else {
             // Si le graphique n'existe pas encore, le crée :
             camembertChart = new Chart(ctx, {
                 type: 'pie',
-                data: {
-                    labels: newDataSet.labels,
-                    datasets: [{
-                        label: newDataSet.legendLabel,
-                        data: newDataSet.data,
-                        backgroundColor: newDataSet.backgroundColor,
-                        borderColor: '#fff',
-                        borderWidth: 1
-                    }]
-                },
+                data: chartData,
                 options: chartOptionsConfig
             });
         }
+        updatePaginationDots()
     }
+
+
+    async function loadChartData(infoParam, pushHistory = true) {
+        try {
+            // Effectue une requête GET asynchrone vers la route Flask '/get_chart_data'
+            // avec le paramètre 'info'.
+            const response = await fetch(`/get_chart_data?info=${infoParam}`);
+
+            // Vérifie si la réponse HTTP est OK (statut 200-299)
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP! statut: ${response.status}`);
+            }
+
+            // Récupère les données JSON de la réponse.
+            chartKeys = await response.json();
+
+            if (chartKeys.length > 1) {
+                prevChartBtn.style.display = 'block'; // Ou 'inline-block' selon votre CSS
+                nextChartBtn.style.display = 'block';
+            }else {
+                prevChartBtn.style.display = 'none';
+                nextChartBtn.style.display = 'none';
+            }
+            createPaginationDots();
+            currentChartIndex = 0;
+            // Appelle la fonction de rendu pour afficher le graphique avec les nouvelles données.
+            updateChart(chartKeys[currentChartIndex]);
+
+            // Synchroniser le bouton actif
+            const matchingButton = Array.from(chartButtons).find(btn => btn.dataset.chartkey === infoParam);
+            if (matchingButton) {
+                setActiveButton(matchingButton);
+            }else{
+                setActiveButton(chartButtons[0]);
+            }
+
+
+            // Mettre à jour l'URL dans la barre d'adresse du navigateur.
+            // Pourquoi : Permet aux utilisateurs de mettre en favori l'état actuel de la page
+            //             et d'utiliser les boutons "Retour" / "Avant" du navigateur.
+            //             Ceci se fait SANS recharger toute la page.
+            if (pushHistory) {
+                const newUrl = `/main_page?info=${infoParam}`;
+                history.pushState({ info: infoParam }, '', newUrl);
+            }
+        } catch (error) {
+            // Gestion des erreurs lors de la récupération des données.
+            // Pourquoi : Afficher un message convivial à l'utilisateur en cas de problème réseau
+            //             ou de réponse invalide du serveur.
+            console.error('Erreur lors du chargement des données du graphique:', error);
+            chartTitleElement.textContent = 'Impossible de charger le graphique. Veuillez réessayer.';
+            if (camembertChart) {
+                camembertChart.destroy();
+                camembertChart = null;
+            }
+            camembertChart.style.display = 'none'; // Masque le canvas en cas d'erreur grave
+        }
+    }
+
+     // NOUVEAU : Fonction pour afficher le graphique suivant
+    function showNextChart() {
+        currentChartIndex = (currentChartIndex + 1) % chartKeys.length;
+        updateChart(chartKeys[currentChartIndex]);
+    }
+
+    // NOUVEAU : Fonction pour afficher le graphique précédent
+    function showPrevChart() {
+        currentChartIndex = (currentChartIndex - 1 + chartKeys.length) % chartKeys.length;
+        updateChart(chartKeys[currentChartIndex]);
+    }
+
+    function createPaginationDots() {
+        chartDotsContainer.innerHTML = ''; // Nettoie les points existants
+        if (chartKeys.length > 1) { // Affiche les points seulement s'il y a plus d'un graphique
+            chartDotsContainer.style.display = 'block'; // Ou 'flex' si vous voulez une flexbox
+            chartKeys.forEach((key, index) => {
+                const dot = document.createElement('span');
+                dot.classList.add('chart-dot');
+                dot.dataset.index = index; // Stocke l'index du graphique que ce point représente
+                dot.addEventListener('click', () => {
+                    currentChartIndex = index; // Met à jour l'index actuel
+                    updateChart(chartKeys[currentChartIndex]); // Charge le graphique correspondant
+                });
+                chartDotsContainer.appendChild(dot);
+            });
+        } else {
+            chartDotsContainer.style.display = 'none'; // Cache le conteneur si un seul graphique
+        }
+        updatePaginationDots(); // Met à jour l'état actif initial
+    }
+
+    function updatePaginationDots() {
+        const dots = document.querySelectorAll('.chart-dot');
+        dots.forEach((dot, index) => {
+            if (index === currentChartIndex) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+    }
+
 
     // Sélectionne tous les boutons de la barre latérale droite qui permettent de changer le type de graphique
     const chartButtons = document.querySelectorAll('.button_right1');
@@ -199,68 +322,37 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ******  INITIALISATION DU CAMEMBERT PRINCIPAL ET ACTIVATION DU BOUTON PAR DEFAUT ******
+    const initial_info = window.initial_info || 'default';
 
     if (canvasElement) {
-        // Vérifie si la clé 'default' (stockée dans currentActiveChartKey) n'existe pas dans chartDataSets
-        // Si c'est le cas et qu'il y a au moins un jeu de données disponible,
-        // utilise la première clé de chartDataSets comme clé par défaut
-        if (!chartDataSets[currentActiveChartKey] && Object.keys(chartDataSets).length > 0) {
-            currentActiveChartKey = Object.keys(chartDataSets)[0];
-            console.warn(`Clé 'default' non trouvée pour chartDataSets. Initialisation avec '${currentActiveChartKey}'.`);
-        }
-
-        // Vérifie si un jeu de données existe pour la clé active (initialement 'default' ou le fallback)
-        if (chartDataSets[currentActiveChartKey]) {
-            // Affiche le graphique principal avec les données initiales
-            updateChart(currentActiveChartKey);
-
-            // Trouve le bouton qui correspond à la clé du graphique initial
-            // On cherche d'abord un bouton ayant un attribut 'data-chartkey' égal à 'currentActiveChartKey'
-            let initialActiveButton = Array.from(chartButtons).find(btn => btn.dataset.chartkey === currentActiveChartKey);
-
-            if (!initialActiveButton && chartButtons.length > 0) {
-                // Prend le premier bouton de la liste comme bouton actif par défaut !
-                initialActiveButton = chartButtons[0];
-                // Vérifie si ce premier bouton a un 'data-chartkey' valide et met à jour le graphique si nécessaire
-                if (initialActiveButton.dataset.chartkey && chartDataSets[initialActiveButton.dataset.chartkey]) {
-                    currentActiveChartKey = initialActiveButton.dataset.chartkey;
-                    updateChart(currentActiveChartKey);
-                } else {
-                    console.warn("Le premier bouton n'a pas de data-chartkey valide. Le graphique pourrait ne pas correspondre au premier bouton.")
-                }
-            }
-
-            // Si un bouton initial actif a été déterminé :
-            if (initialActiveButton) {
-                setActiveButton(initialActiveButton); // Le marque comme actif visuellement
-            } else if (chartButtons.length > 0) {
-                setActiveButton(chartButtons[0]); // Active le premier bouton
-                currentActiveChartKey = chartButtons[0].dataset.chartkey || 'default';
-                updateChart(currentActiveChartKey);
-            } else {
-                console.warn("Aucun bouton '.button_right1' trouvé pour l'activation initiale.");
-            }
-        } else {
-            console.error("Aucune donnée disponible dans chartDataSets pour initialiser le graphique principal.");
-        }
+        // Affiche le graphique principal avec les données initiales
+        loadChartData(initial_info, false);
     }
+
+    window.addEventListener('popstate', (event) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const infoFromUrl = urlParams.get('info') || 'default';
+
+        loadChartData(infoFromUrl, false);
+    });
 
     // Ajoute un écouteur d'événement "click" à chaque bouton de sélection du graphique
     chartButtons.forEach(button => {
         button.addEventListener('click', function(event) {
             event.preventDefault();
             // Récupère la clé du jeu de données depuis l'attribut 'data-chartkey' du bouton cliqué
-            const chartKey = this.dataset.chartkey;
-            // Si la clé existe et qu'un jeu de données correspondant est trouvé :
-            if (chartKey && chartDataSets[chartKey]) {
-                updateChart(chartKey);    // Met à jour le graphique principal
-                setActiveButton(this); // Marque le bouton cliqué comme actif
-            } else {
-                // Avertit si la clé n'est pas valide ou si les données sont manquantes
-                console.warn(`Clé de graphique "${chartKey}" non valide ou jeu de données manquant pour le bouton : "${this.textContent.trim()}".`);
-            }
+            const info = event.target.getAttribute("data-chartkey");
+            // Charge les données du graphique correspondant à l'identifiant, et met à jour l'historique.
+            loadChartData(info);
         });
     });
+
+    if (prevChartBtn && nextChartBtn) {
+        prevChartBtn.addEventListener('click', showPrevChart);
+        nextChartBtn.addEventListener('click', showNextChart);
+    } else {
+        console.warn("Boutons de carousel (précédent/suivant) non trouvés.");
+    }
 
     // ********* MINI-CAMEMBERTS PAR DEPARTEMENT ***********
      /**
@@ -438,7 +530,7 @@ window.addEventListener('load', function () {
     // Vérifie si la fonction 'imageMapResize' (de la bibliothèque image-map-resizer) est disponible
     if (typeof imageMapResize === 'function') {
         // Initialise la bibliothèque pour rendre les zones cliquables (<map>) de l'image responsives
-        imageMapResize();
+        imageMapResize(undefined);
     } else {
         console.warn("La fonction imageMapResize n'a pas été trouvée.");
     }

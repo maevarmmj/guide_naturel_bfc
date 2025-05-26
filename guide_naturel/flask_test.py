@@ -53,11 +53,12 @@ def about():
 def get_chart_data():
     info_key = request.args.get('info')
 
-    if info_key == "Regne":
-        data = species_by_regne(col=collection_instance)
-
+    if info_key == "especesParRegne":
+        data = [species_by_regne(col=collection_instance)]
+    elif info_key == "statutsConservation":
+        data = species_by_regne_and_statut_global(col=collection_instance)
     else:
-        data = species_by_code_statut(col=collection_instance)
+        data = [species_by_code_statut(col=collection_instance)]
 
     return data
 

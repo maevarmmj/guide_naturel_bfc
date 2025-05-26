@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ajouté pour la responsivité -->
   <title>Le Guide Naturel de la BFC</title>
   <link href="../static/css/global.css" rel="stylesheet">
-    <link href="../static/css/index.css" rel="stylesheet">
+  <link href="../static/css/index.css" rel="stylesheet">
+  <link href="../static/css/carousel.css" rel="stylesheet">
 </head>
 
 <body class="index">
@@ -83,14 +84,17 @@
     </section>
 
     <aside class="contenu-droite"> <!-- <aside> pour contenu tangentiel, comme une barre latérale -->
-      <canvas id="camembert"></canvas>
+      <div class="chart-carousel-container">
+          <button class="carousel-arrow carousel-prev">◀</button> <!-- Flèche gauche -->
+          <canvas id="camembert"></canvas>
+          <button class="carousel-arrow carousel-next">▶</button> <!-- Flèche droite -->
+      </div>
+      <div class="chart-dots-container"></div>
       <div class="buttons_right">
         <!-- Remplacé <button> par <a> pour la navigation -->
-        <a href="" class="button_base button_right1" data-chartkey="especesParRegne">Nombre d'espèces par règne</a>
-        <a href="" class="button_base button_right1" data-chartkey="especesDansChaqueRegne">Nombre d'espèces dans chaque règne</a>
-        <a href="" class="button_base button_right1" data-chartkey="statutsConservation">Statuts de conservation par règne</a>
-        <a href="" class="button_base button_right1" data-chartkey="groupesTaxoParRegne">Nombre de groupes taxonomiques par règne</a>
         <a href="" class="button_base button_right1" data-chartkey="especesParStatutConservation">Nombre d'espèces par statut de conservation</a>
+        <a href="" class="button_base button_right1" data-chartkey="especesParRegne">Nombre d'espèces par règne</a>
+        <a href="" class="button_base button_right1" data-chartkey="statutsConservation">Statuts de conservation par règne</a>
       </div>
     </aside>
   </div> <!-- Fin de .content-below -->
@@ -110,7 +114,11 @@
 </div>
 
 
- <div id="footer-placeholder"></div>
+<div id="footer-placeholder"></div>
+
+<script>
+  window.initial_info = {{ initial_info | tojson }};
+</script>
 
 <script src="../static/js/index.js"></script>
 <script src="https://unpkg.com/image-map-resizer@1.0.10/js/imageMapResizer.min.js"></script>
