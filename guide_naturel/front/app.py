@@ -3,7 +3,7 @@ from flask_cors import CORS
 from pymongo import MongoClient
 import uuid
 import os
-import math  # Nécessaire pour math.ceil
+import math
 
 app = Flask(__name__)
 CORS(app)
@@ -12,48 +12,47 @@ CORS(app)
 MONGO_URI = "mongodb+srv://guest:guestpass@big-data.640be.mongodb.net/?retryWrites=true&w=majority&appName=Big-Data"
 DB_NAME = 'LeGuideNaturel'
 OBSERVATIONS_COLLECTION = 'Nature'
-RESULTS_PER_PAGE = 20  # Nombre de résultats par page
+RESULTS_PER_PAGE = 20
 
 client = MongoClient(MONGO_URI)
 db = client[DB_NAME]
 
-conversations = {}  # Stocke l'état des conversations, y compris les filtres pour la pagination
+conversations = {}
 
-# Les questions que le Chatbot va poser (inchangé)
 QUESTIONS_FLOW = {
-    "q1": {
-        "text": "Bonjour ! Quel groupe taxonomique simple vous intéresse ? (ex: Oiseaux, Mammifères, Insectes, Plantes à fleurs, ou tapez 'passer' pour ignorer)",
+    "q_regne": {
+        "text": "Commençons ! As-tu un règne que tu veux chercher ? (ex: Animalia, Plantae, Fungi, ou tapez 'passer')",
+        "next_question_id": "q_groupe_taxo",
+        "param_to_store": "regne",
+        "skippable": True
+    },
+    "q_groupe_taxo": {
+        "text": "Quel groupe taxonomique simple t'intéresse ? (ex: Oiseaux, Mammifères, Insectes, Plantes à fleurs...)",
         "next_question_id": "q2",
         "param_to_store": "groupeTaxoSimple",
         "skippable": True
     },
-    "q2": {
-        "text": "D'accord. Dans quel département souhaitez-vous rechercher ? (Code INSEE, ex: 21, 25, ou tapez 'passer' pour ignorer)",
+    "q2": {  # Question sur le département
+        "text": "Hum, je vois ! Et ce serait dans quel département ? (Code INSEE numérique svp : 21, 25,... ou 'passer')",
         "next_question_id": "q_commune",
         "param_to_store": "codeInseeDepartement",
         "skippable": True
     },
     "q_commune": {
-        "text": "Souhaitez-vous spécifier une commune ? (Nom de la commune, ou tapez 'passer' pour ignorer)",
+        "text": "Si tu as une commune à spécifier, je suis preneuse ! (ex : Dijon, Besançon...)",
         "next_question_id": "q_nom_vern",
         "param_to_store": "commune",
         "skippable": True
     },
     "q_nom_vern": {
-        "text": "Connaissez-vous le nom commun (vernaculaire) de l'espèce recherchée ? (Ou une partie du nom. Sinon, tapez 'passer')",
-        "next_question_id": "q_regne",
+        "text": "Petite question compliquée : connais-tu le nom commun (vernaculaire) de l'espèce recherchée ? Ou une partie du nom ?",
+        "next_question_id": "q_code_statut",
         "param_to_store": "nomVernaculaire",
         "skippable": True
     },
-    "q_regne": {
-        "text": "Voulez-vous filtrer par règne ? (ex: Animalia, Plantae, Fungi, ou tapez 'passer')",
-        "next_question_id": "q_code_statut",
-        "param_to_store": "regne",
-        "skippable": True
-    },
     "q_code_statut": {
-        "text": "Avez-vous un code de statut d'observation spécifique en tête ? (ex: P, O, C, ou tapez 'passer')",
-        "next_question_id": "results",  # Après cette question, on passe aux résultats
+        "text": "As-tu un code de statut d'observation spécifique en tête ? (ex: P, O, C)",
+        "next_question_id": "results",
         "param_to_store": "codeStatut",
         "skippable": True
     }
@@ -62,92 +61,167 @@ QUESTIONS_FLOW = {
 SKIP_KEYWORDS = ["passer", "skip", "ignorer", "non"]
 
 
-def build_mongo_query(filters):
-    query = {}
-    if "groupeTaxoSimple" in filters and filters["groupeTaxoSimple"]:
-        query["groupeTaxoSimple"] = {"$regex": f"^{filters['groupeTaxoSimple']}", "$options": "i"}
-    if "codeInseeDepartement" in filters and filters["codeInseeDepartement"]:
-        query["codeInseeDepartement"] = filters["codeInseeDepartement"]
-    if "commune" in filters and filters["commune"]:
-        query["commune"] = {"$regex": f"^{filters['commune']}", "$options": "i"}
-    if "nomVernaculaire" in filters and filters["nomVernaculaire"]:
-        query["nomVernaculaire"] = {"$regex": filters['nomVernaculaire'], "$options": "i"}
+def build_mongo_match_stage(filters):
+    match_query = {}
     if "regne" in filters and filters["regne"]:
-        query["regne"] = {"$regex": f"^{filters['regne']}$", "$options": "i"}
+        match_query["regne"] = {"$regex": f"^{filters['regne']}$", "$options": "i"}
+    if "groupeTaxoSimple" in filters and filters["groupeTaxoSimple"]:
+        match_query["groupeTaxoSimple"] = {"$regex": f"^{filters['groupeTaxoSimple']}", "$options": "i"}
+
+    # Le filtre codeInseeDepartement est crucial pour la logique d'agrégation
+    if "codeInseeDepartement" in filters and filters["codeInseeDepartement"]:
+        code_dept_str = filters["codeInseeDepartement"]
+        try:
+            code_dept_int = int(code_dept_str)
+            match_query["codeInseeDepartement"] = code_dept_int
+        except ValueError:
+            print(f"Avertissement: Valeur invalide pour codeInseeDepartement '{code_dept_str}', filtre ignoré.")
+            # Si le code dept est invalide, il ne sera pas dans les filtres,
+            # donc l'agrégation se comportera comme si aucun département n'était spécifié.
+            pass
+
+    if "commune" in filters and filters["commune"]:
+        # Le filtre commune n'a de sens que si un département est aussi spécifié.
+        # On pourrait ajouter une logique ici pour l'ignorer si codeInseeDepartement n'est pas dans les filtres.
+        # Pour l'instant, on le laisse, mais l'agrégation le traitera.
+        match_query["commune"] = {"$regex": f"^{filters['commune']}", "$options": "i"}
+
+    if "nomVernaculaire" in filters and filters["nomVernaculaire"]:
+        match_query["nomVernaculaire"] = {"$regex": filters['nomVernaculaire'], "$options": "i"}
     if "codeStatut" in filters and filters["codeStatut"]:
-        query["codeStatut"] = {"$regex": f"^{filters['codeStatut']}$", "$options": "i"}
-    return query
+        match_query["codeStatut"] = {"$regex": f"^{filters['codeStatut']}$", "$options": "i"}
+    return match_query
 
 
 def get_results_from_db(filters, page=1):
-    query = build_mongo_query(filters)
+    match_stage_query = build_mongo_match_stage(filters)
+    departement_specifie = "codeInseeDepartement" in match_stage_query  # True si un code dept valide a été filtré
 
-    if not query:
+    # Si aucun filtre n'est appliqué (sauf potentiellement nomVernaculaire qui est un pré-filtre)
+    # on pourrait vouloir un message différent ou un comportement par défaut.
+    # Pour l'instant, on procède si au moins un filtre (autre que juste nomVernaculaire pour recherche large) est là.
+    # Ou si nomVernaculaire est le SEUL filtre.
+
+    # S'il n'y a aucun filtre du tout après la construction, on sort tôt.
+    if not match_stage_query and not ("nomVernaculaire" in filters and filters["nomVernaculaire"]):
         return {
-            "items": [],
-            "message": "Veuillez spécifier au moins un critère de recherche.",
-            "page": page,
-            "per_page": RESULTS_PER_PAGE,
-            "total_items": 0,
-            "total_pages": 0,
-            "query_used": query  # Pour débogage
+            "items": [], "message": "Veuillez spécifier au moins un critère de recherche.",
+            "page": page, "per_page": RESULTS_PER_PAGE, "total_items": 0, "total_pages": 0,
+            "query_used": match_stage_query, "aggregation_type": "none"
         }
 
-    print(f"Executing MongoDB query: {query} for page {page}")
+    pipeline = []
+    if match_stage_query:
+        pipeline.append({"$match": match_stage_query})
 
-    total_items = db[OBSERVATIONS_COLLECTION].count_documents(query)
+    # Définition du group_stage
+    group_id_key = "$nomVernaculaire"  # Clé de groupement principale
+
+    common_group_fields = {
+        "nomVernaculaire": {"$first": "$nomVernaculaire"},
+        "nomScientifiqueRef": {"$first": "$nomScientifiqueRef"},
+        "regne": {"$first": "$regne"},
+        "groupeTaxoSimple": {"$first": "$groupeTaxoSimple"},
+        "statuts": {"$addToSet": "$codeStatut"},
+        "totalObservationsEspece": {"$sum": "$nombreObservations"}
+    }
+
+    if departement_specifie:
+        # Agrégation spécifique si un département est fourni : inclure les communes du/des département(s) filtré(s)
+        group_stage = {
+            "$group": {
+                "_id": group_id_key,
+                **common_group_fields,
+                "departements": {"$addToSet": "$codeInseeDepartement"},  # Devrait être le(s) dept spécifié(s)
+                "communesDetails": {
+                    "$addToSet": {
+                        "commune": "$commune",
+                        "departement": "$codeInseeDepartement"
+                    }
+                },
+                "aggregation_type": {"$first": "departement_specifique"}  # Pour le debug/frontend
+            }
+        }
+    else:
+        # Agrégation générale si aucun département n'est fourni : lister tous les départements, pas de détail commune
+        group_stage = {
+            "$group": {
+                "_id": group_id_key,
+                **common_group_fields,
+                "departements": {"$addToSet": "$codeInseeDepartement"},  # Tous les départements où l'espèce est trouvée
+                # Pas de communesDetails ici car la recherche est large
+                "aggregation_type": {"$first": "nationale_sans_communes"}  # Pour le debug/frontend
+            }
+        }
+    pipeline.append(group_stage)
+
+    # Comptage pour la pagination
+    count_pipeline = pipeline + [{"$count": "total_items"}]
+    print(f"Executing Aggregation Count Pipeline: {count_pipeline}")
+    count_result = list(db[OBSERVATIONS_COLLECTION].aggregate(count_pipeline))
+    total_items = count_result[0]["total_items"] if count_result else 0
 
     if total_items == 0:
+        message_no_results = "Désolée, je n'ai rien trouvé avec ces critères."
+        if not match_stage_query and ("nomVernaculaire" in filters and filters["nomVernaculaire"]):
+            message_no_results = f"Aucune observation trouvée pour '{filters['nomVernaculaire']}' avec les autres filtres (ou sans)."
+
         return {
-            "items": [],
-            "message": "Désolé, je n'ai rien trouvé avec ces critères.",
-            "page": page,
-            "per_page": RESULTS_PER_PAGE,
-            "total_items": 0,
-            "total_pages": 0,
-            "query_used": query  # Pour débogage
+            "items": [], "message": message_no_results,
+            "page": page, "per_page": RESULTS_PER_PAGE, "total_items": 0, "total_pages": 0,
+            "query_used": match_stage_query,
+            "aggregation_type": group_stage["$group"].get("aggregation_type", {"$first": "unknown"}).get("$first")
         }
 
-    skip_value = (page - 1) * RESULTS_PER_PAGE
-
-    results_cursor = db[OBSERVATIONS_COLLECTION].find(query, {
-        "_id": 0,  # Exclure l'ID de MongoDB
-        "nomVernaculaire": 1,
-        "nomScientifiqueRef": 1,
-        "regne": 1,
-        "commune": 1,
-        "nombreObservations": 1
-        # Ajoutez d'autres champs si nécessaire
-    }).skip(skip_value).limit(RESULTS_PER_PAGE)
-
-    items_on_page = list(results_cursor)
     total_pages = math.ceil(total_items / RESULTS_PER_PAGE)
+    if page < 1: page = 1
+    if page > total_pages and total_pages > 0: page = total_pages  # Correction si page trop élevée
 
-    # Formatter les résultats pour qu'ils soient directement utilisables (chaque item est un dictionnaire)
-    # La mise en forme textuelle se fera côté client pour plus de flexibilité
+    pipeline.append({"$sort": {"nomVernaculaire": 1}})  # ou "_id": 1
+    skip_value = (page - 1) * RESULTS_PER_PAGE
+    pipeline.append({"$skip": skip_value})
+    pipeline.append({"$limit": RESULTS_PER_PAGE})
+
+    print(f"Executing Full Aggregation Pipeline: {pipeline}")
+    aggregated_results = list(db[OBSERVATIONS_COLLECTION].aggregate(pipeline))
+
+    message_text = f"Page {page} sur {total_pages} ({total_items} espèces trouvées).\n"
+    if not aggregated_results and total_items > 0:
+        message_text = "Aucune espèce sur cette page (mais il y en a sur d'autres pages)."
+
+    # S'assurer que chaque item a bien 'aggregation_type' pour le frontend
+    final_aggregation_type = group_stage["$group"].get("aggregation_type", {"$first": "unknown"}).get("$first")
+    for item in aggregated_results:
+        if "aggregation_type" not in item:  # Au cas où $first ne le met pas si le groupe est vide (ne devrait pas arriver ici)
+            item["aggregation_type"] = final_aggregation_type
 
     return {
-        "items": items_on_page,
-        "message": f"Page {page} sur {total_pages} ({total_items} résultats au total).",
+        "items": aggregated_results,
+        "message": message_text,
         "page": page,
         "per_page": RESULTS_PER_PAGE,
         "total_items": total_items,
         "total_pages": total_pages,
-        "query_used": query  # Pour débogage
+        "query_used": match_stage_query,
+        "aggregation_type": final_aggregation_type  # Renvoyer le type d'agrégation utilisé
     }
 
+
+# Les routes @app.route('/chat/start'), @app.route('/chat/send'), @app.route('/chat/results/...')
+# restent identiques à votre version précédente, car elles appellent get_results_from_db
+# qui gère maintenant la logique d'agrégation conditionnelle.
 
 @app.route('/chat/start', methods=['POST'])
 def start_chat():
     conversation_id = str(uuid.uuid4())
-    initial_question_id = "q1"
+    initial_question_id = "q_regne"
     initial_question_data = QUESTIONS_FLOW.get(initial_question_id)
 
     if initial_question_data:
         conversations[conversation_id] = {
             "current_question_id": initial_question_id,
-            "answers": {},  # Pour stocker les filtres
-            "mode": "questioning"  # Indique qu'on est en phase de questions
+            "answers": {},
+            "mode": "questioning"
         }
         is_skippable = initial_question_data.get("skippable", False)
         return jsonify({
@@ -157,7 +231,7 @@ def start_chat():
                 "id": initial_question_id,
                 "is_skippable": is_skippable
             },
-            "is_final_questions": False  # Le flux de questions n'est pas terminé
+            "is_final_questions": False
         })
     else:
         return jsonify({"error": "Could not start chat, no initial question configuration."}), 500
@@ -169,19 +243,14 @@ def handle_message():
     user_answer_raw = data.get('message')
     conversation_id = data.get('conversation_id')
 
-    if not all([user_answer_raw is not None, conversation_id]):  # Vérifier que user_answer_raw n'est pas None
+    if not all([user_answer_raw is not None, conversation_id]):
         return jsonify({"error": "Message or conversation_id missing."}), 400
 
     conv_data = conversations.get(conversation_id)
     if not conv_data:
         return jsonify({"error": "Conversation not found or expired."}), 404
 
-    # Si on est déjà en mode résultat, ce endpoint n'est pas pour la pagination
     if conv_data.get("mode") == "results_displayed":
-        # On pourrait vouloir gérer une nouvelle recherche ici, mais pour l'instant,
-        # on suppose que le client utilisera /chat/start pour une nouvelle recherche.
-        # Ou permettre de relancer une recherche avec les mêmes filtres mais pour page 1 ?
-        # Pour l'instant, on bloque pour éviter la confusion.
         return jsonify({
             "info": "Results already displayed. Use pagination endpoint or start a new chat.",
             "is_final_questions": True
@@ -189,6 +258,9 @@ def handle_message():
 
     current_question_id = conv_data["current_question_id"]
     current_question_config = QUESTIONS_FLOW.get(current_question_id)
+
+    if not current_question_config:
+        return jsonify({"error": "Current question configuration not found."}), 500
 
     param_to_store = current_question_config.get("param_to_store")
     is_current_question_skippable_by_config = current_question_config.get("skippable", False)
@@ -202,17 +274,17 @@ def handle_message():
     next_question_id = current_question_config.get("next_question_id")
 
     if next_question_id == "results":
-        # Les questions sont terminées, on récupère la première page de résultats
         results_payload = get_results_from_db(conv_data["answers"], page=1)
-        conv_data["mode"] = "results_displayed"  # Marquer que les résultats (page 1) ont été envoyés
-        # La conversation (avec ses filtres) est conservée pour la pagination
-
+        if not results_payload.get("items") and results_payload.get("total_items", 0) == 0 and not conv_data.get(
+                "answers"):
+            conv_data["mode"] = "questioning"
+        else:
+            conv_data["mode"] = "results_displayed"
         return jsonify({
-            "results_data": results_payload,  # Contient items, page, total_pages, etc.
-            "is_final_questions": True,  # Le flux de questions est terminé
-            "conversation_id": conversation_id  # Important pour les futurs appels de pagination
+            "results_data": results_payload,  # Contient maintenant aggregation_type
+            "is_final_questions": True,
+            "conversation_id": conversation_id
         })
-
     elif next_question_id and next_question_id in QUESTIONS_FLOW:
         next_question_config = QUESTIONS_FLOW.get(next_question_id)
         conv_data["current_question_id"] = next_question_id
@@ -224,12 +296,10 @@ def handle_message():
                 "is_skippable": is_next_question_skippable
             },
             "is_final_questions": False,
-            "conversation_id": conversation_id  # Toujours renvoyer pour garder la session
+            "conversation_id": conversation_id
         })
     else:
-        # Fin anormale du flux ou erreur de configuration
-        # On pourrait tenter de donner des résultats si des filtres existent
-        if conv_data["answers"]:
+        if conv_data.get("answers"):
             results_payload = get_results_from_db(conv_data["answers"], page=1)
             conv_data["mode"] = "results_displayed"
             return jsonify({
@@ -238,22 +308,19 @@ def handle_message():
                 "conversation_id": conversation_id,
                 "warning": "Chatbot flow ended unexpectedly, showing results based on current answers."
             })
-        # Si pas de réponse, et pas de flux normal, alors erreur.
-        # conversations.pop(conversation_id, None) # On pourrait nettoyer ici
-        return jsonify({"error": "Chatbot flow error or end of defined flow.", "is_final_questions": True}), 500
+        conversations.pop(conversation_id, None)
+        return jsonify({"error": "Chatbot flow error or no answers provided.", "is_final_questions": True}), 500
 
 
-# NOUVELLE ROUTE POUR LA PAGINATION DES RÉSULTATS
 @app.route('/chat/results/<conversation_id>/page/<int:page_num>', methods=['GET'])
 def get_paginated_results(conversation_id, page_num):
     conv_data = conversations.get(conversation_id)
     if not conv_data:
         return jsonify({"error": "Conversation not found or expired. Please start a new search."}), 404
 
-    # S'assurer que la conversation a bien des filtres (a atteint l'étape des résultats)
     if "answers" not in conv_data or conv_data.get("mode") != "results_displayed":
         return jsonify({
-                           "error": "No search filters found for this conversation or results not yet processed. Please complete the questions first."}), 400
+            "error": "No search filters for this conversation or results not yet processed."}), 400
 
     if page_num < 1:
         return jsonify({"error": "Page number must be 1 or greater."}), 400
@@ -261,13 +328,9 @@ def get_paginated_results(conversation_id, page_num):
     filters = conv_data["answers"]
     results_payload = get_results_from_db(filters, page=page_num)
 
-    # Vérifier si la page demandée est valide par rapport au nombre total de pages
-    # (get_results_from_db gère déjà le cas où page_num > total_pages en retournant une liste vide,
-    # mais on pourrait ajouter une vérification ici aussi si on le souhaite)
-
     return jsonify({
-        "results_data": results_payload,
-        "is_final_questions": True,  # On est toujours en mode "questions finies"
+        "results_data": results_payload,  # Contient maintenant aggregation_type
+        "is_final_questions": True,
         "conversation_id": conversation_id
     })
 

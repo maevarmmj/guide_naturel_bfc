@@ -201,7 +201,7 @@
     font-size: 0.9em;
     color: #444;
     margin-bottom: 10px; /* Réduit pour laisser plus de place à la pagination */
-    padding: 5px 0;
+    padding: 2px 0;
 }
 
 /* Styles pour les contrôles de pagination */
@@ -271,11 +271,11 @@
 
 /* Le bouton "OK" utilise le style .pagination-controls button par défaut.
    Si vous voulez un style spécifique pour .goto-page-button, décommentez et ajustez : */
-/*
-.goto-page-button {
-    background-color: #5cb85c; // Exemple: vert différent
-}
-*/
+
+/*.goto-page-button {*/
+/*    background-color: #5cb85c;*/
+/*}*/
+
 
 /* RESPONSIVE */
 @media screen and (max-width: 850px) {
@@ -342,3 +342,110 @@
         margin-bottom: 8px;
     }
 }
+
+
+.pagination-controls button {
+    /* ... vos styles existants ... */
+    display: inline-flex; /* Permet d'aligner l'icône verticalement */
+    align-items: center;  /* Centre l'icône verticalement */
+    justify-content: center; /* Centre l'icône horizontalement (si le bouton est plus large) */
+    padding: 6px 10px; /* Ajustez le padding pour laisser de la place à l'icône */
+    /* Si vous voulez que les boutons aient une taille fixe pour les icônes : */
+    /* width: 36px; */
+    /* height: 36px; */
+}
+
+.pagination-arrow-icon {
+    width: 12px;  /* Définissez la taille de votre icône */
+    height: 12px; /* Définissez la taille de votre icône */
+    /* vertical-align: middle; /* Alternative pour l'alignement vertical si display: inline-flex n'est pas utilisé */
+}
+
+/* Si vous voulez que le bouton OK ait toujours du texte,
+   vous pourriez avoir besoin d'un style plus spécifique pour lui s'il partage la classe
+   générale des boutons de pagination et que vous avez changé le padding global */
+
+.goto-page-button {
+    /* padding: 7px 14px; /* Rétablir le padding si besoin */
+}
+
+/* --- INFOBOX STYLES --- */
+#item-infobox {
+    position: absolute; /* Positionnée par rapport au viewport ou un parent positionné */
+    z-index: 900; /* Au-dessus de la plupart des éléments, mais en dessous du modal si vous en aviez un */
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 12px;
+    min-width: 250px; /* Largeur minimale */
+    max-width: 400px; /* Largeur maximale */
+    font-size: 0.9em;
+    line-height: 1.5;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out, transform 0.2s ease-in-out;
+    transform: translateY(10px) scale(0.98); /* Effet d'apparition subtil */
+}
+
+#item-infobox.infobox-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+#item-infobox.infobox-hidden {
+    display: none; /* Ou garder opacity/visibility pour la transition de disparition */
+    /* Si vous utilisez display: none, la transition de disparition ne sera pas visible.
+       Si vous voulez la transition de disparition, commentez display:none et assurez-vous
+       que opacity et visibility gèrent bien le masquage.
+       Pour l'instant, je laisse display: none pour plus de simplicité
+       car la transition est surtout pour l'apparition. */
+}
+
+
+.infobox-title {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    color: #1e6033;
+    border-bottom: 1px solid #e7e7e7;
+    padding-bottom: 6px;
+}
+
+.infobox-details-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px; /* Limiter la hauteur si beaucoup de champs */
+    overflow-y: auto; /* Scroll si dépasse */
+}
+
+.infobox-details-list li {
+    padding: 3px 0;
+}
+
+.infobox-detail-key {
+    font-weight: bold;
+    color: #333;
+}
+
+.infobox-detail-value {
+    color: #555;
+    word-break: break-word;
+}
+
+/* Optionnel: Flèche pour l'infobox (plus complexe à positionner dynamiquement) */
+/*
+.infobox-arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    // Exemple pour une flèche pointant vers la gauche (si l'infobox est à droite de l'item)
+    // top: 15px; // Ajuster verticalement
+    // right: 100%; // À l'extrémité gauche de l'infobox
+    // border-width: 8px 8px 8px 0;
+    // border-color: transparent #f9f9f9 transparent transparent;
+}
+*/
