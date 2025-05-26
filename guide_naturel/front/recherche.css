@@ -1,3 +1,7 @@
+/* Styles globaux (si vous les avez dans global.css, pas besoin de répéter ici) */
+/* ... */
+
+/* Styles spécifiques à la page de recherche (votre existant) */
 .content-below-recherche {
   display: flex;
   flex-direction: row;
@@ -9,85 +13,66 @@
 }
 
 .chatbot-container {
-  flex: 1 1 0; /* Ou 'flex: 1;' pour un partage équitable avec chatbot-results */
-  /* S'il doit être plus grand, ex: flex: 2 1 0; (deux fois plus grand que chatbot-results si celui-ci est flex: 1 1 0;) */
+  flex: 1 1 0;
   background-color: rgba(53, 161, 84,0.5);
   border-radius: 10px;
-  padding: 20px; /* Gardez ce padding externe */
+  padding: 20px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   min-height: 370px;
-
-  /* MODIFICATION IMPORTANTE: Comment gérer les enfants (log et input) */
   display: flex;
-  flex-direction: column; /* Pour empiler le log et la zone d'input */
-  justify-content: space-between; /* Pousse la zone d'input vers le bas */
-  /* align-items: center; /* Peut-être pas nécessaire, ou align-items: stretch; */
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-
-/* Styles pour les éléments internes du chatbot-container */
 .chat-log-area {
-  flex-grow: 1; /* Permet au log de prendre l'espace vertical disponible DANS SON PARENT */
-  overflow-y: auto; /* Affiche une barre de défilement verticale UNIQUEMENT SI NÉCESSAIRE */
-  /* overflow-x: hidden; /* Optionnel: cache la barre de défilement horizontale si du texte dépasse en largeur */
-
-  /* DÉFINISSEZ UNE HAUTEUR MAXIMALE ICI */
-  max-height: 300px; /* Par exemple, 300 pixels. Ajustez cette valeur selon vos besoins. */
-  /* Vous pouvez aussi utiliser des unités relatives comme 'vh' (viewport height), mais 'px' est souvent plus simple pour commencer. */
-  /* Si vous aviez un 'height' fixe, remplacez-le par 'max-height' ou assurez-vous que 'height' est inférieur ou égal à 'max-height'. */
-
-  /* Vos autres styles pour .chat-log-area restent : */
+  flex-grow: 1;
+  overflow-y: auto;
+  max-height: 300px;
   padding: 10px;
   margin-bottom: 15px;
-    /*background-color: #ffffff;*/
-  /*border: 1px solid #ccc;*/
   border-radius: 5px;
-  /* min-height: 200px; /* Vous pouvez garder un min-height si vous voulez qu'il ait une taille minimale même vide */
 }
 
-.chat-log-area p { /* Styles pour les messages individuels */
+.chat-log-area p {
   margin: 8px 0;
   padding: 10px 15px;
   border-radius: 18px;
-    font-size: 15px;
+  font-size: 15px;
   border : 2px solid rgba(255,255,255,0.4);
   max-width: 85%;
   word-wrap: break-word;
-  line-height: 1;
-
-      /* Styles pour l'animation */
-  opacity: 0; /* Initialement transparent */
-  transform: translateY(15px); /* Initialement un peu décalé vers le bas (ou X si vous préférez) */
-  /* Si vous voulez un effet de "scale" : transform: scale(0.95); */
-
+  line-height: 1.2; /* Ajusté pour une meilleure lisibilité */
+  opacity: 0;
+  transform: translateY(15px);
   transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-  /* Vous pouvez ajuster la durée (0.4s) et la fonction de timing (ease-out) */
 }
 
-.chat-log-area p.visible { /* Classe à ajouter via JS */
+.chat-log-area p.visible {
   opacity: 1;
   transform: translateY(0);
-  /* Si effet de scale : transform: scale(1); */
 }
 
 .bot-message {
   background-color: #3fd181;
-  align-self: flex-start; /* Les messages du bot à gauche */
-      color: #FFFFFF; /* Couleur de texte par défaut pour les messages */
-
+  align-self: flex-start;
+  color: #FFFFFF;
 }
 
 .user-message {
   background-color: #7ae872;
-  margin-left: auto; /* Les messages de l'utilisateur à droite */
-  /* Si vous préférez les messages utilisateur à gauche aussi, retirez margin-left: auto; */
-      color: #0a2e0c; /* Couleur de texte par défaut pour les messages */
-
+  margin-left: auto;
+  color: #0a2e0c;
 }
+.user-message i { /* Pour le "Je ne sais pas" */
+    font-style: italic;
+    color: #1e4620; /* Un peu plus sombre pour l'italique */
+}
+
 
 .chat-input-area {
   display: flex;
   gap: 10px;
+  align-items: center;
 }
 
 #chat-input {
@@ -96,25 +81,29 @@
   border: 1px solid #48bd50;
   border-radius: 20px;
   font-size: 1em;
-  background-color: #fff; /* S'assurer que l'input est visible */
+  background-color: #fff;
   color: #1e6033;
 }
 #chat-input::placeholder {
     color: #888;
 }
 
-
-#send-chat-button {
-  padding: 6px 15px;
-  background-color: #48bd50; /* Un vert un peu plus foncé que le conteneur */
+#send-chat-button,
+#skip-chat-button {
+  padding: 8px 15px; /* Un peu plus de padding vertical */
   color: white;
   border: none;
   border-radius: 20px;
   cursor: pointer;
-  font-size: 0.8em;
+  font-size: 0.9em; /* Ajusté */
   transition: background-color 0.2s;
+  white-space: nowrap;
 }
-#send-chat-button:hover {
+
+#send-chat-button {
+  background-color: #48bd50;
+}
+#send-chat-button:hover:not(:disabled) {
   background-color: #1e6033;
 }
 #send-chat-button:disabled {
@@ -122,87 +111,234 @@
   cursor: not-allowed;
 }
 
+#skip-chat-button {
+  background-color: #f0ad4e;
+}
+#skip-chat-button:hover:not(:disabled) {
+  background-color: #ec971f;
+}
+#skip-chat-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
 
 /* Styles pour .chatbot-results */
 .chatbot-results {
-  flex: 1 1 0; /* Ou 'flex: 1;' pour un partage équitable */
+  flex: 1 1 0;
   background-color: rgba(53, 161, 84,0.5);
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   min-height: 370px;
-  display: flex; /* Pour centrer le contenu s'il est simple */
-  flex-direction: column; /* Au cas où vous mettez un titre + contenu */
-  justify-content: flex-start; /* Alignement en haut par défaut */
-  align-items: stretch; /* S'étire pour prendre la largeur */
-  color: rgba(255,255,255,0.4); /* Couleur de texte par défaut pour le conteneur, sera surchargée si besoin */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  color: rgba(255,255,255,0.4);
 }
 
 #final-chatbot-results-content {
-    background-color: rgba(255, 255, 255, 0.8); /* Fond légèrement transparent pour les résultats */
-    color: #333; /* Texte foncé pour la lisibilité */
+    background-color: rgba(255, 255, 255, 0.85); /* Légèrement moins transparent */
+    color: #333;
     padding: 15px;
     border-radius: 5px;
-    height: 100%; /* Tente de remplir le parent .chatbot-results */
-    overflow-y: auto; /* Si le contenu est long */
-    white-space: pre-wrap; /* Respecte les sauts de ligne du backend */
+    height: 100%;
+    overflow-y: auto; /* Pour le contenu global des résultats */
+    display: flex;
+    flex-direction: column;
+    /* justify-content: space-between; (déjà géré par le flex-grow de la liste) */
     line-height: 1.6;
 }
-#final-chatbot-results-content:empty::before { /* Placeholder si vide */
+
+/* Placeholder si #final-chatbot-results-content est vide (avant le premier résultat) */
+/* Le JS ajoute maintenant un .results-message pour cela, donc :empty::before n'est plus nécessaire
+   si on utilise la méthode JS. Si vous préférez le CSS pur pour le placeholder initial : */
+/*
+#final-chatbot-results-content:empty::before {
     content: "Les résultats de votre recherche apparaîtront ici...";
     display: block;
     text-align: center;
     padding-top: 20px;
     color: #666;
     font-style: italic;
+    flex-grow: 1; /* Pour occuper l'espace si vide */
+/*}*/
+
+
+.results-message { /* Pour les messages comme "Aucun résultat trouvé" ou le placeholder JS */
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+    color: #555;
+    flex-grow: 1; /* Pour centrer verticalement si c'est le seul contenu */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
+.results-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0 0 15px 0;
+    flex-grow: 1; /* Prend l'espace vertical disponible */
+    overflow-y: auto; /* Si la liste elle-même devient trop longue */
+    max-height : 300px;
+}
 
-/* RESPONSIVE pour la page de recherche (votre existant) */
-@media screen and (max-width: 850px) { /* Ajustez ce point de rupture */
+.results-list li {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(53, 161, 84, 0.2);
+    font-size: 0.95em;
+    line-height: 1.5;
+    color: #333;
+}
+.results-list li:last-child {
+    border-bottom: none;
+}
+
+.results-summary {
+    text-align: center;
+    font-size: 0.9em;
+    color: #444;
+    margin-bottom: 10px; /* Réduit pour laisser plus de place à la pagination */
+    padding: 5px 0;
+}
+
+/* Styles pour les contrôles de pagination */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0 5px 0; /* Un peu moins de padding en bas */
+    gap: 8px; /* Espace entre les éléments de pagination */
+    margin-top: auto; /* Pousse la pagination vers le bas */
+    border-top: 1px solid rgba(53, 161, 84, 0.3); /* Ligne de séparation plus visible */
+}
+
+.pagination-controls button { /* Style commun pour Précédent, Suivant, OK */
+    padding: 7px 14px;
+    background-color: #48bd50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.85em; /* Un peu plus petit pour plus de place */
+    transition: background-color 0.2s ease-in-out;
+    white-space: nowrap;
+}
+.pagination-controls button:hover:not(:disabled) {
+    background-color: #3aa842;
+}
+.pagination-controls button:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+}
+
+/* Styles pour le conteneur de l'input de page */
+.page-input-container {
+    display: flex;
+    align-items: center;
+    gap: 4px; /* Espace réduit dans le conteneur de l'input */
+}
+
+.page-input-label {
+    font-size: 0.85em; /* Correspond aux boutons */
+    color: #333;
+    /* margin-right: 2px; (géré par le gap du conteneur) */
+}
+
+.page-number-input {
+    width: 45px; /* Ajusté */
+    padding: 6px; /* Ajusté */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 0.85em; /* Correspond aux boutons */
+    -moz-appearance: textfield;
+}
+.page-number-input::-webkit-outer-spin-button,
+.page-number-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.total-pages-indicator {
+    font-size: 0.85em; /* Correspond aux boutons */
+    color: #333;
+    /* margin-left: 2px; (géré par le gap du conteneur) */
+}
+
+/* Le bouton "OK" utilise le style .pagination-controls button par défaut.
+   Si vous voulez un style spécifique pour .goto-page-button, décommentez et ajustez : */
+/*
+.goto-page-button {
+    background-color: #5cb85c; // Exemple: vert différent
+}
+*/
+
+/* RESPONSIVE */
+@media screen and (max-width: 850px) {
     .content-below-recherche {
         flex-direction: column;
         align-items: center;
         gap: 1.5rem;
     }
-
     .chatbot-container,
-    .chatbot-results { /* Appliquer aussi à chatbot-results */
+    .chatbot-results {
         flex-basis: auto;
         width: 100%;
-        max-width: 500px; /* Limite la largeur quand ils sont empilés */
+        max-width: 500px;
+        min-height: 250px;
     }
-     .chatbot-container,
-     .chatbot-results {
-        min-height: 250px; /* Réduire la hauteur min sur mobile */
-     }
-     /* Peut-être réduire la taille de police pour le chat sur mobile */
      .chat-log-area p {
         padding: 8px 12px;
         font-size: 0.9em;
      }
-     #chat-input, #send-chat-button {
+     #chat-input, #send-chat-button, #skip-chat-button {
         font-size: 0.9em;
         padding: 10px 15px;
      }
 }
 
-@media screen and (max-width: 769px) {
-    .content-below-recherche {
-        flex-direction: column;
-        align-items: center;    /* Centre les blocs s'ils sont moins larges que le parent */
-        gap: 1.5rem;
-    }
+@media screen and (max-width: 769px) { /* Ce point de rupture semble redondant si 850px fait déjà le travail */
+    /* .content-below-recherche, .chatbot-container, .chatbot-results (déjà géré par 850px) */
+    /* Les styles suivants s'appliquent en plus de ceux de 850px si besoin */
+}
 
-     .chatbot-container, .chatbot-results {
-        min-height: 250px;
-        width: 90%;         /* Par exemple, 90% de la largeur du parent .content-below-recherche */
-        /* Ou width: 100%; si vous n'avez pas de padding sur .content-below-recherche qui pourrait causer un dépassement */
-        /* Ou width: 100%; et box-sizing: border-box; si vous avez du padding sur ces éléments et voulez que la largeur inclue le padding */
-        max-width: 500px;   /* Optionnel : une largeur maximale pour éviter qu'ils soient trop larges sur des tablettes en mode portrait par ex. */
-        /* Important: annuler le flex-basis hérité du desktop si besoin,
-           mais avec width: XX%, le flex-basis est moins prioritaire pour la largeur en mode colonne.
-           Par sécurité, on peut ajouter : */
-        flex-basis: auto;
-     }
+
+@media screen and (max-width: 480px) {
+    .pagination-controls {
+        gap: 5px;
+        flex-wrap: wrap; /* Permet aux éléments de passer à la ligne */
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+    .pagination-controls button {
+        padding: 6px 10px; /* Plus petit padding */
+        font-size: 0.8em; /* Plus petite police */
+    }
+    .page-input-container {
+        /* Sur mobile, on pourrait vouloir que l'input prenne plus de place ou soit sur sa propre ligne */
+        /* Par exemple, pour centrer l'input et son label/total:
+        /* order: -1; /* Le mettre avant les boutons Précédent/Suivant si flex-wrap */
+        /* flex-basis: 100%;
+        justify-content: center;
+        margin-bottom: 5px; */
+    }
+    .page-number-input {
+        width: 35px;
+        padding: 5px;
+        font-size: 0.8em;
+    }
+    .page-input-label, .total-pages-indicator {
+        font-size: 0.8em;
+    }
+    .results-list li {
+        font-size: 0.9em;
+    }
+    .results-summary {
+        font-size: 0.85em;
+        margin-bottom: 8px;
+    }
 }
