@@ -24,11 +24,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Instances des graphiques Chart.js :
     let camembertChart;
     let miniChartInstance;
-    let chartKeys = Array;
+    let mainChatData = Array;
     let currentChartIndex = 0;
     // Variable pour suivre quel type de données le graphique principal (et donc le mini-graphique) doit afficher
     // Initialisée à 'default', qui correspond à une clé dans chartDataSets
-    let currentActiveChartKey = 'default';
+    let chartKeyValue  = 'default';
+    let minichartData = Array;
 
 
     // ********** SURVOL DES DEPARTEMENTS *********
@@ -83,20 +84,11 @@ document.addEventListener('DOMContentLoaded', function() {
             data: [1200, 850, 300, 500, 150],
             backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
             legendLabel: "Nombre d'espèces par règne" },
-        especesDansChaqueRegne: {
-            labels: ['Mammifères', 'Oiseaux', 'Angiospermes', 'Champignons Ascomycètes'],
-            data: [150, 350, 700, 250],
-            backgroundColor: ['#FF9F40', '#FFCD56', '#4BC0C0', '#36A2EB', '#C9CBCF'], legendLabel: "Exemples d'espèces par groupes" },
-        statutsConservation: {
+        statutsConservationParRegne: {
             labels: ['Préoccupation mineure (LC)', 'Quasi menacée (NT)', 'Vulnérable (VU)', 'En danger (EN)', 'En danger critique (CR)'],
             data: [500, 120, 80, 40, 15],
             backgroundColor: ['#A1E8A1', '#F9E79F', '#F5CBA7', '#F1948A', '#EC7063'],
             legendLabel: "Statuts de conservation (Tous règnes)" },
-        groupesTaxoParRegne: {
-            labels: ['Classes (Animalia)', 'Divisions (Plantae)', 'Phyla (Fungi)'],
-            data: [30, 15, 25],
-            backgroundColor: ['#85C1E9', '#7DCEA0', '#F8C471'],
-            legendLabel: "Diversité des groupes taxonomiques" },
         especesParStatutConservation: { labels: ['LC', 'NT', 'VU', 'EN', 'CR', 'DD', 'NE'],
             data: [600, 250, 150, 100, 50, 200, 30],
             backgroundColor: ['#76D7C4', '#F7DC6F', '#F0B27A', '#E74C3C', '#C0392B', '#BFC9CA', '#AAB7B8'],
@@ -117,6 +109,12 @@ document.addEventListener('DOMContentLoaded', function() {
             legend: {
                 position: 'right',
                 align: 'center',
+                title: {
+                    display: true,
+                    padding: 10,
+                    color: '#ffffff',
+                    font: { weight: 'bold'}
+                },
                 labels: { color: '#ffffff',
                     font: {
                     family: 'Georgia', size: 10 },
@@ -168,6 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         chartOptionsConfig.plugins.title.text = newDataSet.title;
+        chartOptionsConfig.plugins.legend.title.text = newDataSet.legendLabel;
         chartOptionsConfig.plugins.tooltip = {callbacks: {
                                                     label: function(context) {
                                                         let label = context.label || '';
@@ -213,9 +212,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Récupère les données JSON de la réponse.
-            chartKeys = await response.json();
+            mainChatData = await response.json();
 
-            if (chartKeys.length > 1) {
+            if (mainChatData.length > 1) {
                 prevChartBtn.style.display = 'block'; // Ou 'inline-block' selon votre CSS
                 nextChartBtn.style.display = 'block';
             }else {
@@ -225,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function() {
             createPaginationDots();
             currentChartIndex = 0;
             // Appelle la fonction de rendu pour afficher le graphique avec les nouvelles données.
-            updateChart(chartKeys[currentChartIndex]);
+            updateChart(mainChatData[currentChartIndex]);
 
             // Synchroniser le bouton actif
             const matchingButton = Array.from(chartButtons).find(btn => btn.dataset.chartkey === infoParam);
@@ -260,27 +259,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
      // NOUVEAU : Fonction pour afficher le graphique suivant
     function showNextChart() {
-        currentChartIndex = (currentChartIndex + 1) % chartKeys.length;
-        updateChart(chartKeys[currentChartIndex]);
+        currentChartIndex = (currentChartIndex + 1) % mainChatData.length;
+        updateChart(mainChatData[currentChartIndex]);
     }
 
     // NOUVEAU : Fonction pour afficher le graphique précédent
     function showPrevChart() {
-        currentChartIndex = (currentChartIndex - 1 + chartKeys.length) % chartKeys.length;
-        updateChart(chartKeys[currentChartIndex]);
+        currentChartIndex = (currentChartIndex - 1 + mainChatData.length) % mainChatData.length;
+        updateChart(mainChatData[currentChartIndex]);
     }
 
     function createPaginationDots() {
         chartDotsContainer.innerHTML = ''; // Nettoie les points existants
-        if (chartKeys.length > 1) { // Affiche les points seulement s'il y a plus d'un graphique
+        if (mainChatData.length > 1) { // Affiche les points seulement s'il y a plus d'un graphique
             chartDotsContainer.style.display = 'block'; // Ou 'flex' si vous voulez une flexbox
-            chartKeys.forEach((key, index) => {
+            mainChatData.forEach((key, index) => {
                 const dot = document.createElement('span');
                 dot.classList.add('chart-dot');
                 dot.dataset.index = index; // Stocke l'index du graphique que ce point représente
                 dot.addEventListener('click', () => {
                     currentChartIndex = index; // Met à jour l'index actuel
-                    updateChart(chartKeys[currentChartIndex]); // Charge le graphique correspondant
+                    updateChart(mainChatData[currentChartIndex]); // Charge le graphique correspondant
                 });
                 chartDotsContainer.appendChild(dot);
             });
@@ -344,6 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const info = event.target.getAttribute("data-chartkey");
             // Charge les données du graphique correspondant à l'identifiant, et met à jour l'historique.
             loadChartData(info);
+            initialise_chart_data(info);
         });
     });
 
@@ -355,18 +355,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ********* MINI-CAMEMBERTS PAR DEPARTEMENT ***********
-     /**
-     * @function generateRandomDataForExistingLabels
-     * @description Génère un ensemble de valeurs de données aléatoires pour une liste de labels existants
-     * @param {string[]} mainChartLabels - Le tableau des labels du graphique principal
-     * @returns {number[]} Un tableau de valeurs numériques aléatoires
-     */
-    function generateRandomDataForExistingLabels(mainChartLabels) {
-        const data = [];
-        mainChartLabels.forEach(() => {
-            data.push(Math.floor(Math.random() * 100));
-        });
-        return data;
+    async function initialise_chart_data(info) {
+        const response = await fetch(`/get_chart_data?info=${infoParam}`);
+
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP! statut: ${response.status}`);
+        }
+        
+        minichartData = await response.json();
     }
 
     // Objet pour stocker les données des graphiques pour chaque département.
@@ -413,6 +409,7 @@ document.addEventListener('DOMContentLoaded', function() {
             event.preventDefault(); // Empêche le comportement par défaut du lien <area>
             // Récupère le nom du département cliqué (depuis l'attribut 'alt')
             const departementKey = this.alt.toLowerCase();
+            chartKeyValue = document.querySelector('.button_active')?.dataset.chartkey;
 
             if (!departementChartContainer || !miniDepartementChartCanvas) {
                 console.error("Conteneur (#departement-chart-container) ou canvas (#mini-departement-chart) pour le mini-graphique non trouvé.");
@@ -421,10 +418,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Récupère les données pour le département cliqué ET pour le type de graphique actuellement actif
             const deptDataSetsForCurrentType = departementalChartData[departementKey];
-            const specificDeptData = deptDataSetsForCurrentType ? deptDataSetsForCurrentType[currentActiveChartKey] : null;
+            const specificDeptData = deptDataSetsForCurrentType ? deptDataSetsForCurrentType[chartKeyValue] : null;
 
             // Récupère les informations (notamment le titre/label) du graphique principal actuellement affiché
-            const mainChartInfo = chartDataSets[currentActiveChartKey];
+            const mainChartInfo = chartDataSets[chartKeyValue];
             const mainChartLegendLabelBase = mainChartInfo ? (mainChartInfo.legendLabel || "Données") : "Données";
 
             // Si des données spécifiques existent pour ce département et ce type de graphique :
@@ -435,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 // Construit le titre pour le mini-graphique en combinant le titre du graphique principal
-                const miniChartTitle = `${mainChartLegendLabelBase.replace(/\s*\(Tous règnes\)\s*$/i, '').replace(/\s*par règne\s*$/i, '')} ${specificDeptData.titleSuffix || ''}`;
+                const miniChartTitle = `${mainChartLegendLabelBase} ${specificDeptData.titleSuffix || ''}`;
 
                 // Récupère le contexte de dessin 2D du canvas du mini-graphique
                 const miniCtx = miniDepartementChartCanvas.getContext('2d');
@@ -501,7 +498,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 departementChartContainer.style.display = 'block';
 
             } else {
-                console.warn(`Pas de données de graphique disponibles pour le département "${departementKey}" et le type de graphique "${currentActiveChartKey}".`);
+                console.warn(`Pas de données de graphique disponibles pour le département "${departementKey}" et le type de graphique "${chartKeyValue}".`);
                 departementChartContainer.style.display = 'none';
             }
         });
