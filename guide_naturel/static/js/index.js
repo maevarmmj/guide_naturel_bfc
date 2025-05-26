@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Variable pour suivre quel type de données le graphique principal (et donc le mini-graphique) doit afficher
     // Initialisée à 'default', qui correspond à une clé dans chartDataSets
     let chartKeyValue  = 'default';
-    let minichartData = Array;
+    let minichartData = [];
 
 
     // ********** SURVOL DES DEPARTEMENTS *********
@@ -69,32 +69,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("L'élément Canvas avec l'ID 'camembert' n'a pas été trouvé");
     }
 
-    // Définit un objet contenant les différents jeux de données pour le graphique principal.
-    // Chaque clé (ex: 'default', 'especesParRegne') correspond à un type de graphique
-    // que l'utilisateur peut sélectionner via les boutons '.button_right1'
-
-    const chartDataSets = {
-        default: {
-            labels: ['Animalia', 'Plantae', 'Fungi', 'Bacteria', 'Chromista'],
-            data: [1200, 850, 300, 500, 150],
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
-            legendLabel: "Nombre d'espèces par règne" },
-        especesParRegne: {
-            labels: ['Animalia', 'Plantae', 'Fungi', 'Bacteria', 'Chromista'],
-            data: [1200, 850, 300, 500, 150],
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
-            legendLabel: "Nombre d'espèces par règne" },
-        statutsConservationParRegne: {
-            labels: ['Préoccupation mineure (LC)', 'Quasi menacée (NT)', 'Vulnérable (VU)', 'En danger (EN)', 'En danger critique (CR)'],
-            data: [500, 120, 80, 40, 15],
-            backgroundColor: ['#A1E8A1', '#F9E79F', '#F5CBA7', '#F1948A', '#EC7063'],
-            legendLabel: "Statuts de conservation (Tous règnes)" },
-        especesParStatutConservation: { labels: ['LC', 'NT', 'VU', 'EN', 'CR', 'DD', 'NE'],
-            data: [600, 250, 150, 100, 50, 200, 30],
-            backgroundColor: ['#76D7C4', '#F7DC6F', '#F0B27A', '#E74C3C', '#C0392B', '#BFC9CA', '#AAB7B8'],
-            legendLabel: "Nombre d'espèces par statut UICN" }
-    };
-
     // Définit un objet de configuration commun pour les options du graphique principal (responsivité, la légende, le titre)
     const chartOptionsConfig = {
         responsive: true,
@@ -107,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 left: 10 } },
         plugins: {
             legend: {
-                position: 'right',
+                position: 'bottom',
                 align: 'center',
                 title: {
                     display: true,
@@ -166,7 +140,6 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         chartOptionsConfig.plugins.title.text = newDataSet.title;
-        chartOptionsConfig.plugins.legend.title.text = newDataSet.legendLabel;
         chartOptionsConfig.plugins.tooltip = {callbacks: {
                                                     label: function(context) {
                                                         let label = context.label || '';
@@ -325,6 +298,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (canvasElement) {
         // Affiche le graphique principal avec les données initiales
+        initialise_chart_data(initial_info);
         loadChartData(initial_info, false);
     }
 
@@ -332,6 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const urlParams = new URLSearchParams(window.location.search);
         const infoFromUrl = urlParams.get('info') || 'default';
 
+        initialise_chart_data(infoFromUrl);
         loadChartData(infoFromUrl, false);
     });
 
@@ -342,8 +317,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // Récupère la clé du jeu de données depuis l'attribut 'data-chartkey' du bouton cliqué
             const info = event.target.getAttribute("data-chartkey");
             // Charge les données du graphique correspondant à l'identifiant, et met à jour l'historique.
-            loadChartData(info);
             initialise_chart_data(info);
+            loadChartData(info);
         });
     });
 
@@ -356,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ********* MINI-CAMEMBERTS PAR DEPARTEMENT ***********
     async function initialise_chart_data(info) {
-        const response = await fetch(`/get_chart_data?info=${infoParam}`);
+        const response = await fetch(`/get_chart_data?info=${info}_dep`);
 
         if (!response.ok) {
             throw new Error(`Erreur HTTP! statut: ${response.status}`);
@@ -365,43 +340,7 @@ document.addEventListener('DOMContentLoaded', function() {
         minichartData = await response.json();
     }
 
-    // Objet pour stocker les données des graphiques pour chaque département.
-    const departementalChartData = {};
-    const departementAltNames = Array.from(departementAreas).map(area => area.alt.toLowerCase());
-    const chartKeysForDepartments = Object.keys(chartDataSets); // Clés comme 'default', 'especesParRegne', etc.
-
-    // Boucle sur chaque nom de département pour initialiser ses données de graphique
-    departementAltNames.forEach(deptAltName => {
-        departementalChartData[deptAltName] = {}; // Crée un objet pour ce département
-        const deptDisplayName = deptAltName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-
-        // Pour chaque type de graphique défini dans chartDataSets...
-        chartKeysForDepartments.forEach(chartKey => {
-            // Récupère les labels et les couleurs du jeu de données correspondant dans le graphique principal
-            const mainChartDatasetInfo = chartDataSets[chartKey];
-
-            if (mainChartDatasetInfo) {
-                const labelsFromMainChart = mainChartDatasetInfo.labels;
-                const backgroundColorsFromMainChart = mainChartDatasetInfo.backgroundColor;
-
-                // Génère des valeurs de données aléatoires spécifiques au département,
-                // mais en utilisant les labels et couleurs du graphique principal
-                const randomDataValues = generateRandomDataForExistingLabels(labelsFromMainChart);
-
-                departementalChartData[deptAltName][chartKey] = {
-                    labels: labelsFromMainChart, // Utilise les labels du graphique principal
-                    data: randomDataValues,       // Nouvelles données aléatoires pour ce département
-                    backgroundColor: backgroundColorsFromMainChart, // Utilise les couleurs du graphique principal
-                    titleSuffix: `pour ${deptDisplayName}` // Suffixe pour le titre du mini-graphique
-                };
-            } else {
-                console.warn(`Dataset principal non trouvé pour chartKey: ${chartKey} lors de la génération des données départementales pour ${deptAltName}.`);
-                departementalChartData[deptAltName][chartKey] = {
-                    labels: ['Erreur'], data: [1], backgroundColor: ['#CCCCCC'], titleSuffix: `pour ${deptDisplayName}`
-                };
-            }
-        });
-    });
+    //TODO faire en sorte de charger le minichartdata au lancement de la page
 
     // Ajoute un écouteur d'événement 'click' à chaque zone cliquable de département
     departementAreas.forEach(area => {
@@ -410,29 +349,21 @@ document.addEventListener('DOMContentLoaded', function() {
             // Récupère le nom du département cliqué (depuis l'attribut 'alt')
             const departementKey = this.alt.toLowerCase();
             chartKeyValue = document.querySelector('.button_active')?.dataset.chartkey;
+            const dep_num = area.dataset.numDep;
 
-            if (!departementChartContainer || !miniDepartementChartCanvas) {
-                console.error("Conteneur (#departement-chart-container) ou canvas (#mini-departement-chart) pour le mini-graphique non trouvé.");
-                return;
+            if (minichartData.length === 0){
+                initialise_chart_data(chartKeyValue)
             }
 
-            // Récupère les données pour le département cliqué ET pour le type de graphique actuellement actif
-            const deptDataSetsForCurrentType = departementalChartData[departementKey];
-            const specificDeptData = deptDataSetsForCurrentType ? deptDataSetsForCurrentType[chartKeyValue] : null;
+            const chartData = minichartData[dep_num]
 
-            // Récupère les informations (notamment le titre/label) du graphique principal actuellement affiché
-            const mainChartInfo = chartDataSets[chartKeyValue];
-            const mainChartLegendLabelBase = mainChartInfo ? (mainChartInfo.legendLabel || "Données") : "Données";
 
             // Si des données spécifiques existent pour ce département et ce type de graphique :
-            if (specificDeptData) {
+            if (chartData) {
                 // Si une instance de mini-graphique existe déjà, la détruit pour en créer une nouvelle
                 if (miniChartInstance) {
                     miniChartInstance.destroy();
                 }
-
-                // Construit le titre pour le mini-graphique en combinant le titre du graphique principal
-                const miniChartTitle = `${mainChartLegendLabelBase} ${specificDeptData.titleSuffix || ''}`;
 
                 // Récupère le contexte de dessin 2D du canvas du mini-graphique
                 const miniCtx = miniDepartementChartCanvas.getContext('2d');
@@ -440,11 +371,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 miniChartInstance = new Chart(miniCtx, {
                     type: 'pie',
                     data: {
-                        labels: specificDeptData.labels,
+                        labels: chartData.labels,
                         datasets: [{
-                            label: mainChartLegendLabelBase,
-                            data: specificDeptData.data,
-                            backgroundColor: specificDeptData.backgroundColor,
+                            label: chartData.title,
+                            data: chartData.data,
+                            backgroundColor: chartData.backgroundColor,
                             borderColor: '#FFFFFF',
                             borderWidth: 1
                         }]
@@ -454,7 +385,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         maintainAspectRatio: true,
                         plugins: {
                             legend: {
-                                display: specificDeptData.labels.length > 1 && specificDeptData.labels.length < 8,
+                                display: true,
                                 position: 'bottom',
                                 labels: {
                                     font: {
@@ -466,7 +397,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             },
                             title: {
                                 display: true,
-                                text: miniChartTitle,
+                                text: chartData.title,
                                 font: {
                                     size: 12,
                                     family: 'Georgia',
@@ -474,6 +405,25 @@ document.addEventListener('DOMContentLoaded', function() {
                                 color: '#0a7353',
                                 padding: { top: 8, bottom: 8 }
                             },
+                            tooltip :{
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            label += context.parsed.toFixed(2) + '%'; // Utilise le pourcentage
+                                        }
+                                        return label;
+                                    },
+                                    afterLabel: function(context) {
+                                        // Afficher le nombre brut d'espèces
+                                        const count = chartData.counts[context.dataIndex];
+                                        return `(${count} espèces)`;
+                                    }
+                                }
+                            }
                         }
                     }
                 });

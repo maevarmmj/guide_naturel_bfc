@@ -464,7 +464,7 @@ def species_by_regne_dep(col: Collection, departements: list) -> dict:
     return final_output_by_department
 
 
-def species_by_regne_and_statut_global(col: Collection) -> List[Dict]:
+def species_by_regne_and_statut(col: Collection) -> List[Dict]:
     """
     Compte le nombre d'espèces uniques par règne et codeStatut sur l'ensemble de la base de données,
     et formate les résultats en une liste de dictionnaires Chart.js (un par règne).

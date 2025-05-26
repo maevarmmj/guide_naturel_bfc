@@ -25,8 +25,6 @@
 
 .chart-dots-container {
     text-align: center; /* Centre les points */
-    margin-top: 15px; /* Espace au-dessus des points */
-    margin-bottom: 10px;
     display: none; /* Caché par défaut, géré par JS */
 }
 

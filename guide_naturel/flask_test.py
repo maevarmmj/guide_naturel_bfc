@@ -14,6 +14,8 @@ COLLECTION_NAME = 'Nature'
 mongo_client_instance = None
 collection_instance = None
 
+departements_a_analyser = [21, 25, 39, 58, 70, 71, 89, 90]
+
 try:
     collection_instance = get_mongo_collection(MONGO_URI, DB_NAME, COLLECTION_NAME)
     mongo_client_instance = collection_instance.database.client
@@ -55,8 +57,14 @@ def get_chart_data():
 
     if info_key == "especesParRegne":
         data = [species_by_regne(col=collection_instance)]
-    elif info_key == "statutsConservation":
-        data = species_by_regne_and_statut_global(col=collection_instance)
+    elif info_key == "especesParRegne_dep":
+        data = species_by_regne_dep(col=collection_instance, departements=departements_a_analyser)
+    elif info_key == "statutsConservationParRegne":
+        data = species_by_regne_and_statut(col=collection_instance)
+    elif info_key == "statutsConservationParRegne_dep":
+        data = species_by_regne_and_statut(col=collection_instance)
+    elif info_key == "especesParStatutConservation_dep":
+        data = species_by_code_statut_dep(col=collection_instance, departements=departements_a_analyser)
     else:
         data = [species_by_code_statut(col=collection_instance)]
 
