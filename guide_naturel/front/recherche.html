@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Chatbot de la BFC, Anna">
   <title>Recherche - Le Guide Naturel BFC</title>
   <link href="global.css" rel="stylesheet">
   <link href="recherche.css" rel="stylesheet">
+    <link href="recherche2.css" rel="stylesheet">
+
 
 </head>
 
@@ -23,21 +26,30 @@
   <div class="content-below-recherche">
 
     <div class="chatbot-container">
+
+        <div class="chatbot-profile-header">
+            <div class="profile-image-container">
+                <img src="ressources/Anna/Annakinator.webp" alt="Avatar du Chatbot" id="chatbot-avatar">
+            </div>
+            <h3 class="chatbot-name">A N N A</h3>
+        </div>
+
         <div id="chat-log" class="chat-log-area">
         </div>
 <div class="chat-input-area">
-    <input type="text" id="chat-input" placeholder="Tapez votre réponse ici..." disabled>
+    <input type="text" id="chat-input" placeholder="Écris ta réponse ici..." disabled>
     <button id="send-chat-button" disabled>Envoyer</button>
-    <button id="skip-chat-button" disabled>Je ne sais pas</button> <!-- NOUVEAU BOUTON -->
+    <button id="skip-chat-button" disabled>Je ne sais pas</button>
 </div>
     </div>
 
     <div class="chatbot-results">
         <div id="final-chatbot-results-content">
         </div>
-    </div>
 
-  </div>
+        <img src="ressources/Anna/anna.webp" alt="Personnage assistant" id="results-character">
+    </div>
+    </div>
 
 </main>
 

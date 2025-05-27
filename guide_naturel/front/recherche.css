@@ -1,451 +1,200 @@
-/* Styles globaux (si vous les avez dans global.css, pas besoin de répéter ici) */
-/* ... */
-
-/* Styles spécifiques à la page de recherche (votre existant) */
-.content-below-recherche {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  width: 100%;
-  max-width: 1300px;
-  gap: 2rem;
-  margin: 0 auto;
+.content-below-recherche{
+  display:flex;
+  flex-direction:row;
+  align-items:flex-start;
+  width:100%;
+  max-width:1300px;
+  gap:2rem;
+  margin:0 auto
 }
 
-.chatbot-container {
-  flex: 1 1 0;
-  background-color: rgba(53, 161, 84,0.5);
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  min-height: 370px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+/******* CONTENU CHATBOT *********/
+
+.chatbot-container{
+  flex:1 1 0;
+  background-color:rgba(53,161,84,.5);
+  border-radius:10px;
+  padding:20px;
+  box-shadow:0 4px 12px rgba(0,0,0,.1);
+  min-height:430px;
+  max-height:430px;
+  display:flex;
+  flex-direction:column
 }
 
-.chat-log-area {
-  flex-grow: 1;
-  overflow-y: auto;
-  max-height: 300px;
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 5px;
+/* --- En-tête du Profil Chatbot --- */
+.chatbot-profile-header{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  padding-bottom:10px;
+  margin-bottom:10px;
+  border-bottom:1px solid rgba(255,255,255,.2);
+  flex-shrink:0
 }
 
-.chat-log-area p {
-  margin: 8px 0;
-  padding: 10px 15px;
-  border-radius: 18px;
-  font-size: 15px;
-  border : 2px solid rgba(255,255,255,0.4);
-  max-width: 85%;
-  word-wrap: break-word;
-  line-height: 1.2; /* Ajusté pour une meilleure lisibilité */
-  opacity: 0;
-  transform: translateY(15px);
-  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+.profile-image-container{
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  overflow:hidden;
+  margin-bottom:8px;
+  border:2px solid rgba(255,255,255,.5);
+  background-color:rgba(255,255,255,.3)
 }
 
-.chat-log-area p.visible {
-  opacity: 1;
-  transform: translateY(0);
+#chatbot-avatar{
+  width:100%;
+  height:100%;
+  object-fit:cover
 }
 
-.bot-message {
-  background-color: #3fd181;
-  align-self: flex-start;
-  color: #FFFFFF;
+.chatbot-name{
+  font-size:1em;
+  font-weight:bold;
+  color:#fff;
+  margin:0;
+  text-shadow: 1px 1px #154211
 }
 
-.user-message {
-  background-color: #7ae872;
-  margin-left: auto;
-  color: #0a2e0c;
-}
-.user-message i { /* Pour le "Je ne sais pas" */
-    font-style: italic;
-    color: #1e4620; /* Un peu plus sombre pour l'italique */
-}
-
-
-.chat-input-area {
-  display: flex;
-  gap: 10px;
-  align-items: center;
+/* --- Zone de Log du Chat --- */
+.chat-log-area{
+  flex-grow:1;
+  overflow-y:auto;
+  max-height:300px;
+  padding:10px;
+  margin-bottom:15px;
+  border-radius:5px
 }
 
-#chat-input {
-  flex-grow: 1;
-  padding: 12px;
-  border: 1px solid #48bd50;
-  border-radius: 20px;
-  font-size: 1em;
-  background-color: #fff;
-  color: #1e6033;
+.chat-log-area p{
+  margin:8px 0;
+  padding:10px 15px;
+  border-radius:18px;
+  font-size:15px;
+  border:1px solid #fff;
+  max-width:85%;
+  word-wrap:break-word;
+  line-height:1.2;
+  opacity:0;
+  transform:translateY(15px);
+  transition:opacity .4s ease-out,transform .4s ease-out
 }
-#chat-input::placeholder {
-    color: #888;
+
+.chat-log-area p.visible{
+  opacity:1;
+  transform:translateY(0)
+}
+
+.bot-message{
+  background-color:#0D633A;
+  align-self:flex-start;
+  color:#fff
+}
+
+.user-message{
+  background-color:#7ae872;
+  margin-left:auto;
+  color:#0a2e0c
+}
+
+.user-message i{ /* "Je ne sais pas" */
+    font-style:italic;
+    color:#1e4620
+}
+
+.chat-input-area{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-shrink:0
+}
+
+#chat-input{
+  flex-grow:1;
+  padding:12px;
+  border:1px solid #48bd50;
+  border-radius:20px;
+  font-size:1em;
+  background-color:#fff;
+  color:#1e6033
+}
+
+#chat-input::placeholder{
+    color:#888
 }
 
 #send-chat-button,
-#skip-chat-button {
-  padding: 8px 15px; /* Un peu plus de padding vertical */
-  color: white;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 0.9em; /* Ajusté */
-  transition: background-color 0.2s;
-  white-space: nowrap;
+#skip-chat-button{
+  padding:8px 15px;
+  color:#fff;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+  font-size:.9em;
+  transition:background-color .2s;
+  white-space:nowrap
 }
 
-#send-chat-button {
-  background-color: #48bd50;
+#send-chat-button{
+  background-color:#21642B
 }
-#send-chat-button:hover:not(:disabled) {
-  background-color: #1e6033;
+#send-chat-button:hover:not(:disabled){
+  background-color:#1a5423
 }
-#send-chat-button:disabled {
-  background-color: #aaa;
-  cursor: not-allowed;
-}
-
-#skip-chat-button {
-  background-color: #f0ad4e;
-}
-#skip-chat-button:hover:not(:disabled) {
-  background-color: #ec971f;
-}
-#skip-chat-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+#send-chat-button:disabled{
+  background-color:#aaa;
+  cursor:not-allowed
 }
 
-/* Styles pour .chatbot-results */
-.chatbot-results {
-  flex: 1 1 0;
-  background-color: rgba(53, 161, 84,0.5);
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  min-height: 370px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: stretch;
-  color: rgba(255,255,255,0.4);
+#skip-chat-button{
+  background-color:#A52727
+}
+#skip-chat-button:hover:not(:disabled){
+  background-color:#851616
+}
+#skip-chat-button:disabled{
+  background-color:#ccc;
+  cursor:not-allowed
 }
 
-#final-chatbot-results-content {
-    background-color: rgba(255, 255, 255, 0.85); /* Légèrement moins transparent */
-    color: #333;
-    padding: 15px;
-    border-radius: 5px;
-    height: 100%;
-    overflow-y: auto; /* Pour le contenu global des résultats */
-    display: flex;
-    flex-direction: column;
-    /* justify-content: space-between; (déjà géré par le flex-grow de la liste) */
-    line-height: 1.6;
+/* ******* RESULTATS DU CHATBOT *********/
+
+.chatbot-results{
+  flex:1 1 0;
+  background-color:rgba(53,161,84,.5);
+  border-radius:10px;
+  padding:20px;
+  box-shadow:0 4px 12px rgba(0,0,0,.1);
+  min-height:430px;
+  max-height:430px;
+  display:flex;
+  flex-direction:column;
+  color:rgba(255,255,255,.4);
+  position:relative
 }
 
-/* Placeholder si #final-chatbot-results-content est vide (avant le premier résultat) */
-/* Le JS ajoute maintenant un .results-message pour cela, donc :empty::before n'est plus nécessaire
-   si on utilise la méthode JS. Si vous préférez le CSS pur pour le placeholder initial : */
-/*
-#final-chatbot-results-content:empty::before {
-    content: "Les résultats de votre recherche apparaîtront ici...";
-    display: block;
-    text-align: center;
-    padding-top: 20px;
-    color: #666;
-    font-style: italic;
-    flex-grow: 1; /* Pour occuper l'espace si vide */
-/*}*/
-
-
-.results-message { /* Pour les messages comme "Aucun résultat trouvé" ou le placeholder JS */
-    text-align: center;
-    padding: 20px;
-    font-style: italic;
-    color: #555;
-    flex-grow: 1; /* Pour centrer verticalement si c'est le seul contenu */
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* --- Anna (à côté des résultats) --- */
+#results-character{
+  position:absolute;
+  width:240px;
+  height:auto;
+  right:-160px;
+  bottom:10px;
+  z-index:10
 }
 
-.results-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0 0 15px 0;
-    flex-grow: 1; /* Prend l'espace vertical disponible */
-    overflow-y: auto; /* Si la liste elle-même devient trop longue */
-    max-height : 300px;
+/* --- Contenu des résultats finaux --- */
+#final-chatbot-results-content{
+    background-color:rgba(187,255,141,.85);
+    color:#333;
+    padding:15px;
+    border-radius:5px;
+    height:100%;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    line-height:1.6
 }
 
-.results-list li {
-    padding: 8px 10px;
-    border-bottom: 1px solid rgba(53, 161, 84, 0.2);
-    font-size: 0.95em;
-    line-height: 1.5;
-    color: #333;
-}
-.results-list li:last-child {
-    border-bottom: none;
-}
-
-.results-summary {
-    text-align: center;
-    font-size: 0.9em;
-    color: #444;
-    margin-bottom: 10px; /* Réduit pour laisser plus de place à la pagination */
-    padding: 2px 0;
-}
-
-/* Styles pour les contrôles de pagination */
-.pagination-controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px 0 5px 0; /* Un peu moins de padding en bas */
-    gap: 8px; /* Espace entre les éléments de pagination */
-    margin-top: auto; /* Pousse la pagination vers le bas */
-    border-top: 1px solid rgba(53, 161, 84, 0.3); /* Ligne de séparation plus visible */
-}
-
-.pagination-controls button { /* Style commun pour Précédent, Suivant, OK */
-    padding: 7px 14px;
-    background-color: #48bd50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.85em; /* Un peu plus petit pour plus de place */
-    transition: background-color 0.2s ease-in-out;
-    white-space: nowrap;
-}
-.pagination-controls button:hover:not(:disabled) {
-    background-color: #3aa842;
-}
-.pagination-controls button:disabled {
-    background-color: #cccccc;
-    color: #666666;
-    cursor: not-allowed;
-}
-
-/* Styles pour le conteneur de l'input de page */
-.page-input-container {
-    display: flex;
-    align-items: center;
-    gap: 4px; /* Espace réduit dans le conteneur de l'input */
-}
-
-.page-input-label {
-    font-size: 0.85em; /* Correspond aux boutons */
-    color: #333;
-    /* margin-right: 2px; (géré par le gap du conteneur) */
-}
-
-.page-number-input {
-    width: 45px; /* Ajusté */
-    padding: 6px; /* Ajusté */
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    text-align: center;
-    font-size: 0.85em; /* Correspond aux boutons */
-    -moz-appearance: textfield;
-}
-.page-number-input::-webkit-outer-spin-button,
-.page-number-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.total-pages-indicator {
-    font-size: 0.85em; /* Correspond aux boutons */
-    color: #333;
-    /* margin-left: 2px; (géré par le gap du conteneur) */
-}
-
-/* Le bouton "OK" utilise le style .pagination-controls button par défaut.
-   Si vous voulez un style spécifique pour .goto-page-button, décommentez et ajustez : */
-
-/*.goto-page-button {*/
-/*    background-color: #5cb85c;*/
-/*}*/
-
-
-/* RESPONSIVE */
-@media screen and (max-width: 850px) {
-    .content-below-recherche {
-        flex-direction: column;
-        align-items: center;
-        gap: 1.5rem;
-    }
-    .chatbot-container,
-    .chatbot-results {
-        flex-basis: auto;
-        width: 100%;
-        max-width: 500px;
-        min-height: 250px;
-    }
-     .chat-log-area p {
-        padding: 8px 12px;
-        font-size: 0.9em;
-     }
-     #chat-input, #send-chat-button, #skip-chat-button {
-        font-size: 0.9em;
-        padding: 10px 15px;
-     }
-}
-
-@media screen and (max-width: 769px) { /* Ce point de rupture semble redondant si 850px fait déjà le travail */
-    /* .content-below-recherche, .chatbot-container, .chatbot-results (déjà géré par 850px) */
-    /* Les styles suivants s'appliquent en plus de ceux de 850px si besoin */
-}
-
-
-@media screen and (max-width: 480px) {
-    .pagination-controls {
-        gap: 5px;
-        flex-wrap: wrap; /* Permet aux éléments de passer à la ligne */
-        padding-top: 8px;
-        padding-bottom: 8px;
-    }
-    .pagination-controls button {
-        padding: 6px 10px; /* Plus petit padding */
-        font-size: 0.8em; /* Plus petite police */
-    }
-    .page-input-container {
-        /* Sur mobile, on pourrait vouloir que l'input prenne plus de place ou soit sur sa propre ligne */
-        /* Par exemple, pour centrer l'input et son label/total:
-        /* order: -1; /* Le mettre avant les boutons Précédent/Suivant si flex-wrap */
-        /* flex-basis: 100%;
-        justify-content: center;
-        margin-bottom: 5px; */
-    }
-    .page-number-input {
-        width: 35px;
-        padding: 5px;
-        font-size: 0.8em;
-    }
-    .page-input-label, .total-pages-indicator {
-        font-size: 0.8em;
-    }
-    .results-list li {
-        font-size: 0.9em;
-    }
-    .results-summary {
-        font-size: 0.85em;
-        margin-bottom: 8px;
-    }
-}
-
-
-.pagination-controls button {
-    /* ... vos styles existants ... */
-    display: inline-flex; /* Permet d'aligner l'icône verticalement */
-    align-items: center;  /* Centre l'icône verticalement */
-    justify-content: center; /* Centre l'icône horizontalement (si le bouton est plus large) */
-    padding: 6px 10px; /* Ajustez le padding pour laisser de la place à l'icône */
-    /* Si vous voulez que les boutons aient une taille fixe pour les icônes : */
-    /* width: 36px; */
-    /* height: 36px; */
-}
-
-.pagination-arrow-icon {
-    width: 12px;  /* Définissez la taille de votre icône */
-    height: 12px; /* Définissez la taille de votre icône */
-    /* vertical-align: middle; /* Alternative pour l'alignement vertical si display: inline-flex n'est pas utilisé */
-}
-
-/* Si vous voulez que le bouton OK ait toujours du texte,
-   vous pourriez avoir besoin d'un style plus spécifique pour lui s'il partage la classe
-   générale des boutons de pagination et que vous avez changé le padding global */
-
-.goto-page-button {
-    /* padding: 7px 14px; /* Rétablir le padding si besoin */
-}
-
-/* --- INFOBOX STYLES --- */
-#item-infobox {
-    position: absolute; /* Positionnée par rapport au viewport ou un parent positionné */
-    z-index: 900; /* Au-dessus de la plupart des éléments, mais en dessous du modal si vous en aviez un */
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    padding: 12px;
-    min-width: 250px; /* Largeur minimale */
-    max-width: 400px; /* Largeur maximale */
-    font-size: 0.9em;
-    line-height: 1.5;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out, transform 0.2s ease-in-out;
-    transform: translateY(10px) scale(0.98); /* Effet d'apparition subtil */
-}
-
-#item-infobox.infobox-visible {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);
-}
-
-#item-infobox.infobox-hidden {
-    display: none; /* Ou garder opacity/visibility pour la transition de disparition */
-    /* Si vous utilisez display: none, la transition de disparition ne sera pas visible.
-       Si vous voulez la transition de disparition, commentez display:none et assurez-vous
-       que opacity et visibility gèrent bien le masquage.
-       Pour l'instant, je laisse display: none pour plus de simplicité
-       car la transition est surtout pour l'apparition. */
-}
-
-
-.infobox-title {
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 1.1em;
-    color: #1e6033;
-    border-bottom: 1px solid #e7e7e7;
-    padding-bottom: 6px;
-}
-
-.infobox-details-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    max-height: 200px; /* Limiter la hauteur si beaucoup de champs */
-    overflow-y: auto; /* Scroll si dépasse */
-}
-
-.infobox-details-list li {
-    padding: 3px 0;
-}
-
-.infobox-detail-key {
-    font-weight: bold;
-    color: #333;
-}
-
-.infobox-detail-value {
-    color: #555;
-    word-break: break-word;
-}
-
-/* Optionnel: Flèche pour l'infobox (plus complexe à positionner dynamiquement) */
-/*
-.infobox-arrow {
-    position: absolute;
-    width: 0;
-    height: 0;
-    border-style: solid;
-    // Exemple pour une flèche pointant vers la gauche (si l'infobox est à droite de l'item)
-    // top: 15px; // Ajuster verticalement
-    // right: 100%; // À l'extrémité gauche de l'infobox
-    // border-width: 8px 8px 8px 0;
-    // border-color: transparent #f9f9f9 transparent transparent;
-}
-*/
