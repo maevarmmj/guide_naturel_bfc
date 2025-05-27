@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const li = document.createElement('li');
                 const keySp = document.createElement('span');
                 keySp.className = 'infobox-detail-key';
-                keySp.textContent = `${formatFieldKey(key, label)}: `;
+                keySp.textContent = `${formatFieldKey(key, label)} : `;
                 li.appendChild(keySp);
                 const valSp = document.createElement('span');
                 valSp.className = 'infobox-detail-value';
@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const li = document.createElement('li');
                 const keySp = document.createElement('span');
                 keySp.className = 'infobox-detail-key';
-                keySp.textContent = `${formatFieldKey("communesDetails", "Lieux (Commune (Dépt.))")}: `;
+                keySp.textContent = `${formatFieldKey("communesDetails", "Lieux (Commune (Dépt.))")} : `;
                 li.appendChild(keySp);
                 const valSp = document.createElement('span');
                 valSp.className = 'infobox-detail-value';

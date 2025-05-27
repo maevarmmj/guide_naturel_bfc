@@ -162,11 +162,11 @@
 
 .infobox-detail-key{
     font-weight:bold;
-    color:#333
+    color: #444444
 }
 
 .infobox-detail-value{
-    color:#555;
+    color: #696969;
     word-break:break-word
 }
 

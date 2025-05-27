@@ -187,7 +187,7 @@
 
 /* --- Contenu des résultats finaux --- */
 #final-chatbot-results-content{
-    background-color:rgba(187,255,141,.85);
+    background-color: rgba(200, 255, 161, 0.85);
     color:#333;
     padding:15px;
     border-radius:5px;

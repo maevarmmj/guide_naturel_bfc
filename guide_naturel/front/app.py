@@ -12,7 +12,7 @@ CORS(app)
 MONGO_URI = "mongodb+srv://guest:guestpass@big-data.640be.mongodb.net/?retryWrites=true&w=majority&appName=Big-Data"
 DB_NAME = 'LeGuideNaturel'
 OBSERVATIONS_COLLECTION = 'Nature'
-RESULTS_PER_PAGE = 20
+RESULTS_PER_PAGE = 30
 FUZZY_MATCH_THRESHOLD = 20  # Seuil d'acceptation de correction
 
 client = MongoClient(MONGO_URI)
