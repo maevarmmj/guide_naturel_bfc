@@ -1,1 +1,0 @@
-# BFC : Le Guide Naturel
