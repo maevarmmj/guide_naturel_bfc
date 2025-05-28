@@ -423,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setInputState(false);
         consecutiveSkips = 0;
 
-        displayMessage('Coucou 👋🏻 Prêt(e) pour une nouvelle recherche ?', "bot");
+        displayMessage('Coucou 👋🏻 Prêt(e) pour une nouvelle recherche ? Plus tu es précis(e), plus je pourrai t\'aider !', "bot");
         try {
             const data = await fetchAPI(`${API_BASE_URL}/chat/start`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
             if (data.error) throw new Error(data.error);
