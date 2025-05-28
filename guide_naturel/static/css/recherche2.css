@@ -272,3 +272,47 @@
         font-size:1em
     }
 }
+
+/* Dans recherche.css */
+#results-search-bar-container {
+    display: flex; /* Pour aligner input et bouton */
+    gap: 10px;
+    align-items: center;
+    position: relative; /* Pour positionner la liste de suggestions */
+    /* ... autres styles que vous pourriez vouloir ... */
+}
+
+#species-search-input {
+    flex-grow: 1;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#species-search-button {
+    padding: 8px 15px;
+    /* ... styles de votre bouton ... */
+}
+
+.suggestions-dropdown {
+    position: absolute;
+    top: 100%; /* Juste en dessous de la barre de recherche */
+    left: 0;
+    right: 0; /* S'étend sur toute la largeur de son parent positionné */
+    background-color: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    z-index: 1000; /* Pour être au-dessus des autres éléments */
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+}
+.suggestion-item:hover {
+    background-color: #f0f0f0;
+}
+
