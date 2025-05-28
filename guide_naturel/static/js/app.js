@@ -59,7 +59,7 @@ function setupFooterNavListeners() {
     const aproposBtn = document.getElementById('footerBtnApropos');
 
     // Détermine le nom du fichier de la page HTML actuellement affichée
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const currentPage = window.location.pathname.split('/').pop() || 'guide_naturel';
 
     /**
      * @function scrollToTop
@@ -79,7 +79,7 @@ function setupFooterNavListeners() {
     // Footer : bouton "ACCUEIL"
     if (accueilBtn) {
         // Compare la page actuelle avec la destination du lien "ACCUEIL" ('index.html')
-        if (currentPage === 'index.html' || currentPage === '') {
+        if (currentPage === 'guide_naturel' || currentPage === '') {
             accueilBtn.addEventListener('click', scrollToTop);
         }
         // Si on n'est PAS sur la page d'accueil, le lien gardera son comportement par défaut
@@ -89,7 +89,7 @@ function setupFooterNavListeners() {
     // Footer : bouton "RECHERCHE"
     if (rechercheBtn) {
         // Compare la page actuelle avec la destination du lien "RECHERCHE" ('recherche.html')
-        if (currentPage === 'recherche.html') {
+        if (currentPage === 'recherche') {
             rechercheBtn.addEventListener('click', scrollToTop);
         }
     }
@@ -97,7 +97,7 @@ function setupFooterNavListeners() {
     // Footer : bouton "A PROPOS"
     if (aproposBtn) {
         // Compare la page actuelle avec la destination du lien "A PROPOS" (qui est 'apropos.html').
-        if (currentPage === 'apropos.html') {
+        if (currentPage === 'apropos') {
             aproposBtn.addEventListener('click', scrollToTop);
         }
     }

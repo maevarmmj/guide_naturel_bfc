@@ -2,35 +2,63 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ajouté pour la responsivité -->
-  <title>Le Guide Naturel de la BFC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Chatbot de la BFC, Anna">
+  <title>Recherche - Le Guide Naturel BFC</title>
   <link href="../static/css/global.css" rel="stylesheet">
-    <link href="../static/css/recherche.css" rel="stylesheet">
+  <link href="../static/css/recherche.css" rel="stylesheet">
+    <link href="../static/css/recherche2.css" rel="stylesheet">
+
+
 </head>
 
 <body class="recherche">
 
 <div id="header-placeholder"></div>
 
-<main class="container"> <!-- <main> pour le contenu principal de la page -->
+<main class="container">
 
   <div class="text-container">
-      <!-- Utilisation de balises de titre sémantiques -->
       <h2 class="bfc_subtitle">B O U R G O G N E - F R A N C H E - C O M T É</h2>
       <h1 class="bfc_title">LE GUIDE NATUREL</h1>
   </div>
 
+  <div class="content-below-recherche">
 
-</main> <!-- Fin de .container / <main> -->
+    <div class="chatbot-container">
+
+        <div class="chatbot-profile-header">
+            <div class="profile-image-container">
+                <img src="../static/ressources/Anna/Annakinator.webp" alt="Avatar du Chatbot" id="chatbot-avatar">
+            </div>
+            <h3 class="chatbot-name">A N N A</h3>
+        </div>
+
+        <div id="chat-log" class="chat-log-area">
+        </div>
+<div class="chat-input-area">
+    <input type="text" id="chat-input" placeholder="Écris ta réponse ici..." disabled>
+    <button id="send-chat-button" disabled>Envoyer</button>
+    <button id="skip-chat-button" disabled>Je ne sais pas</button>
+</div>
+    </div>
+
+    <div class="chatbot-results">
+        <div id="final-chatbot-results-content">
+        </div>
+
+        <img src="../static/ressources/Anna/anna.webp" alt="Personnage assistant" id="results-character">
+    </div>
+    </div>
+
+</main>
+
+<div id="footer-placeholder"></div>
 
 
-
- <div id="footer-placeholder"></div>
-
-<script src="script_recherche.js"></script>
-<script src="https://unpkg.com/image-map-resizer@1.0.10/js/imageMapResizer.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../static/js/recherche.js"></script>
 <script src="../static/js/app.js"></script>
+
 
 </body>
 </html>

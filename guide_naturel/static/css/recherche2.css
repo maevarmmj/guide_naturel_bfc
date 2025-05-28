@@ -1,0 +1,274 @@
+/* Message dans la zone de résultats (placeholder, "aucun résultat") */
+.results-message{
+    text-align:center;
+    padding:20px;
+    font-style:italic;
+    color:#555;
+    flex-grow:1;
+    display:flex;
+    align-items:center;
+    justify-content:center
+}
+
+/* Liste des résultats */
+.results-list{
+    list-style-type:none;
+    padding:0;
+    margin:0 0 15px;
+    flex-grow:1;
+    overflow-y:auto;
+    max-height:300px
+}
+
+.results-list li{
+    padding:8px 10px;
+    border-bottom:1px solid rgba(53,161,84,.2);
+    font-size:.95em;
+    line-height:1.5;
+    color:#333
+}
+.results-list li:last-child{
+    border-bottom:none
+}
+
+/* Résumé des résultats ("Page 1 sur X") */
+.results-summary{
+    text-align:center;
+    font-size:.9em;
+    color:#444;
+    margin-bottom:10px;
+    padding:2px 0;
+    flex-shrink:0
+}
+
+/* --- Contrôles de Pagination --- */
+.pagination-controls{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:10px 0 5px;
+    gap:8px;
+    margin-top:auto;
+    border-top:1px solid rgba(53,161,84,.3);
+    flex-shrink:0
+}
+
+.pagination-controls button{
+    padding:6px 10px;
+    background-color:#48bd50;
+    color:#fff;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:.85em;
+    transition:background-color .2s ease-in-out;
+    white-space:nowrap;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center
+}
+.pagination-controls button:hover:not(:disabled){
+    background-color:#3aa842
+}
+.pagination-controls button:disabled{
+    background-color:#ccc;
+    color:#666;
+    cursor:not-allowed
+}
+
+.pagination-arrow-icon{
+    width:12px;
+    height:12px
+}
+
+
+.page-input-container{
+    display:flex;
+    align-items:center;
+    gap:4px
+}
+
+.page-input-label{
+    font-size:.85em;
+    color:#333
+}
+
+.page-number-input{
+    width:45px;
+    padding:6px;
+    border:1px solid #ccc;
+    border-radius:4px;
+    text-align:center;
+    font-size:.85em;
+    -moz-appearance:textfield
+}
+.page-number-input::-webkit-outer-spin-button,
+.page-number-input::-webkit-inner-spin-button{
+    -webkit-appearance:none;
+    margin:0
+}
+
+.total-pages-indicator{
+    font-size:.85em;
+    color:#333
+}
+
+/* ******* INFOBOX DES RESULTATS ******* */
+#item-infobox{
+    position:absolute;
+    z-index:900;
+    background-color:#f9f9f9;
+    border:1px solid #ddd;
+    border-radius:6px;
+    box-shadow:0 4px 12px rgba(0,0,0,.15);
+    padding:12px;
+    min-width:250px;
+    max-width:400px;
+    font-size:.9em;
+    line-height:1.5;
+    opacity:0;
+    visibility:hidden;
+    transition:opacity .2s ease-in-out,visibility .2s ease-in-out,transform .2s ease-in-out;
+    transform:translateY(10px) scale(.98)
+}
+
+#item-infobox.infobox-visible{
+    opacity:1;
+    visibility:visible;
+    transform:translateY(0) scale(1)
+}
+
+
+.infobox-title{
+    margin-top:0;
+    margin-bottom:10px;
+    font-size:1.1em;
+    color:#1e6033;
+    border-bottom:1px solid #e7e7e7;
+    padding-bottom:6px
+}
+
+.infobox-details-list{
+    list-style-type:none;
+    padding:0;
+    margin:0;
+    max-height:200px;
+    overflow-y:auto
+}
+
+.infobox-details-list li{
+    padding:3px 0
+}
+
+.infobox-detail-key{
+    font-weight:bold;
+    color: #444444
+}
+
+.infobox-detail-value{
+    color: #696969;
+    word-break:break-word
+}
+
+
+
+/* Pour les tablettes et écrans moyens  */
+@media screen and (max-width:1024px){
+    .content-below-recherche{
+        gap:1.5rem
+    }
+    #results-character{
+        width:200px;
+        right:-130px
+    }
+}
+
+
+/* Passage en une seule colonne pour tablettes et mobiles */
+@media screen and (max-width:850px){
+    .content-below-recherche{
+        flex-direction:column;
+        align-items:center;
+        gap:1.5rem
+    }
+    .chatbot-container,
+    .chatbot-results{
+        flex-basis:auto;
+        width:100%;
+        max-width:500px;
+        min-height:300px;
+        max-height:none
+    }
+     .chat-log-area p{
+        padding:8px 12px;
+        font-size:.9em
+     }
+
+     #chat-input,#send-chat-button,#skip-chat-button{
+        font-size:.8em;
+        padding:8px 12px
+     }
+
+     #results-character{
+        width:200px;
+        right:-75px;
+        bottom:-10px
+     }
+}
+
+/* Pour les petits mobiles */
+@media screen and (max-width:480px){
+    .content-below-recherche{
+        gap:1rem
+    }
+    .chatbot-container,.chatbot-results{
+        min-height:250px;
+        padding:15px
+    }
+    #chat-input,#send-chat-button,#skip-chat-button{
+        font-size:.75em;
+        padding:6px 10px
+    }
+    #results-character{
+        width:200px;
+        right:-75px;
+        bottom:-10px
+    }
+
+    .pagination-controls{
+        gap:5px;
+        flex-wrap:wrap;
+        padding:8px 0
+    }
+    .pagination-controls button{
+        padding:6px 10px;
+        font-size:.8em
+    }
+    .page-number-input{
+        width:35px;
+        padding:5px;
+        font-size:.8em
+    }
+    .page-input-label,.total-pages-indicator{
+        font-size:.8em
+    }
+    .results-list li{
+        font-size:.9em
+    }
+    .results-summary{
+        font-size:.85em;
+        margin-bottom:8px
+    }
+    .chatbot-profile-header{
+        padding-bottom:8px;
+        margin-bottom:8px
+    }
+    .profile-image-container{
+        width:50px;
+        height:50px;
+        margin-bottom:5px
+    }
+    .chatbot-name{
+        font-size:1em
+    }
+}

@@ -45,8 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
         departementAreas.forEach(area => {
             const departementName = area.alt.toLowerCase();
             // Construit les URLs pour les images de survol (image et texte)
-            const overlayImageURL = `/static/ressources/dep/${departementName}.png`;
-            const overlayTextURL = `/static/ressources/dep/${departementName}_text.png`;
+            const overlayImageURL = `/static/ressources/dep/${departementName}.webp`;
+            const overlayTextURL = `/static/ressources/dep/${departementName}_text.webp`;
 
             // Ajoute un écouteur d'événement pour le survol de la souris ('mouseenter')
             area.addEventListener('mouseenter', function() {
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Définit un objet de configuration commun pour les options du graphique principal (responsivité, la légende, le titre)
     const chartOptionsConfig = {
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         layout: {
             padding: {
                 top: 10,
@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
             //             et d'utiliser les boutons "Retour" / "Avant" du navigateur.
             //             Ceci se fait SANS recharger toute la page.
             if (pushHistory) {
-                const newUrl = `/main_page?info=${infoParam}`;
+                const newUrl = `/guide_naturel?info=${infoParam}`;
                 history.pushState({ info: infoParam }, '', newUrl);
             }
         } catch (error) {

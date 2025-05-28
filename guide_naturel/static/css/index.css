@@ -4,14 +4,13 @@
   flex-direction: row;
   align-items: flex-start;
   width: 100%;
-  max-width: 950px; /* Largeur maximale par défaut pour les écrans "normaux" */
+  max-width: 950px;
   gap: 1.5rem;
   margin: 0 auto;
 }
 
 .Carte {
-  flex: 0 1 55%; /* Reste tel quel pour la proportion par défaut */
-  /* max-width: 450px; */ /* Commentez ou ajustez si vous l'aviez */
+  flex: 0 1 55%;
 }
 
 .Carte .image-container {
@@ -42,7 +41,7 @@
 .contenu-droite {
   flex: 1;
   min-width: 300px;
-  max-width: 355px; /* Largeur maximale par défaut pour le camembert */
+  max-width: 355px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -79,9 +78,9 @@
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
   width: auto;
-  min-width: 170px; /* MODIFIÉ : Peut-être un peu plus petit */
+  min-width: 170px;
   text-align: left;
-  padding-left: 15px; /* MODIFIÉ : Peut-être un peu plus petit */
+  padding-left: 15px;
 }
 
 .button_right1:hover, .button_right1:focus, .button_right1.button_active {
@@ -90,13 +89,12 @@
 }
 
 /* RESPONSIVE POUR CARTE ET CONTENU DROITE */
-@media screen and (max-width: 992px) { /* Ce point de rupture devient plus pertinent maintenant */
+@media screen and (max-width: 992px) {
     .content-below {
         gap: 1rem;
-        max-width: 100%; /* Permet de prendre toute la largeur disponible en dessous de 992px */
-        padding: 0 1rem; /* Ajoute un peu de padding sur les côtés */
+        max-width: 100%;
+        padding: 0 1rem;
     }
-    /* Les flex-basis peuvent rester les mêmes, ils s'appliqueront à un conteneur plus petit */
 }
 
 @media screen and (max-width: 768px) {
@@ -108,13 +106,13 @@
     .Carte,
     .contenu-droite {
         width: 100%;
-        max-width: 450px; /* MODIFIÉ : Réduit la largeur max quand ils sont empilés */
+        max-width: 450px;
         flex-basis: auto;
     }
 
     .contenu-droite {
         min-width: unset;
-        max-width: 400px; /* MODIFIÉ : Pour le camembert quand il est seul sur sa ligne */
+        max-width: 400px;
     }
 
     .buttons_right {
@@ -132,7 +130,7 @@
 
     .button_right1 {
         flex-grow: 1;
-        min-width: 140px; /* MODIFIÉ */
+        min-width: 140px;
         text-align: center;
         border-radius: 10px;
         margin: 5px;
@@ -144,39 +142,17 @@
 @media screen and (min-width: 1921px) {
 
     .content-below {
-        /* Augmenter la largeur maximale du conteneur global carte + camembert */
-        /* Pour un écran 4K, vous pouvez être plus généreux */
-        max-width: 1800px; /* Exemple, ajustez selon vos préférences (était 1400px) */
-        /* Augmenter le gap si vous voulez plus d'espace entre carte et camembert */
+        max-width: 1800px;
         gap: 2.5rem;
     }
 
     .Carte {
-        /* Si .Carte avait un max-width par défaut, augmentez-le ici */
-        max-width: 800px; /* Exemple si vous aviez une limite par défaut à augmenter */
-
-        /* Optionnel: si vous voulez que la carte prenne un peu plus de proportion */
+        max-width: 800px;
         flex-basis: 60%;
     }
 
     .contenu-droite {
-        /* Très important: Augmenter la max-width du conteneur du camembert */
-        max-width: 550px;  /* Exemple, ajustez pour une bonne taille de camembert (était 350px par défaut) */
-        /* Vous pourriez aussi vouloir un min-width plus grand si nécessaire */
+        max-width: 550px;
         min-width: 400px;
     }
-
-    /* Les styles pour .bfc_subtitle et .bfc_title devraient être dans global.css
-       si ces titres apparaissent sur plusieurs pages. S'ils sont UNIQUEMENT
-       sur index.html, alors ils peuvent rester ici.
-       Si dans global.css, la media query (min-width: 1921px) dans global.css s'en chargera.
-    */
-    /*
-    .bfc_subtitle {
-        font-size: 1.5em;
-    }
-    .bfc_title {
-        font-size: 3.5em;
-    }
-    */
 }

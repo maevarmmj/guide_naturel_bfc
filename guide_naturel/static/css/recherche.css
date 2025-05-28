@@ -1,0 +1,199 @@
+.content-below-recherche{
+  display:flex;
+  flex-direction:row;
+  align-items:flex-start;
+  width:100%;
+  max-width:1300px;
+  gap:2rem;
+  margin:0 auto
+}
+
+/******* CONTENU CHATBOT *********/
+
+.chatbot-container{
+  flex:1 1 0;
+  background-color:rgba(53,161,84,.5);
+  border-radius:10px;
+  padding:20px;
+  box-shadow:0 4px 12px rgba(0,0,0,.1);
+  min-height:430px;
+  max-height:430px;
+  display:flex;
+  flex-direction:column
+}
+
+/* --- En-tête du Profil Chatbot --- */
+.chatbot-profile-header{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  padding-bottom:10px;
+  margin-bottom:10px;
+  border-bottom:1px solid rgba(255,255,255,.2);
+  flex-shrink:0
+}
+
+.profile-image-container{
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  overflow:hidden;
+  margin-bottom:8px;
+  border:2px solid rgba(255,255,255,.5);
+  background-color:rgba(255,255,255,.3)
+}
+
+#chatbot-avatar{
+  width:100%;
+  height:100%;
+  object-fit:cover
+}
+
+.chatbot-name{
+  font-size:1em;
+  font-weight:bold;
+  color:#fff;
+  margin:0;
+  text-shadow: 1px 1px #154211
+}
+
+/* --- Zone de Log du Chat --- */
+.chat-log-area{
+  flex-grow:1;
+  overflow-y:auto;
+  max-height:300px;
+  padding:10px;
+  margin-bottom:15px;
+  border-radius:5px
+}
+
+.chat-log-area p{
+  margin:8px 0;
+  padding:10px 15px;
+  border-radius:18px;
+  font-size:15px;
+  border:1px solid #fff;
+  max-width:85%;
+  word-wrap:break-word;
+  line-height:1.2;
+  opacity:0;
+  transform:translateY(15px);
+  transition:opacity .4s ease-out,transform .4s ease-out
+}
+
+.chat-log-area p.visible{
+  opacity:1;
+  transform:translateY(0)
+}
+
+.bot-message{
+  background-color:#0D633A;
+  align-self:flex-start;
+  color:#fff
+}
+
+.user-message{
+  background-color:#7ae872;
+  margin-left:auto;
+  color:#0a2e0c
+}
+
+.user-message i{ /* "Je ne sais pas" */
+    font-style:italic;
+    color:#1e4620
+}
+
+.chat-input-area{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-shrink:0
+}
+
+#chat-input{
+  flex-grow:1;
+  padding:12px;
+  border:1px solid #48bd50;
+  border-radius:20px;
+  font-size:1em;
+  background-color:#fff;
+  color:#1e6033
+}
+
+#chat-input::placeholder{
+    color:#888
+}
+
+#send-chat-button,
+#skip-chat-button{
+  padding:8px 15px;
+  color:#fff;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+  font-size:.9em;
+  transition:background-color .2s;
+  white-space:nowrap
+}
+
+#send-chat-button{
+  background-color:#21642B
+}
+#send-chat-button:hover:not(:disabled){
+  background-color:#1a5423
+}
+#send-chat-button:disabled{
+  background-color:#aaa;
+  cursor:not-allowed
+}
+
+#skip-chat-button{
+  background-color:#A52727
+}
+#skip-chat-button:hover:not(:disabled){
+  background-color:#851616
+}
+#skip-chat-button:disabled{
+  background-color:#ccc;
+  cursor:not-allowed
+}
+
+/* ******* RESULTATS DU CHATBOT *********/
+
+.chatbot-results{
+  flex:1 1 0;
+  background-color:rgba(53,161,84,.5);
+  border-radius:10px;
+  padding:20px;
+  box-shadow:0 4px 12px rgba(0,0,0,.1);
+  min-height:430px;
+  max-height:430px;
+  display:flex;
+  flex-direction:column;
+  color:rgba(255,255,255,.4);
+  position:relative
+}
+
+/* --- Anna (à côté des résultats) --- */
+#results-character{
+  position:absolute;
+  width:240px;
+  height:auto;
+  right:-160px;
+  bottom:10px;
+  z-index:10
+}
+
+/* --- Contenu des résultats finaux --- */
+#final-chatbot-results-content{
+    background-color: rgba(200, 255, 161, 0.85);
+    color:#333;
+    padding:15px;
+    border-radius:5px;
+    height:100%;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    line-height:1.6
+}
