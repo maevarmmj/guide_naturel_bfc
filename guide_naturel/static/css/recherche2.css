@@ -284,6 +284,7 @@
 
 #species-search-input {
     flex-grow: 1;
+    font-family: Georgia, serif;
     padding: 8px 12px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -291,7 +292,17 @@
 
 #species-search-button {
     padding: 8px 15px;
-    /* ... styles de votre bouton ... */
+    border: 1px solid #4fcdf7;
+    border-radius: 20px;
+    color: #FFFFFF;
+    font-weight: bold;
+    font-size:15px;
+    background-color: #4fcdf7;
+}
+
+#species-search-button:hover{
+    background-color: #5faecb;
+    border: 1px solid #60afcb;
 }
 
 .suggestions-dropdown {
@@ -300,6 +311,8 @@
     left: 0;
     right: 0; /* S'étend sur toute la largeur de son parent positionné */
     background-color: white;
+    color: #364d36;
+    font-size: 15px;
     border: 1px solid #ddd;
     border-top: none;
     z-index: 1000; /* Pour être au-dessus des autres éléments */

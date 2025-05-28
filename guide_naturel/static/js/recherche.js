@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const messageDiv = document.createElement('div');
             messageDiv.className = 'results-message no-results-message';
             if (isCurrentlyLocallyFiltered) {
-                messageDiv.textContent = `Aucune espèce trouvée pour "${speciesSearchInput.value.trim()}" dans les résultats de cette page.`;
+                messageDiv.textContent = `Aucune espèce trouvée pour "${speciesSearchInput.value.trim()}" dans les résultats de cette page... Cherche peut-être sur une autre page ?`;
             } else {
                 messageDiv.textContent = message || "Aucun résultat trouvé pour ces critères.";
             }
