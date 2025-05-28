@@ -8,9 +8,9 @@ import pprint
 
 # --- Constantes pour l'ordre et les couleurs des statuts IUCN ---
 STATUS_INFO = {
-    "Autre": {"order": 0, "color": "#9E9E9E", "full_name": "Autres (DD/Non spécifié)"},
+    "Autre": {"order": 0, "color": "#B9DDBA", "full_name": "Autres (DD/Non spécifié)"},
     "LC": {"order": 1, "color": "#4CAF50", "full_name": "Préoccupation mineure"},
-    "NT": {"order": 3, "color": "#0097A7", "full_name": "Quasi menacée"},
+    "NT": {"order": 3, "color": "#45C4EB", "full_name": "Quasi menacée"},
     "VU": {"order": 4, "color": "#FBC02D", "full_name": "Vulnérable"},
     "EN": {"order": 5, "color": "#F57C00", "full_name": "En danger"},
     "CR": {"order": 6, "color": "#D32F2F", "full_name": "En danger critique"},
@@ -19,10 +19,10 @@ STATUS_INFO = {
 }
 
 REGNE_COLORS = {
-    'Animalia': '#FF6384',      # Rouge/rose
-    'Plantae': '#2DA03E',       # vert
-    'Fungi': '#A06E2D',         # marron
-    'Sans Règne': '#757575'      # Gris
+    'Animalia': '#29C9B7',
+    'Plantae': '#2DA03E',
+    'Fungi': '#A06E2D',
+    'Sans Règne': '#757575'   
 }
 
 
@@ -126,7 +126,7 @@ def species_by_code_statut(col: Collection) -> dict:
         "data": data,
         "backgroundColor": background_colors,
         "counts": counts_raw, # Nombres bruts
-        "title": "Répartition des espèces par codeStatut (BFC)"
+        "title": "Répartition des espèces par état de conservation (BFC)"
     }
 
 
@@ -318,9 +318,7 @@ def species_by_code_statut_dep(col: Collection, departements: list) -> dict:
             "data": data_dep,
             "backgroundColor": background_colors_dep,
             "counts": counts_raw_dep,
-            "title": f"Répartition des espèces par codeStatut"
-            # Vous pouvez ajouter d'autres clés si nécessaire, comme le total_especes_departement
-            # "totalEspeces": total_especes_departement
+            "title": f"Répartition des espèces par état de conservation ({dep_code})"
         }]
 
     # S'assurer que tous les départements demandés ont une entrée, même vide
@@ -440,8 +438,7 @@ def species_by_regne_dep(col: Collection, departements: list) -> dict:
             "data": data_dep,
             "backgroundColor": background_colors_dep,
             "counts": counts_raw_dep,
-            "title": f"Répartition des espèces par Règne"
-            # "totalEspeces": total_especes_departement # Optionnel
+            "title": f"Répartition des espèces par Règne ({dep_code})"
         }]
 
     # S'assurer que tous les départements demandés ont une entrée, même vide
@@ -701,359 +698,10 @@ def species_by_regne_and_statut_dep(col: Collection, dep: List[int]) -> Dict[int
                     "data": data,
                     "backgroundColor": background_colors,
                     "counts": counts_raw,
-                    "title": f"Statuts de conservation des espèces de {regne_name}",
-                    "legendLabel": f"Statuts de conservation"
+                    "title": f"État de conservation des espèces de {regne_name} ({dep_code})",
+                    "legendLabel": f"État de conservation"
                 })
 
         final_output_by_department[dep_code] = charts_for_this_department
 
     return final_output_by_department
-
-
-TAXO_GROUP_PALETTE = [
-    '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
-    '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
-]
-
-
-def species_by_regne_taxogroup_global(col: Collection) -> List[Dict]:
-    """
-    Compte le nombre d'espèces uniques par règne et groupe taxonomique simple
-    sur l'ensemble de la base de données (globalement), et formate les résultats
-    en une liste de dictionnaires Chart.js (un par règne).
-    """
-    pipeline = [
-        {
-            # Étape 1: Grouper par nom scientifique unique pour s'assurer de ne compter
-            # chaque espèce qu'une seule fois à l'échelle globale.
-            # On prend le premier 'regne' et 'groupeTaxoSimple' rencontrés pour cette espèce.
-            "$group": {
-                "_id": "$nomScientifiqueRef",
-                "regneSpecies": {"$first": "$regne"},
-                "groupeTaxoSimpleSpecies": {"$first": "$groupeTaxoSimple"},
-            }
-        },
-        {
-            # Étape 2: Grouper les espèces uniques par leur règne et leur groupe taxonomique,
-            # puis compter le nombre d'espèces dans chaque combinaison.
-            "$group": {
-                "_id": {
-                    "regne": "$regneSpecies",
-                    "groupeTaxoSimple": "$groupeTaxoSimpleSpecies",
-                },
-                "nombreEspeces": {"$sum": 1}
-            }
-        },
-        {
-            # Étape 3: Reformater le document de sortie pour faciliter le traitement Python.
-            "$project": {
-                "_id": 0,
-                "regne": "$_id.regne",
-                "groupeTaxoSimple": "$_id.groupeTaxoSimple",
-                "nombreEspeces": "$nombreEspeces"
-            }
-        },
-        {
-            # Étape 4: Trier les résultats pour une sortie cohérente.
-            "$sort": {"regne": 1, "groupeTaxoSimple": 1}
-        }
-    ]
-
-    resultats_aggregation = list(col.aggregate(pipeline))
-
-    # Re-structuration des résultats pour faciliter le traitement par règne
-    # {regne: {groupe_taxo_simple: count, ..., 'total_regne': X}}
-    regne_taxo_counts = defaultdict(lambda: {'groupes_taxo': defaultdict(int), 'total_regne': 0})
-
-    for res in resultats_aggregation:
-        regne = _format_key(res['regne'], 'Sans Règne')
-        groupe_taxo = _format_key(res['groupeTaxoSimple'], 'Autres Groupes Taxo') # Nom par défaut si manquant
-        nombre = res['nombreEspeces']
-
-        regne_taxo_counts[regne]['groupes_taxo'][groupe_taxo] += nombre
-        regne_taxo_counts[regne]['total_regne'] += nombre
-
-    # Préparation des données pour Chart.js
-    charts_output = []
-
-    # Filtrer les règnes qui sont intéressants (Animalia, Fungi, Plantae) et les trier
-    target_regnes_order = ["Animalia", "Fungi", "Plantae"] # Ordre désiré pour les charts
-
-    # On s'assure d'inclure uniquement les règnes pour lesquels nous avons des données
-    # et de les traiter dans l'ordre défini.
-    available_regnes = [r for r in target_regnes_order if r in regne_taxo_counts]
-    # Si d'autres règnes existent dans les données et que vous voulez les inclure,
-    # ajoutez une étape pour les trier et les ajouter après les principaux
-    other_regnes = sorted([r for r in regne_taxo_counts.keys() if r not in target_regnes_order])
-    final_regnes_to_process = available_regnes + other_regnes
-
-
-    for regne_name in final_regnes_to_process:
-        regne_details = regne_taxo_counts[regne_name]
-        total_species_in_regne = regne_details['total_regne']
-        taxo_groups_counts = regne_details['groupes_taxo']
-
-        # Préparer les données pour ce règne spécifique
-        processed_taxo_groups_for_chart = []
-        # Utiliser un index pour cycler les couleurs de la palette
-        color_idx = 0
-        for group_name, count in taxo_groups_counts.items():
-            color = TAXO_GROUP_PALETTE[color_idx % len(TAXO_GROUP_PALETTE)]
-            color_idx += 1
-
-            processed_taxo_groups_for_chart.append({
-                "label": group_name,
-                "count": count,
-                "color": color
-            })
-
-        # Trier les groupes taxonomiques (ex: par nombre d'espèces décroissant ou alphabétiquement)
-        # Ici, tri alphabétique des labels pour une cohérence.
-        sorted_taxo_groups_for_chart = sorted(processed_taxo_groups_for_chart, key=lambda x: x["label"])
-
-        labels = []
-        data = []  # Pourcentages
-        background_colors = []
-        counts_raw = []  # Nombres bruts
-
-        for item in sorted_taxo_groups_for_chart:
-            percentage = (item['count'] / total_species_in_regne) * 100 if total_species_in_regne > 0 else 0
-            labels.append(item['label'])
-            data.append(percentage)
-            background_colors.append(item['color'])
-            counts_raw.append(item['count'])
-
-        charts_output.append({
-            "labels": labels,
-            "data": data,
-            "backgroundColor": background_colors,
-            "counts": counts_raw,
-            "title": f"Répartition des espèces par groupe taxonomique ({regne_name}, Global)", # Titre global
-            "legendLabel": f"Groupes taxonomiques ({regne_name})"
-        })
-
-    return charts_output
-
-
-def species_by_regne_taxogroup(col: Collection, dep: int) -> List[Dict]:
-    """
-    Compte le nombre d'espèces uniques par règne et groupe taxonomique simple
-    pour un département donné, et formate les résultats en une liste de dictionnaires
-    Chart.js (un par règne).
-    """
-    pipeline = [
-        {
-            "$match": {"codeInseeDepartement": dep}
-        },
-        {
-            "$group": {
-                "_id": {
-                    "nomScientifiqueRef": "$nomScientifiqueRef",
-                    "codeInseeDepartement": "$codeInseeDepartement"
-                },
-                "regneSpecies": {"$first": "$regne"},
-                "groupeTaxoSimpleSpecies": {"$first": "$groupeTaxoAvance"},
-            }
-        },
-        {
-            "$group": {
-                "_id": {
-                    "regne": "$regneSpecies",
-                    "groupeTaxoSimple": "$groupeTaxoSimpleSpecies",
-                },
-                "nombreEspeces": {"$sum": 1}
-            }
-        },
-        {
-            "$project": {
-                "_id": 0,
-                "regne": "$_id.regne",
-                "groupeTaxoSimple": "$_id.groupeTaxoSimple",
-                "nombreEspeces": "$nombreEspeces"
-            }
-        },
-        {
-            "$sort": {"regne": 1, "groupeTaxoSimple": 1}
-        }
-    ]
-
-    resultats_aggregation = list(col.aggregate(pipeline))
-
-    # Re-structuration des résultats pour faciliter le traitement par règne
-    # {regne: {groupe_taxo_simple: count, ..., 'total_regne': X}}
-    regne_taxo_counts = defaultdict(lambda: {'groupes_taxo': defaultdict(int), 'total_regne': 0})
-
-    for res in resultats_aggregation:
-        regne = _format_key(res['regne'], 'Sans Règne')
-        groupe_taxo = _format_key(res['groupeTaxoSimple'], 'Autres Groupes Taxo') # Nom par défaut si manquant
-        nombre = res['nombreEspeces']
-
-        regne_taxo_counts[regne]['groupes_taxo'][groupe_taxo] += nombre
-        regne_taxo_counts[regne]['total_regne'] += nombre
-
-    # Préparation des données pour Chart.js
-    charts_output = []
-
-    # Filtrer les règnes qui sont intéressants (Animalia, Fungi, Plantae) et les trier
-    # Si vous voulez tous les règnes, utilisez `sorted(regne_taxo_counts.keys())`
-    # Sinon, spécifiez l'ordre voulu
-    target_regnes_order = ["Animalia", "Fungi", "Plantae"] # Ordre désiré pour les charts
-
-    # On s'assure d'inclure uniquement les règnes pour lesquels nous avons des données
-    # et de les traiter dans l'ordre défini.
-    available_regnes = [r for r in target_regnes_order if r in regne_taxo_counts]
-    # Si d'autres règnes existent dans les données et que vous voulez les inclure,
-    # ajoutez une étape pour les trier et les ajouter après les principaux
-    other_regnes = sorted([r for r in regne_taxo_counts.keys() if r not in target_regnes_order])
-    final_regnes_to_process = available_regnes + other_regnes
-
-
-    for regne_name in final_regnes_to_process:
-        regne_details = regne_taxo_counts[regne_name]
-        total_species_in_regne = regne_details['total_regne']
-        taxo_groups_counts = regne_details['groupes_taxo']
-
-        # Préparer les données pour ce règne spécifique
-        processed_taxo_groups_for_chart = []
-        # Utiliser un index pour cycler les couleurs de la palette
-        color_idx = 0
-        for group_name, count in taxo_groups_counts.items():
-            # Vous pouvez utiliser TAXO_GROUP_COLORS.get(group_name, TAXO_GROUP_PALETTE[color_idx])
-            # si vous avez des couleurs spécifiques pour certains groupes.
-            color = TAXO_GROUP_PALETTE[color_idx % len(TAXO_GROUP_PALETTE)]
-            color_idx += 1
-
-            processed_taxo_groups_for_chart.append({
-                "label": group_name,
-                "count": count,
-                "color": color
-            })
-
-        # Trier les groupes taxonomiques (ex: par nombre d'espèces décroissant ou alphabétiquement)
-        # Ici, tri alphabétique des labels pour une cohérence.
-        sorted_taxo_groups_for_chart = sorted(processed_taxo_groups_for_chart, key=lambda x: x["label"])
-
-        labels = []
-        data = []  # Pourcentages
-        background_colors = []
-        counts_raw = []  # Nombres bruts
-
-        for item in sorted_taxo_groups_for_chart:
-            percentage = (item['count'] / total_species_in_regne) * 100 if total_species_in_regne > 0 else 0
-            labels.append(item['label'])
-            data.append(percentage)
-            background_colors.append(item['color'])
-            counts_raw.append(item['count'])
-
-        charts_output.append({
-            "labels": labels,
-            "data": data,
-            "backgroundColor": background_colors,
-            "counts": counts_raw,
-            "title": f"Répartition des espèces {regne_name}",
-            "legendLabel": f"Groupes taxonomiques"
-        })
-
-    return charts_output
-
-
-def count_species_by_regne_taxogroup_simple_advanced(col: Collection, dep: int) -> tuple[dict, int]:
-    """
-    Compte le nombre d'espèces uniques par règne, groupe taxonomique simple et groupe taxonomique avancé
-    pour un département donné.
-    Retourne un tuple: (dictionnaire structuré avec les résultats, total d'espèces pour le département).
-    """
-    pipeline = [
-        {
-            "$match": {"codeInseeDepartement": dep}
-        },
-        {
-            "$group": {
-                "_id": {
-                    "nomScientifiqueRef": "$nomScientifiqueRef",
-                    "codeInseeDepartement": "$codeInseeDepartement"
-                },
-                "regneSpecies": {"$first": "$regne"},
-                "groupeTaxoSimpleSpecies": {"$first": "$groupeTaxoSimple"},
-                "groupeTaxoAvanceSpecies": {"$first": "$groupeTaxoAvance"}
-            }
-        },
-        {
-            "$group": {
-                "_id": {
-                    "regne": "$regneSpecies",
-                    "groupeTaxoSimple": "$groupeTaxoSimpleSpecies",
-                    "groupeTaxoAvance": "$groupeTaxoAvanceSpecies"
-                },
-                "nombreEspeces": {"$sum": 1}
-            }
-        },
-        {
-            "$project": {
-                "_id": 0,
-                "regne": "$_id.regne",
-                "groupeTaxoSimple": "$_id.groupeTaxoSimple",
-                "groupeTaxoAvance": "$_id.groupeTaxoAvance",
-                "nombreEspeces": "$nombreEspeces"
-            }
-        },
-        {
-            "$sort": {"regne": 1, "groupeTaxoSimple": 1, "groupeTaxoAvance": 1}
-        }
-    ]
-
-    resultats_aggregation = list(col.aggregate(pipeline))
-
-    data_structure = {}
-    total_especes_departement = 0
-
-    for res in resultats_aggregation:
-        regne = _format_key(res['regne'], 'N/A Règne')
-        groupe_simple = _format_key(res['groupeTaxoSimple'], 'N/A Groupe Taxo Simple')
-        groupe_avance = _format_key(res['groupeTaxoAvance'], 'N/A Groupe Taxo Avancé')
-        nombre = res['nombreEspeces']
-
-        if regne not in data_structure:
-            data_structure[regne] = {'total_regne': 0, 'groupes_simple': {}}
-
-        if groupe_simple not in data_structure[regne]['groupes_simple']:
-            data_structure[regne]['groupes_simple'][groupe_simple] = {'total_groupe_simple': 0, 'groupes_avance': {}}
-
-        data_structure[regne]['groupes_simple'][groupe_simple]['groupes_avance'][groupe_avance] = nombre
-
-        data_structure[regne]['groupes_simple'][groupe_simple]['total_groupe_simple'] += nombre
-        data_structure[regne]['total_regne'] += nombre
-        total_especes_departement += nombre
-
-    return data_structure, total_especes_departement
-
-
-# --- Bloc d'exécution principal ---
-
-if __name__ == '__main__':
-    uri = "mongodb+srv://guest:guestpass@big-data.640be.mongodb.net/?retryWrites=true&w=majority&appName=Big-Data"
-    db_name = 'LeGuideNaturel'
-    collection_name = 'Nature'
-
-    collection = None
-    client = None  # Initialiser client à None
-
-    try:
-        # Récupérer la collection (le client est inclus dans l'objet collection via son attribut client)
-        collection = get_mongo_collection(uri, db_name, collection_name)
-        client = collection.database.client  # Récupérer le client pour le fermer plus tard
-
-        departements_a_analyser = [21, 25, 39, 58, 71, 89, 90]
-
-        # Test de chaque fonction et affichage des résultats
-        print("\n--- Analyse par codeStatut pour plusieurs départements ---")
-        results_statut = species_by_regne_taxogroup_global(col=collection)
-        print(results_statut)
-
-
-    except Exception as e:
-        print(f"Une erreur inattendue est survenue: {e}")
-    finally:
-        if client:
-            client.close()
-            print("\nConnexion à MongoDB fermée.")

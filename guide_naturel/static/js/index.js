@@ -338,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ********* MINI-CAMEMBERTS PAR DEPARTEMENT ***********
     async function initialise_chart_data(info) {
         if (info === "default"){
-            info = "especesParStatutConservation"
+            info = "especesParRegne"
         }
         const response = await fetch(`/get_chart_data?info=${info}_dep`);
 
@@ -455,7 +455,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             size: 12,
                             family: 'Georgia',
                             weight: 'bold' },
-                        color: '#0a7353',
+                        color: '#FFFFFF',
                         padding: { top: 8, bottom: 8 }
                     },
                     tooltip :{

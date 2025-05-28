@@ -9,7 +9,7 @@
 
 .carousel-arrow {
     background-color: rgba(10, 115, 83, 0.7); /* Vert foncé, semi-transparent */
-    color: white;
+    color: #ffffff;
     border: none;
     padding: 8px 12px;
     cursor: pointer;
