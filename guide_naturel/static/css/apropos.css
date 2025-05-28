@@ -97,9 +97,9 @@
     line-height: 1.7;
     font-size: 1.1em;
     color: #FFFFFF;
-    background-color: rgba(53, 161, 84,0.5);
+    background-color: rgba(53, 161, 84,0.7);
     border-radius: 8px;
-    padding: 2px;
+    padding: 3px 15px;
 }
 
 .mission-text a{
@@ -120,7 +120,7 @@
     line-height: 1.6;
     margin-bottom: 1em;
     color: #FFFFFF;
-    background-color: rgba(53, 161, 84,0.5);
+    background-color: rgba(53, 161, 84,0.7);
     border-radius: 8px;
     padding: 2px;
 }
