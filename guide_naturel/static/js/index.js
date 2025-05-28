@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const miniDepartementChartCanvas = document.getElementById('mini-departement-chart');
 
     const chartDotsContainer = document.querySelector('.chart-dots-container');
+    const miniChartDotsContainer = document.querySelector('.mini-chart-dots-container');
 
     // Instances des graphiques Chart.js :
     let camembertChart;
@@ -399,7 +400,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }else {
                     miniPrevChartBtn.style.display = 'none';
                     miniNextChartBtn.style.display = 'none';
-                }             } else {
+                }
+                createMiniPaginationDots();
+            } else {
                 console.warn(`Pas de données de graphique disponibles pour le département "${departementKey}" et le type de graphique "${chartKeyValue}".`);
                 departementChartContainer.style.display = 'none';
             }
@@ -477,6 +480,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
+        updateMiniPaginationDots();
 
     }
 
@@ -496,6 +500,37 @@ document.addEventListener('DOMContentLoaded', function() {
         miniNextChartBtn.addEventListener('click', showNextMiniChart);
     } else {
         console.warn("Boutons de carousel (précédent/suivant) non trouvés.");
+    }
+
+    function createMiniPaginationDots() {
+        miniChartDotsContainer.innerHTML = ''; // Nettoie les points existants
+        if (miniChartDataList.length > 1) { // Affiche les points seulement s'il y a plus d'un graphique
+            miniChartDotsContainer.style.display = 'block'; // Ou 'flex' si vous voulez une flexbox
+            miniChartDataList.forEach((key, index) => {
+                const dot = document.createElement('span');
+                dot.classList.add('mini-chart-dot');
+                dot.dataset.index = index; // Stocke l'index du graphique que ce point représente
+                dot.addEventListener('click', () => {
+                    currentMiniChartIndex = index; // Met à jour l'index actuel
+                    updateMiniChart(miniChartDataList[currentMiniChartIndex]); // Charge le graphique correspondant
+                });
+                miniChartDotsContainer.appendChild(dot);
+            });
+        } else {
+            miniChartDotsContainer.style.display = 'none'; // Cache le conteneur si un seul graphique
+        }
+        updateMiniPaginationDots(); // Met à jour l'état actif initial
+    }
+
+    function updateMiniPaginationDots() {
+        const dots = document.querySelectorAll('.mini-chart-dot');
+        dots.forEach((dot, index) => {
+            if (index === currentMiniChartIndex) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
     }
 
     // Ajoute un écouteur d'événement 'click' sur l'ensemble du document

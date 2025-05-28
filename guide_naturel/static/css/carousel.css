@@ -29,7 +29,7 @@
     display: none; /* Caché par défaut, géré par JS */
 }
 
-.chart-dot {
+.chart-dot, .mini-chart-dot{
     display: inline-block; /* Pour qu'ils soient sur la même ligne */
     width: 10px;
     height: 10px;
@@ -40,11 +40,11 @@
     transition: background-color 0.3s ease, transform 0.3s ease; /* Animation douce */
 }
 
-.chart-dot.active {
+.chart-dot.active, .mini-chart-dot.active{
     background-color: #0a7353; /* Couleur du point actif (votre vert principal) */
     transform: scale(1.2); /* Grossit légèrement le point actif */
 }
 
-.chart-dot:hover {
+.chart-dot:hover, .mini-chart-dot:hover {
     background-color: rgba(255, 255, 255, 0.8); /* Changement de couleur au survol */
 }
