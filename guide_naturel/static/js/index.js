@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Sélectionne les boutons du carousel
     const prevChartBtn = document.querySelector('.carousel-prev');
     const nextChartBtn = document.querySelector('.carousel-next');
+    // Sélectionne les boutons du carousel
+    const miniPrevChartBtn = document.querySelector('.mini-carousel-prev');
+    const miniNextChartBtn = document.querySelector('.mini-carousel-next');
     // Sélectionne le <div> qui contiendra le mini-graphique affiché au clic sur un département
     const departementChartContainer = document.getElementById('departement-chart-container');
     // Sélectionne l'élément <canvas> à l'intérieur du conteneur ci-dessus pour le mini-graphique
@@ -26,10 +29,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let miniChartInstance;
     let mainChatData = Array;
     let currentChartIndex = 0;
+    let currentMiniChartIndex = 0;
     // Variable pour suivre quel type de données le graphique principal (et donc le mini-graphique) doit afficher
     // Initialisée à 'default', qui correspond à une clé dans chartDataSets
     let chartKeyValue  = 'default';
     let minichartData = [];
+    let miniChartDataList = [];
 
 
     // ********** SURVOL DES DEPARTEMENTS *********
@@ -331,6 +336,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ********* MINI-CAMEMBERTS PAR DEPARTEMENT ***********
     async function initialise_chart_data(info) {
+        if (info === "default"){
+            info = "especesParStatutConservation"
+        }
         const response = await fetch(`/get_chart_data?info=${info}_dep`);
 
         if (!response.ok) {
@@ -340,93 +348,31 @@ document.addEventListener('DOMContentLoaded', function() {
         minichartData = await response.json();
     }
 
-    //TODO faire en sorte de charger le minichartdata au lancement de la page
-
     // Ajoute un écouteur d'événement 'click' à chaque zone cliquable de département
     departementAreas.forEach(area => {
-        area.addEventListener('click', function(event) {
+        area.addEventListener('click', async function(event) {
             event.preventDefault(); // Empêche le comportement par défaut du lien <area>
             // Récupère le nom du département cliqué (depuis l'attribut 'alt')
             const departementKey = this.alt.toLowerCase();
             chartKeyValue = document.querySelector('.button_active')?.dataset.chartkey;
             const dep_num = area.dataset.numDep;
 
+
             if (minichartData.length === 0){
                 initialise_chart_data(chartKeyValue)
             }
 
-            const chartData = minichartData[dep_num]
+            miniChartDataList = minichartData[dep_num]
+
+            currentMiniChartIndex = 0;
+
+            try {
+                const chartData = miniChartDataList[currentMiniChartIndex];
 
 
             // Si des données spécifiques existent pour ce département et ce type de graphique :
             if (chartData) {
-                // Si une instance de mini-graphique existe déjà, la détruit pour en créer une nouvelle
-                if (miniChartInstance) {
-                    miniChartInstance.destroy();
-                }
-
-                // Récupère le contexte de dessin 2D du canvas du mini-graphique
-                const miniCtx = miniDepartementChartCanvas.getContext('2d');
-                // Crée une nouvelle instance de Chart pour le mini-graphique
-                miniChartInstance = new Chart(miniCtx, {
-                    type: 'pie',
-                    data: {
-                        labels: chartData.labels,
-                        datasets: [{
-                            label: chartData.title,
-                            data: chartData.data,
-                            backgroundColor: chartData.backgroundColor,
-                            borderColor: '#FFFFFF',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'bottom',
-                                labels: {
-                                    font: {
-                                        size: 10,
-                                        family: 'Georgia' },
-                                    boxWidth: 12,
-                                    padding: 8,
-                                    color: '#FFFFFF' }
-                            },
-                            title: {
-                                display: true,
-                                text: chartData.title,
-                                font: {
-                                    size: 12,
-                                    family: 'Georgia',
-                                    weight: 'bold' },
-                                color: '#0a7353',
-                                padding: { top: 8, bottom: 8 }
-                            },
-                            tooltip :{
-                                callbacks: {
-                                    label: function(context) {
-                                        let label = context.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
-                                        if (context.parsed !== null) {
-                                            label += context.parsed.toFixed(2) + '%'; // Utilise le pourcentage
-                                        }
-                                        return label;
-                                    },
-                                    afterLabel: function(context) {
-                                        // Afficher le nombre brut d'espèces
-                                        const count = chartData.counts[context.dataIndex];
-                                        return `(${count} espèces)`;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
+                updateMiniChart(chartData, event)
 
                 // Calcule la position du popup du mini-graphique pour qu'il apparaisse près du clic
                 // tout en essayant de rester visible dans la fenêtre.
@@ -447,12 +393,110 @@ document.addEventListener('DOMContentLoaded', function() {
                 departementChartContainer.style.top = `${y}px`;
                 departementChartContainer.style.display = 'block';
 
-            } else {
+                 if (miniChartDataList.length > 1) {
+                    miniPrevChartBtn.style.display = 'block';
+                    miniNextChartBtn.style.display = 'block';
+                }else {
+                    miniPrevChartBtn.style.display = 'none';
+                    miniNextChartBtn.style.display = 'none';
+                }             } else {
                 console.warn(`Pas de données de graphique disponibles pour le département "${departementKey}" et le type de graphique "${chartKeyValue}".`);
                 departementChartContainer.style.display = 'none';
             }
+            } catch{
+                await initialise_chart_data(chartKeyValue);
+            }
         });
     });
+
+    function updateMiniChart(chartData){
+        // Si une instance de mini-graphique existe déjà, la détruit pour en créer une nouvelle
+        if (miniChartInstance) {
+            miniChartInstance.destroy();
+        }
+
+        // Récupère le contexte de dessin 2D du canvas du mini-graphique
+        const miniCtx = miniDepartementChartCanvas.getContext('2d');
+        // Crée une nouvelle instance de Chart pour le mini-graphique
+        miniChartInstance = new Chart(miniCtx, {
+            type: 'pie',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: chartData.title,
+                    data: chartData.data,
+                    backgroundColor: chartData.backgroundColor,
+                    borderColor: '#FFFFFF',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                size: 10,
+                                family: 'Georgia' },
+                            boxWidth: 12,
+                            padding: 8,
+                            color: '#FFFFFF' }
+                    },
+                    title: {
+                        display: true,
+                        text: chartData.title,
+                        font: {
+                            size: 12,
+                            family: 'Georgia',
+                            weight: 'bold' },
+                        color: '#0a7353',
+                        padding: { top: 8, bottom: 8 }
+                    },
+                    tooltip :{
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed.toFixed(2) + '%'; // Utilise le pourcentage
+                                }
+                                return label;
+                            },
+                            afterLabel: function(context) {
+                                // Afficher le nombre brut d'espèces
+                                const count = chartData.counts[context.dataIndex];
+                                return `(${count} espèces)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+    }
+
+    function showNextMiniChart() {
+        currentMiniChartIndex = (currentMiniChartIndex + 1) % mainChatData.length;
+        updateMiniChart(miniChartDataList[currentMiniChartIndex]);
+    }
+
+    // NOUVEAU : Fonction pour afficher le graphique précédent
+    function showPrevMiniChart() {
+        currentMiniChartIndex = (currentMiniChartIndex - 1 + mainChatData.length) % mainChatData.length;
+        updateMiniChart(miniChartDataList[currentMiniChartIndex]);
+    }
+
+    if (prevChartBtn && nextChartBtn) {
+        miniPrevChartBtn.addEventListener('click', showPrevMiniChart);
+        miniNextChartBtn.addEventListener('click', showNextMiniChart);
+    } else {
+        console.warn("Boutons de carousel (précédent/suivant) non trouvés.");
+    }
 
     // Ajoute un écouteur d'événement 'click' sur l'ensemble du document
     // Utilisé pour fermer le mini-graphique si l'utilisateur clique n'importe où en dehors de celui-ci

@@ -313,7 +313,7 @@ def species_by_code_statut_dep(col: Collection, departements: list) -> dict:
             background_colors_dep.append(s_item['color'])
             counts_raw_dep.append(s_item['count'])
 
-        final_output_by_department[dep_code] = {
+        final_output_by_department[dep_code] = [{
             "labels": labels_dep,
             "data": data_dep,
             "backgroundColor": background_colors_dep,
@@ -321,7 +321,7 @@ def species_by_code_statut_dep(col: Collection, departements: list) -> dict:
             "title": f"Répartition des espèces par codeStatut"
             # Vous pouvez ajouter d'autres clés si nécessaire, comme le total_especes_departement
             # "totalEspeces": total_especes_departement
-        }
+        }]
 
     # S'assurer que tous les départements demandés ont une entrée, même vide
     for dep in departements:
@@ -408,15 +408,6 @@ def species_by_regne_dep(col: Collection, departements: list) -> dict:
             nombre = item['nombreEspeces']
             total_especes_departement += nombre
 
-            # Si vous utilisez une structure REGNE_INFO avec "order" et "full_name":
-            # info = REGNE_INFO.get(regne_nom, {"order": 999, "color": "#CCCCCC", "full_name": regne_nom})
-            # chart_data_raw_dep.append({
-            #     "label": info["full_name"],
-            #     "count": nombre,
-            #     "color": info["color"],
-            #     "sort_order": info["order"]
-            # })
-            # Sinon, avec un simple REGNE_COLORS:
             chart_data_raw_dep.append({
                 "label": regne_nom,
                 "count": nombre,
@@ -444,14 +435,14 @@ def species_by_regne_dep(col: Collection, departements: list) -> dict:
             background_colors_dep.append(s_item['color'])
             counts_raw_dep.append(s_item['count'])
 
-        final_output_by_department[dep_code] = {
+        final_output_by_department[dep_code] = [{
             "labels": labels_dep,
             "data": data_dep,
             "backgroundColor": background_colors_dep,
             "counts": counts_raw_dep,
             "title": f"Répartition des espèces par Règne"
             # "totalEspeces": total_especes_departement # Optionnel
-        }
+        }]
 
     # S'assurer que tous les départements demandés ont une entrée, même vide
     for dep in departements:
@@ -580,16 +571,17 @@ def species_by_regne_and_statut(col: Collection) -> List[Dict]:
     return charts_output
 
 
-def species_by_regne_and_statut_dep(col: Collection, dep: int) -> List[Dict]:
+def species_by_regne_and_statut_dep(col: Collection, dep: List[int]) -> Dict[int, List[Dict]]:
     """
-    Compte le nombre d'espèces uniques par règne et codeStatut pour un département donné,
-    et formate les résultats en une liste de dictionnaires Chart.js (un par règne).
+    Compte le nombre d'espèces uniques par département, règne et codeStatut,
+    et formate les résultats en un dictionnaire où chaque clé est un code de département,
+    et la valeur est une liste de dictionnaires Chart.js (un par règne pour ce département).
     """
     pipeline = [
         {
-            "$match": {"codeInseeDepartement": dep}
-        },
-        {
+            # Étape 1: Grouper par nom scientifique ET département pour obtenir
+            # une entrée unique par espèce au sein de chaque département.
+            # On prend le premier règne et codeStatut rencontrés pour cette espèce dans ce département.
             "$group": {
                 "_id": {
                     "nomScientifiqueRef": "$nomScientifiqueRef",
@@ -600,6 +592,8 @@ def species_by_regne_and_statut_dep(col: Collection, dep: int) -> List[Dict]:
             }
         },
         {
+            # Étape 2: Grouper les espèces uniques par leur département, règne et statut de conservation,
+            # puis compter le nombre d'espèces dans chaque combinaison.
             "$group": {
                 "_id": {
                     "departement": "$_id.codeInseeDepartement",
@@ -610,6 +604,7 @@ def species_by_regne_and_statut_dep(col: Collection, dep: int) -> List[Dict]:
             }
         },
         {
+            # Étape 3: Reformater le document de sortie pour faciliter le traitement Python.
             "$project": {
                 "_id": 0,
                 "departement": "$_id.departement",
@@ -619,91 +614,100 @@ def species_by_regne_and_statut_dep(col: Collection, dep: int) -> List[Dict]:
             }
         },
         {
+            # Étape 4: Trier les résultats pour une sortie cohérente.
             "$sort": {"departement": 1, "regne": 1, "statut": 1}
         }
     ]
 
     resultats_aggregation = list(col.aggregate(pipeline))
 
-    # Re-structuration des résultats pour faciliter le traitement par règne
-    # {departement: {regne: {statut: count, ..., 'total_regne': X}}}
-    department_regne_status_counts = defaultdict(lambda: defaultdict(lambda: {'statuts': defaultdict(int), 'total_regne': 0}))
+    # Re-structuration des résultats pour faciliter le traitement:
+    full_data_structure = defaultdict(lambda: defaultdict(lambda: {'statuts': defaultdict(int), 'total_regne': 0}))
 
     for res in resultats_aggregation:
         current_dep = res['departement']
         regne = _format_key(res['regne'], 'Sans Règne')
-        statut_key_raw = res['statut'] # Garde la clé brute pour la correspondance STATUS_INFO
+        statut_key_raw = res['statut']
         nombre = res['nombreEspeces']
 
-        # Map 'N/A Statut' ou autres valeurs non définies à 'Autre' pour la lookup dans STATUS_INFO
-        # Mais garde la clé brute pour stocker si nécessaire, ou standardise-la dès le début.
-        # Ici, on normalise la clé pour la recherche dans STATUS_INFO
+        # Normalise la clé de statut pour la recherche dans STATUS_INFO
         effective_statut_key = 'Autre'
         if statut_key_raw in STATUS_INFO:
             effective_statut_key = statut_key_raw
-        elif statut_key_raw is None or str(statut_key_raw).strip() == "" or _format_key(statut_key_raw, 'N/A Statut') == 'N/A Statut':
-            effective_statut_key = 'Autre' # Normalise les "N/A Statut" en "Autre"
+        elif statut_key_raw is None or str(statut_key_raw).strip() == "" or _format_key(statut_key_raw,
+                                                                                        'N/A Statut') == 'N/A Statut':
+            effective_statut_key = 'Autre'  # Normalise les "N/A Statut" en "Autre"
         else:
-            effective_statut_key = statut_key_raw # Si c'est une autre valeur inattendue, on la garde ou la map à 'Autre'
+            effective_statut_key = statut_key_raw  # Si c'est une autre valeur inattendue, on la garde
 
-        department_regne_status_counts[current_dep][regne]['statuts'][effective_statut_key] += nombre
-        department_regne_status_counts[current_dep][regne]['total_regne'] += nombre
+        full_data_structure[current_dep][regne]['statuts'][effective_statut_key] += nombre
+        full_data_structure[current_dep][regne]['total_regne'] += nombre
 
-    # Préparation des données pour Chart.js
-    charts_output = []
+    # Préparation du dictionnaire final pour Chart.js, structuré par département
+    final_output_by_department = {}
 
-    # Vérifie si le département est présent dans les résultats
-    if dep not in department_regne_status_counts:
-        return [] # Aucun résultat pour ce département
+    departments_to_process = sorted(full_data_structure.keys())
 
-    regnes_data_for_dep = department_regne_status_counts[dep]
+    for dep_code in departments_to_process:
+        charts_for_this_department = []
+        regnes_data_for_dep = full_data_structure.get(dep_code, {})
 
-    # Iterer sur chaque règne pour créer un graphique séparé
-    # On trie les règnes pour une sortie cohérente (ex: alphabétique)
-    sorted_regnes = sorted(regnes_data_for_dep.keys())
+        # Itérer sur chaque règne pour créer un graphique séparé pour ce département
+        sorted_regnes = sorted(regnes_data_for_dep.keys())
 
-    for regne_name in sorted_regnes:
-        regne_details = regnes_data_for_dep[regne_name]
-        total_species_in_regne = regne_details['total_regne']
-        statuts_counts = regne_details['statuts']
-
-        # Préparer les données de statut pour ce règne, en les triant selon STATUS_INFO['order']
-        processed_statuts_for_chart = []
-        for statut_key, count in statuts_counts.items():
-            status_info = STATUS_INFO.get(statut_key, STATUS_INFO["Autre"]) # Fallback to Autre
-            processed_statuts_for_chart.append({
-                "label_full": status_info['full_name'],
-                "label_short": statut_key,
-                "count": count,
-                "color": status_info['color'],
-                "order": status_info['order']
+        if not sorted_regnes:
+            charts_for_this_department.append({
+                "labels": ["Aucune donnée"],
+                "data": [100],
+                "backgroundColor": ["#CCCCCC"],
+                "counts": [0],
+                "title": f"Statuts de conservation (Dép. {dep_code})",
+                "legendLabel": "Aucune donnée"
             })
+        else:
+            for regne_name in sorted_regnes:
+                regne_details = regnes_data_for_dep[regne_name]
+                total_species_in_regne = regne_details['total_regne']
+                statuts_counts = regne_details['statuts']
 
-        # Trier les statuts pour le graphique
-        sorted_statuts_for_chart = sorted(processed_statuts_for_chart, key=lambda x: x["order"])
+                processed_statuts_for_chart = []
+                for statut_key, count in statuts_counts.items():
+                    status_info = STATUS_INFO.get(statut_key, STATUS_INFO["Autre"])
+                    processed_statuts_for_chart.append({
+                        "label_full": status_info['full_name'],
+                        "label_short": statut_key,
+                        "count": count,
+                        "color": status_info['color'],
+                        "order": status_info['order']
+                    })
 
-        labels = []
-        data = []  # Pourcentages
-        background_colors = []
-        counts_raw = []  # Nombres bruts
+                # Trier les statuts pour le graphique
+                sorted_statuts_for_chart = sorted(processed_statuts_for_chart, key=lambda x: x["order"])
 
-        for item in sorted_statuts_for_chart:
-            percentage = (item['count'] / total_species_in_regne) * 100 if total_species_in_regne > 0 else 0
-            labels.append(item['label_full']) # Utilisez le nom complet pour le label du graphique
-            data.append(percentage)
-            background_colors.append(item['color'])
-            counts_raw.append(item['count'])
+                labels = []
+                data = []  # Pourcentages
+                background_colors = []
+                counts_raw = []  # Nombres bruts
 
-        charts_output.append({
-            "labels": labels,
-            "data": data,
-            "backgroundColor": background_colors,
-            "counts": counts_raw,
-            "title": f"Statuts de conservation des espèces de {regne_name} (Dép. {dep})",
-            "legendLabel": f"Statuts de conservation ({regne_name})" # Utile pour la légende
-        })
+                for item in sorted_statuts_for_chart:
+                    percentage = (item['count'] / total_species_in_regne) * 100 if total_species_in_regne > 0 else 0
+                    labels.append(item['label_full'])
+                    data.append(round(percentage, 2))  # Arrondir les pourcentages pour un affichage plus propre
+                    background_colors.append(item['color'])
+                    counts_raw.append(item['count'])
 
-    return charts_output
+                charts_for_this_department.append({
+                    "labels": labels,
+                    "data": data,
+                    "backgroundColor": background_colors,
+                    "counts": counts_raw,
+                    "title": f"Statuts de conservation des espèces de {regne_name}",
+                    "legendLabel": f"Statuts de conservation"
+                })
+
+        final_output_by_department[dep_code] = charts_for_this_department
+
+    return final_output_by_department
 
 
 TAXO_GROUP_PALETTE = [
@@ -726,7 +730,7 @@ def species_by_regne_taxogroup_global(col: Collection) -> List[Dict]:
             "$group": {
                 "_id": "$nomScientifiqueRef",
                 "regneSpecies": {"$first": "$regne"},
-                "groupeTaxoSimpleSpecies": {"$first": "$groupeTaxoAvance"},
+                "groupeTaxoSimpleSpecies": {"$first": "$groupeTaxoSimple"},
             }
         },
         {
@@ -946,8 +950,8 @@ def species_by_regne_taxogroup(col: Collection, dep: int) -> List[Dict]:
             "data": data,
             "backgroundColor": background_colors,
             "counts": counts_raw,
-            "title": f"Répartition des espèces par groupe taxonomique ({regne_name}, Dép. {dep})",
-            "legendLabel": f"Groupes taxonomiques ({regne_name})"
+            "title": f"Répartition des espèces {regne_name}",
+            "legendLabel": f"Groupes taxonomiques"
         })
 
     return charts_output
@@ -1043,7 +1047,7 @@ if __name__ == '__main__':
 
         # Test de chaque fonction et affichage des résultats
         print("\n--- Analyse par codeStatut pour plusieurs départements ---")
-        results_statut = species_by_regne_dep(col=collection, departements=departements_a_analyser)
+        results_statut = species_by_regne_taxogroup_global(col=collection)
         print(results_statut)
 
 

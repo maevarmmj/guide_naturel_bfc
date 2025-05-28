@@ -62,7 +62,7 @@ def get_chart_data():
     elif info_key == "statutsConservationParRegne":
         data = species_by_regne_and_statut(col=collection_instance)
     elif info_key == "statutsConservationParRegne_dep":
-        data = species_by_regne_and_statut(col=collection_instance)
+        data = species_by_regne_and_statut_dep(col=collection_instance, dep=departements_a_analyser)
     elif info_key == "especesParStatutConservation_dep":
         data = species_by_code_statut_dep(col=collection_instance, departements=departements_a_analyser)
     else:
