@@ -83,12 +83,16 @@ def build_mongo_match_stage(filters):
 # LA fonction qui va interroger MongoDB
 def get_results_from_db(filters, col, page=1):
 
+    # Objet de filtre MongoDB
     match_stage_query = build_mongo_match_stage(filters)
 
+    # Verifie si un filtre sur le départment a été mis (va influenecr la manière dont les données seront agrégées après)
     departement_specifie = "codeInseeDepartement" in match_stage_query
 
+    # Si rien n'a été spécifié
     if not match_stage_query and not ("nomVernaculaire" in filters and filters["nomVernaculaire"]):
-        return {"items": [], "message": "Veuillez spécifier au moins un critère de recherche",
+        return {"items": [],
+                "message": "Veuillez spécifier au moins un critère de recherche",
                 "page": page,
                 "per_page": RESULTS_PER_PAGE,
                 "total_items": 0,
@@ -97,55 +101,82 @@ def get_results_from_db(filters, col, page=1):
                 "aggregation_type": "none"
                 }
 
+    # Étapes de la pipeline d'agrégation MongoDB
     pipeline = []
 
     if match_stage_query:
-        pipeline.append({"$match": match_stage_query})
+        pipeline.append({"$match": match_stage_query}) #$match ajouté (étape de filtrage des documents) - équivalent : "where"
 
+    # Résultats vont être regroupés par leur nom scientifique
     group_id_key = "$nomScientifiqueRef"
+
     common_group_fields = {
         # On prend le $first nomVernaculaire, on le traitera en "N/A" dans $project
+
         "nomVernaculaireSource": {"$first": "$nomVernaculaire"},
         "regne": {"$first": "$regne"},
         "groupeTaxoSimple": {"$first": "$groupeTaxoSimple"},
-        "statuts": {"$addToSet": "$codeStatut"},
+        "statuts": {"$addToSet": "$codeStatut"}, # Tableau de valeurs uniques pour les statuts de chaque groupe
         "totalObservationsEspece": {"$sum": "$nombreObservations"}
     }
 
     if departement_specifie:
-        group_stage_content = {"_id": group_id_key, **common_group_fields,
-                               "departements": {"$addToSet": "$codeInseeDepartement"}, "communesDetails": {
-                "$addToSet": {"commune": "$commune", "departement": "$codeInseeDepartement"}}}
+
+        group_stage_content = {
+            "_id": group_id_key,
+            **common_group_fields, # On inclut tous les champs définis dans common_group_fields
+            "departements": {
+                "$addToSet": "$codeInseeDepartement"
+            },
+            "communesDetails": {
+                "$addToSet": {"commune": "$commune",
+                              "departement": "$codeInseeDepartement"
+                              }
+            }
+        }
         aggregation_type_for_stage = "departement_specifique"
+
     else:
-        group_stage_content = {"_id": group_id_key, **common_group_fields,
-                               "departements": {"$addToSet": "$codeInseeDepartement"}}
+        group_stage_content = {
+            "_id": group_id_key,
+            **common_group_fields,
+            "departements": {
+                "$addToSet": "$codeInseeDepartement"
+            }
+        }
         aggregation_type_for_stage = "nationale_sans_communes"
 
-    pipeline.append({"$group": group_stage_content})
+    pipeline.append({"$group": group_stage_content}) # Ajout de $group
 
     # Étape de projection pour formater nomVernaculaire en "N/A" si besoin et préparer le tri
     project_stage = {
         "$project": {
             "_id": 0,
             "nomScientifiqueRef": "$_id",
-            "nomVernaculaire": {"$ifNull": ["$nomVernaculaireSource", "N/A"]},  # Si null, mettre "N/A"
+            "nomVernaculaire": {
+                "$ifNull": ["$nomVernaculaireSource", "N/A"]
+            },  # Si null, mettre "N/A"
             "regne": 1,
             "groupeTaxoSimple": 1,
             "statuts": 1,
             "totalObservationsEspece": 1,
             "departements": 1,
-            "communesDetails": {"$ifNull": ["$communesDetails", []]},
+            "communesDetails": {
+                "$ifNull": ["$communesDetails", []]
+            },
             "aggregation_type": aggregation_type_for_stage,
             "sort_priority_nomVernaculaire": {
                 "$cond": [{"$eq": [{"$ifNull": ["$nomVernaculaireSource", "N/A"]}, "N/A"]}, 1, 0]
             }
         }
     }
-    pipeline.append(project_stage)
 
+    pipeline.append(project_stage) # Ajout de l'étape ci-dessus
+
+    # Copie de la pipeline pour compter le nombre total d'items avant la pagination
     count_pipeline_after_group = [stage for stage in pipeline if
                                   "$skip" not in stage and "$limit" not in stage and "$sort" not in stage]
+    # $count pour compter
     count_pipeline_after_group.append({"$count": "total_items"})
     count_result = list(col.aggregate(count_pipeline_after_group))
     total_items = count_result[0]["total_items"] if count_result else 0
@@ -160,10 +191,10 @@ def get_results_from_db(filters, col, page=1):
     if page < 1:
         page = 1
 
-    if page > total_pages and total_pages > 0:
+    if page > total_pages > 0:
         page = total_pages
 
-    # Étape de tri
+    # Étape de tri $sort (ajouté dans la pipeline)
     pipeline.append({
         "$sort": {
             "sort_priority_nomVernaculaire": 1,  # Les N/A (valeur 1) en dernier
@@ -177,6 +208,14 @@ def get_results_from_db(filters, col, page=1):
 
     aggregated_results = list(col.aggregate(pipeline))
     message_text = f"Page {page} sur {total_pages} ({total_items} espèces trouvées)\n"
-    return {"items": aggregated_results, "message": message_text, "page": page, "per_page": RESULTS_PER_PAGE,
-            "total_items": total_items, "total_pages": total_pages, "query_used": match_stage_query,
-            "aggregation_type": aggregation_type_for_stage}
+
+    return {
+        "items": aggregated_results,
+            "message": message_text,
+            "page": page,
+            "per_page": RESULTS_PER_PAGE,
+            "total_items": total_items,
+            "total_pages": total_pages,
+            "query_used": match_stage_query,
+            "aggregation_type": aggregation_type_for_stage
+        }

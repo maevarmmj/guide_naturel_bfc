@@ -19,7 +19,7 @@ collection_instance = None
 
 departements_a_analyser = [21, 25, 39, 58, 70, 71, 89, 90]
 
-# connexion à la base de donnée
+# Connexion à la base de donnée
 try:
     collection_instance = get_mongo_collection(MONGO_URI, DB_NAME, COLLECTION_NAME)
     mongo_client_instance = collection_instance.database.client
@@ -28,7 +28,7 @@ except Exception as e:
     print(f"Failed to initialize MongoDB client for Flask app: {e}")
 
 
-# --- Routes Flask ---
+# *** Routes Flask ***
 @app.route('/')
 def index():
     return redirect(url_for('guide_naturel'))
@@ -55,7 +55,7 @@ def apropos():
     return render_template('apropos.html')
 
 
-#route pour récupérer les informations des graphiques
+# Route pour récupérer les informations des graphiques
 @app.route('/get_chart_data')
 def get_chart_data():
     info_key = request.args.get('info')
@@ -88,29 +88,36 @@ def get_footer_html_fragment():
     return render_template('footer.html')
 
 
-# routes pour faire des requêtes dans la barre de recherche
+# Initialisation d'une nouvelle session de conversation avec le Chatbot
 @app.route('/chat/start', methods=['POST'])
 def start_chat():
-    conversation_id = str(uuid.uuid4())
+    conversation_id = str(uuid.uuid4()) # Génération d'un nouvel id pour cette nouvelle conv
     initial_question_id = "q_regne"
     initial_question_data = QUESTIONS_FLOW.get(initial_question_id)
+
     if initial_question_data:
         conversations[conversation_id] = {
-            "current_question_id": initial_question_id, "answers": {}, "mode": "questioning"
+            "current_question_id": initial_question_id,
+            "answers": {},
+            "mode": "questioning"
         }
         is_skippable = initial_question_data.get("skippable", False)
         return jsonify({
             "conversation_id": conversation_id,
-            "question": {"text": initial_question_data["text"], "id": initial_question_id,
+            "question": {"text": initial_question_data["text"],
+                         "id": initial_question_id,
                          "is_skippable": is_skippable},
             "is_final_questions": False
         })
+
     return jsonify({"error": "Could not start chat"}), 500
 
 
+# Gestion de la réception d'une réponse de l'utilisateur à une question du chatbot et détermine la prochaine action
 @app.route('/chat/send', methods=['POST'])
 def handle_message():
     data = request.json
+
     user_answer_raw = data.get('message')
     conversation_id = data.get('conversation_id')
 
@@ -146,7 +153,6 @@ def handle_message():
             value_to_store = best_match
             print(f"Correction applied: '{user_answer_processed}' -> '{value_to_store}'")
         else:
-
             print(f"Fuzzy score too low for '{user_answer_processed}'. Storing original (or consider re-prompting).")
 
     if not (is_current_question_skippable_by_config
@@ -169,8 +175,11 @@ def handle_message():
         conv_data["current_question_id"] = next_question_id
         is_next_skippable = next_question_config.get("skippable", False)
         return jsonify({
-            "question": {"text": next_question_config["text"], "id": next_question_id,
-                         "is_skippable": is_next_skippable},
+            "question": {
+                         "text": next_question_config["text"],
+                         "id": next_question_id,
+                         "is_skippable": is_next_skippable
+                         },
             "is_final_questions": False, "conversation_id": conversation_id
         })
     else:
@@ -178,7 +187,9 @@ def handle_message():
             results_payload = get_results_from_db(conv_data["answers"], col=collection_instance, page=1)
             conv_data["mode"] = "results_displayed"
             return jsonify({
-                "results_data": results_payload, "is_final_questions": True, "conversation_id": conversation_id,
+                "results_data": results_payload,
+                "is_final_questions": True,
+                "conversation_id": conversation_id,
                 "warning": "Chatbot flow ended unexpectedly, showing results."
             })
         conversations.pop(conversation_id, None)
@@ -188,12 +199,18 @@ def handle_message():
 @app.route('/chat/results/<conversation_id>/page/<int:page_num>', methods=['GET'])
 def get_paginated_results(conversation_id, page_num):
     conv_data = conversations.get(conversation_id)
-    if not conv_data: return jsonify({"error": "Conversation not found."}), 404
+    if not conv_data:
+        return jsonify({"error": "Conversation not found."}), 404
+
     if "answers" not in conv_data or conv_data.get("mode") != "results_displayed":
         return jsonify({"error": "No search filters or results not processed."}), 400
-    if page_num < 1: return jsonify({"error": "Page number must be >= 1."}), 400
+
+    if page_num < 1:
+        return jsonify({"error": "Page number must be >= 1."}), 400
+
     filters = conv_data["answers"]
     results_payload = get_results_from_db(filters,col=collection_instance, page=page_num)
+
     return jsonify({
         "results_data": results_payload, "is_final_questions": True, "conversation_id": conversation_id
     })
