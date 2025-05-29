@@ -1,5 +1,3 @@
-// Attend que le document HTML initial soit complètement chargé et analysé
-
 document.addEventListener('DOMContentLoaded', function() {
 
     // Sélectionne toutes les zones cliquables (<area>) de la carte qui ont la classe 'departement-area'
@@ -14,27 +12,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // Sélectionne les boutons du carousel
     const prevChartBtn = document.querySelector('.carousel-prev');
     const nextChartBtn = document.querySelector('.carousel-next');
-    // Sélectionne les boutons du carousel
+    // Sélectionne les boutons du mini carousel
     const miniPrevChartBtn = document.querySelector('.mini-carousel-prev');
     const miniNextChartBtn = document.querySelector('.mini-carousel-next');
-    // Sélectionne le <div> qui contiendra le mini-graphique affiché au clic sur un département
-    const departementChartContainer = document.getElementById('departement-chart-container');
-    // Sélectionne l'élément <canvas> à l'intérieur du conteneur ci-dessus pour le mini-graphique
-    const miniDepartementChartCanvas = document.getElementById('mini-departement-chart');
 
+    // Sélectionne les informations du mini graphiques
+    const departementChartContainer = document.getElementById('departement-chart-container');
+    const miniDepartementChartCanvas = document.getElementById('mini-departement-chart');
     const chartDotsContainer = document.querySelector('.chart-dots-container');
     const miniChartDotsContainer = document.querySelector('.mini-chart-dots-container');
 
     // Instances des graphiques Chart.js :
     let camembertChart;
     let miniChartInstance;
+    // pour les boutons du carroussel et stocker les informations
     let mainChatData = Array;
     let currentChartIndex = 0;
-    let currentMiniChartIndex = 0;
-    // Variable pour suivre quel type de données le graphique principal (et donc le mini-graphique) doit afficher
-    // Initialisée à 'default', qui correspond à une clé dans chartDataSets
     let chartKeyValue  = 'default';
+    // pour les graphque de la fenêtre pop up
     let minichartData = [];
+    let currentMiniChartIndex = 0;
     let miniChartDataList = [];
 
 
@@ -75,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("L'élément Canvas avec l'ID 'camembert' n'a pas été trouvé");
     }
 
-    // Définit un objet de configuration commun pour les options du graphique principal (responsivité, la légende, le titre)
+    // Définit un objet de configuration commun pour les options du graphique principal
     const chartOptionsConfig = {
         responsive: true,
         maintainAspectRatio: false,
@@ -153,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                                             label += ': ';
                                                         }
                                                         if (context.parsed !== null) {
-                                                            label += context.parsed.toFixed(2) + '%'; // Utilise le pourcentage
+                                                            label += context.parsed.toFixed(2) + '%';
                                                         }
                                                         return label;
                                                     },
@@ -182,10 +179,9 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadChartData(infoParam, pushHistory = true) {
         try {
             // Effectue une requête GET asynchrone vers la route Flask '/get_chart_data'
-            // avec le paramètre 'info'.
             const response = await fetch(`/get_chart_data?info=${infoParam}`);
 
-            // Vérifie si la réponse HTTP est OK (statut 200-299)
+            // Vérifie si la réponse HTTP est OK
             if (!response.ok) {
                 throw new Error(`Erreur HTTP! statut: ${response.status}`);
             }
@@ -194,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
             mainChatData = await response.json();
 
             if (mainChatData.length > 1) {
-                prevChartBtn.style.display = 'block'; // Ou 'inline-block' selon votre CSS
+                prevChartBtn.style.display = 'block';
                 nextChartBtn.style.display = 'block';
             }else {
                 prevChartBtn.style.display = 'none';
@@ -215,17 +211,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
             // Mettre à jour l'URL dans la barre d'adresse du navigateur.
-            // Pourquoi : Permet aux utilisateurs de mettre en favori l'état actuel de la page
-            //             et d'utiliser les boutons "Retour" / "Avant" du navigateur.
-            //             Ceci se fait SANS recharger toute la page.
             if (pushHistory) {
                 const newUrl = `/guide_naturel?info=${infoParam}`;
                 history.pushState({ info: infoParam }, '', newUrl);
             }
         } catch (error) {
             // Gestion des erreurs lors de la récupération des données.
-            // Pourquoi : Afficher un message convivial à l'utilisateur en cas de problème réseau
-            //             ou de réponse invalide du serveur.
             console.error('Erreur lors du chargement des données du graphique:', error);
             chartTitleElement.textContent = 'Impossible de charger le graphique. Veuillez réessayer.';
             if (camembertChart) {
@@ -236,22 +227,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-     // NOUVEAU : Fonction pour afficher le graphique suivant
+     // Fonction pour afficher le graphique suivant
     function showNextChart() {
         currentChartIndex = (currentChartIndex + 1) % mainChatData.length;
         updateChart(mainChatData[currentChartIndex]);
     }
 
-    // NOUVEAU : Fonction pour afficher le graphique précédent
+    // Fonction pour afficher le graphique précédent
     function showPrevChart() {
         currentChartIndex = (currentChartIndex - 1 + mainChatData.length) % mainChatData.length;
         updateChart(mainChatData[currentChartIndex]);
     }
 
+    // Créer les points pour naviguer sur les graphiques
     function createPaginationDots() {
-        chartDotsContainer.innerHTML = ''; // Nettoie les points existants
+        chartDotsContainer.innerHTML = '';
         if (mainChatData.length > 1) { // Affiche les points seulement s'il y a plus d'un graphique
-            chartDotsContainer.style.display = 'block'; // Ou 'flex' si vous voulez une flexbox
+            chartDotsContainer.style.display = 'block';
             mainChatData.forEach((key, index) => {
                 const dot = document.createElement('span');
                 dot.classList.add('chart-dot');
@@ -268,6 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePaginationDots(); // Met à jour l'état actif initial
     }
 
+    // met à jour les points
     function updatePaginationDots() {
         const dots = document.querySelectorAll('.chart-dot');
         dots.forEach((dot, index) => {
@@ -280,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-    // Sélectionne tous les boutons de la barre latérale droite qui permettent de changer le type de graphique
+    // Sélectionne tous les boutons en dessus des graphiques qui permettent de changer le type de graphique
     const chartButtons = document.querySelectorAll('.button_right1');
 
     /**
@@ -328,6 +321,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // attribue les fonctions pour changer de graphique sur les boutons précédents et suivants
     if (prevChartBtn && nextChartBtn) {
         prevChartBtn.addEventListener('click', showPrevChart);
         nextChartBtn.addEventListener('click', showNextChart);
@@ -353,59 +347,59 @@ document.addEventListener('DOMContentLoaded', function() {
     departementAreas.forEach(area => {
         area.addEventListener('click', async function(event) {
             event.preventDefault(); // Empêche le comportement par défaut du lien <area>
-            // Récupère le nom du département cliqué (depuis l'attribut 'alt')
+            // Récupère le nom du département cliqué
             const departementKey = this.alt.toLowerCase();
             chartKeyValue = document.querySelector('.button_active')?.dataset.chartkey;
             const dep_num = area.dataset.numDep;
 
-
+            // initialise les données pour le graphique si jamais la variable est nulle
             if (minichartData.length === 0){
                 initialise_chart_data(chartKeyValue)
             }
 
+            // récupère les données pour le département du graphique
             miniChartDataList = minichartData[dep_num]
-
             currentMiniChartIndex = 0;
 
+            // si jamais les données ne sont pas en core configuré, catch une erreur et relnce la configuration
             try {
                 const chartData = miniChartDataList[currentMiniChartIndex];
 
+                // Si des données spécifiques existent pour ce département et ce type de graphique :
+                if (chartData) {
+                    updateMiniChart(chartData, event)
 
-            // Si des données spécifiques existent pour ce département et ce type de graphique :
-            if (chartData) {
-                updateMiniChart(chartData, event)
+                    // Calcule la position du popup du mini-graphique pour qu'il apparaisse près du clic
+                    // tout en essayant de rester visible dans la fenêtre.
+                    const popupWidth = departementChartContainer.offsetWidth; // Largeur du popup
+                    const popupHeight = departementChartContainer.offsetHeight; // Hauteur estimée du popup
 
-                // Calcule la position du popup du mini-graphique pour qu'il apparaisse près du clic
-                // tout en essayant de rester visible dans la fenêtre.
-                const popupWidth = departementChartContainer.offsetWidth; // Largeur du popup
-                const popupHeight = departementChartContainer.offsetHeight; // Hauteur estimée du popup
+                    let x = event.pageX + 15; // Position X initiale (à droite du clic).
+                    let y = event.pageY + 15; // Position Y initiale (en dessous du clic).
 
-                let x = event.pageX + 15; // Position X initiale (à droite du clic).
-                let y = event.pageY + 15; // Position Y initiale (en dessous du clic).
+                    // Ajuste la position si le popup sort de la fenêtre :
+                    if (x + popupWidth > window.innerWidth) x = window.innerWidth - popupWidth - 10;
+                    if (y + popupHeight > window.innerHeight) y = window.innerHeight - popupHeight - 10;
+                    if (x < 0) x = 10; // Empêche de sortir à gauche
+                    if (y < 0) y = 10; // Empêche de sortir en haut
 
-                // Ajuste la position si le popup sort de la fenêtre :
-                if (x + popupWidth > window.innerWidth) x = window.innerWidth - popupWidth - 10;
-                if (y + popupHeight > window.innerHeight) y = window.innerHeight - popupHeight - 10;
-                if (x < 0) x = 10; // Empêche de sortir à gauche
-                if (y < 0) y = 10; // Empêche de sortir en haut
+                    // Applique la position calculée au conteneur du mini-graphique et le rend visible
+                    departementChartContainer.style.left = `${x}px`;
+                    departementChartContainer.style.top = `${y}px`;
+                    departementChartContainer.style.display = 'block';
 
-                // Applique la position calculée au conteneur du mini-graphique et le rend visible
-                departementChartContainer.style.left = `${x}px`;
-                departementChartContainer.style.top = `${y}px`;
-                departementChartContainer.style.display = 'block';
-
-                 if (miniChartDataList.length > 1) {
-                    miniPrevChartBtn.style.display = 'block';
-                    miniNextChartBtn.style.display = 'block';
-                }else {
-                    miniPrevChartBtn.style.display = 'none';
-                    miniNextChartBtn.style.display = 'none';
+                     if (miniChartDataList.length > 1) {
+                        miniPrevChartBtn.style.display = 'block';
+                        miniNextChartBtn.style.display = 'block';
+                    }else {
+                        miniPrevChartBtn.style.display = 'none';
+                        miniNextChartBtn.style.display = 'none';
+                    }
+                    createMiniPaginationDots();
+                } else {
+                    console.warn(`Pas de données de graphique disponibles pour le département "${departementKey}" et le type de graphique "${chartKeyValue}".`);
+                    departementChartContainer.style.display = 'none';
                 }
-                createMiniPaginationDots();
-            } else {
-                console.warn(`Pas de données de graphique disponibles pour le département "${departementKey}" et le type de graphique "${chartKeyValue}".`);
-                departementChartContainer.style.display = 'none';
-            }
             } catch{
                 await initialise_chart_data(chartKeyValue);
             }
@@ -466,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     label += ': ';
                                 }
                                 if (context.parsed !== null) {
-                                    label += context.parsed.toFixed(2) + '%'; // Utilise le pourcentage
+                                    label += context.parsed.toFixed(2) + '%';
                                 }
                                 return label;
                             },
@@ -481,15 +475,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         updateMiniPaginationDots();
-
     }
 
+    // Fonction pour afficher le mini graphique précédent
     function showNextMiniChart() {
         currentMiniChartIndex = (currentMiniChartIndex + 1) % mainChatData.length;
         updateMiniChart(miniChartDataList[currentMiniChartIndex]);
     }
 
-    // NOUVEAU : Fonction pour afficher le graphique précédent
+    // Fonction pour afficher le mini graphique précédent
     function showPrevMiniChart() {
         currentMiniChartIndex = (currentMiniChartIndex - 1 + mainChatData.length) % mainChatData.length;
         updateMiniChart(miniChartDataList[currentMiniChartIndex]);
@@ -505,7 +499,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function createMiniPaginationDots() {
         miniChartDotsContainer.innerHTML = ''; // Nettoie les points existants
         if (miniChartDataList.length > 1) { // Affiche les points seulement s'il y a plus d'un graphique
-            miniChartDotsContainer.style.display = 'block'; // Ou 'flex' si vous voulez une flexbox
+            miniChartDotsContainer.style.display = 'block';
             miniChartDataList.forEach((key, index) => {
                 const dot = document.createElement('span');
                 dot.classList.add('mini-chart-dot');
@@ -519,7 +513,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             miniChartDotsContainer.style.display = 'none'; // Cache le conteneur si un seul graphique
         }
-        updateMiniPaginationDots(); // Met à jour l'état actif initial
+        updateMiniPaginationDots();
     }
 
     function updateMiniPaginationDots() {
@@ -549,9 +543,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-}); // FIN DE DOMContentLoaded
+});
 
-// Attend que toutes les ressources de la page (y compris les images) soient chargées
+// Attend que toutes les ressources de la page soient chargées
 window.addEventListener('load', function () {
     // Vérifie si la fonction 'imageMapResize' (de la bibliothèque image-map-resizer) est disponible
     if (typeof imageMapResize === 'function') {
