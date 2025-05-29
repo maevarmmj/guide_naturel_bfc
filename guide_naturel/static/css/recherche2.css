@@ -1,3 +1,45 @@
+/* PARTIE 2 DU STYLESHEET DE RECHERCHE.HTML */
+
+
+/* ******* RESULTATS DU CHATBOT *********/
+
+.chatbot-results{
+  flex:1 1 0;
+  background-color:rgba(53,161,84,0.5);
+  border-radius:10px;
+  padding:20px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+  min-height:430px;
+  max-height:430px;
+  display:flex;
+  flex-direction:column;
+  color:rgba(255,255,255,.4);
+  position:relative
+}
+
+/* --- Anna (à côté des résultats) --- */
+#results-character{
+  position:absolute;
+  width:240px;
+  height:auto;
+  right:-160px;
+  bottom:10px;
+  z-index:10
+}
+
+/* --- Contenu des résultats finaux --- */
+#final-chatbot-results-content{
+    background-color: rgba(200, 255, 161, 0.85);
+    color:#333;
+    padding:15px;
+    border-radius:5px;
+    height:100%;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    line-height:1.6
+}
+
 /* Message dans la zone de résultats (placeholder, "aucun résultat") */
 .results-message{
     text-align:center;
@@ -20,9 +62,11 @@
     max-height:300px
 }
 
+/* *** PARTIE GEREE PAR RECHERCHE.JS *** */
+
 .results-list li{
     padding:8px 10px;
-    border-bottom:1px solid rgba(53,161,84,.2);
+    border-bottom:1px solid rgba(53,161,84,0.2);
     font-size:.95em;
     line-height:1.5;
     color:#333
@@ -41,7 +85,7 @@
     flex-shrink:0
 }
 
-/* --- Contrôles de Pagination --- */
+/* *** Contrôles de Pagination *** */
 .pagination-controls{
     display:flex;
     justify-content:center;
@@ -49,7 +93,7 @@
     padding:10px 0 5px;
     gap:8px;
     margin-top:auto;
-    border-top:1px solid rgba(53,161,84,.3);
+    border-top:1px solid rgb(255, 255, 255); /* Ligne entre les résultats de pag. et partie du changement de page */
     flex-shrink:0
 }
 
@@ -60,8 +104,8 @@
     border:none;
     border-radius:5px;
     cursor:pointer;
-    font-size:.85em;
-    transition:background-color .2s ease-in-out;
+    font-size:0.85em;
+    transition:background-color 0.2s ease-in-out;
     white-space:nowrap;
     display:inline-flex;
     align-items:center;
@@ -70,6 +114,8 @@
 .pagination-controls button:hover:not(:disabled){
     background-color:#3aa842
 }
+
+/* Désactivation des boutons */
 .pagination-controls button:disabled{
     background-color:#ccc;
     color:#666;
@@ -81,7 +127,6 @@
     height:12px
 }
 
-
 .page-input-container{
     display:flex;
     align-items:center;
@@ -89,7 +134,7 @@
 }
 
 .page-input-label{
-    font-size:.85em;
+    font-size:0.85em;
     color:#333
 }
 
@@ -99,7 +144,7 @@
     border:1px solid #ccc;
     border-radius:4px;
     text-align:center;
-    font-size:.85em;
+    font-size:0.85em;
     -moz-appearance:textfield
 }
 .page-number-input::-webkit-outer-spin-button,
@@ -109,7 +154,7 @@
 }
 
 .total-pages-indicator{
-    font-size:.85em;
+    font-size:0.85em;
     color:#333
 }
 
@@ -120,7 +165,7 @@
     background-color:#f9f9f9;
     border:1px solid #ddd;
     border-radius:6px;
-    box-shadow:0 4px 12px rgba(0,0,0,.15);
+    box-shadow:0 4px 12px rgba(0,0,0,0.15);
     padding:12px;
     min-width:250px;
     max-width:400px;
@@ -128,7 +173,7 @@
     line-height:1.5;
     opacity:0;
     visibility:hidden;
-    transition:opacity .2s ease-in-out,visibility .2s ease-in-out,transform .2s ease-in-out;
+    transition:opacity 0.2s ease-in-out,visibility 0.2s ease-in-out,transform 0.2s ease-in-out;
     transform:translateY(10px) scale(.98)
 }
 
@@ -171,6 +216,64 @@
 }
 
 
+/* *** BARRE DE RECHERCHE DES ESPECES *** */
+
+#results-search-bar-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    position: relative;
+}
+
+#species-search-input {
+    flex-grow: 1;
+    font-family: Georgia, serif;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#species-search-button {
+    padding: 8px 15px;
+    border: 1px solid #4fcdf7;
+    border-radius: 20px;
+    color: #FFFFFF;
+    font-weight: bold;
+    font-size:15px;
+    background-color: #4fcdf7;
+}
+
+#species-search-button:hover{
+    background-color: #5faecb;
+    border: 1px solid #60afcb;
+}
+
+.suggestions-dropdown {
+    position: absolute;
+    top: 100%; /* Juste en dessous de la barre de recherche */
+    left: 0;
+    right: 0;
+    background-color: white;
+    color: #364d36;
+    font-size: 15px;
+    border: 1px solid #ddd;
+    border-top: none;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+}
+.suggestion-item:hover {
+    background-color: #f0f0f0;
+}
+
+
+/* Responsivité */
 
 /* Pour les tablettes et écrans moyens  */
 @media screen and (max-width:1024px){
@@ -271,61 +374,5 @@
     .chatbot-name{
         font-size:1em
     }
-}
-
-/* Dans recherche.css */
-#results-search-bar-container {
-    display: flex; /* Pour aligner input et bouton */
-    gap: 10px;
-    align-items: center;
-    position: relative; /* Pour positionner la liste de suggestions */
-    /* ... autres styles que vous pourriez vouloir ... */
-}
-
-#species-search-input {
-    flex-grow: 1;
-    font-family: Georgia, serif;
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-#species-search-button {
-    padding: 8px 15px;
-    border: 1px solid #4fcdf7;
-    border-radius: 20px;
-    color: #FFFFFF;
-    font-weight: bold;
-    font-size:15px;
-    background-color: #4fcdf7;
-}
-
-#species-search-button:hover{
-    background-color: #5faecb;
-    border: 1px solid #60afcb;
-}
-
-.suggestions-dropdown {
-    position: absolute;
-    top: 100%; /* Juste en dessous de la barre de recherche */
-    left: 0;
-    right: 0; /* S'étend sur toute la largeur de son parent positionné */
-    background-color: white;
-    color: #364d36;
-    font-size: 15px;
-    border: 1px solid #ddd;
-    border-top: none;
-    z-index: 1000; /* Pour être au-dessus des autres éléments */
-    max-height: 200px;
-    overflow-y: auto;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.suggestion-item {
-    padding: 10px;
-    cursor: pointer;
-}
-.suggestion-item:hover {
-    background-color: #f0f0f0;
 }
 

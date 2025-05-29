@@ -1,4 +1,4 @@
-/* CONTENU PRINCIPAL : CARTE BFC + CONTENU DROITE */
+/* CONTENU PRINCIPAL : CARTE BFC, CAMEMBERT, BOUTONS */
 .content-below {
   display: flex;
   flex-direction: row;
@@ -76,7 +76,7 @@
   background-color: rgb(10, 115, 83);
 }
 
-/* RESPONSIVE POUR CARTE ET CONTENU DROITE */
+/* Responsivité */
 @media screen and (max-width: 992px) {
     .content-below {
         gap: 1rem;

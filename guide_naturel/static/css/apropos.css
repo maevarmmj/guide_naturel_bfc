@@ -10,7 +10,8 @@
     position: relative;
 }
 
-.h2_apropos::after {
+/* Ligne décorative sous les titres h2 */
+.apropos-main-content, .h2_apropos::after {
     content: '';
     display: block;
     width: 60px;
@@ -19,28 +20,20 @@
     margin: 10px auto 0;
 }
 
+/* Padding de chaque section */
 .section-padding {
     padding-top: 30px;
     padding-bottom: 30px;
     width: 100%;
 }
 
+/* Ligne décorative sous chaque section */
 .apropos .container section:not(:last-child) {
     border-bottom: 1px solid #eee;
 }
 
-/* Ligne décorative sous les titres h2 */
-.apropos-main-content .h2_apropos::after {
-    content: '';
-    display: block;
-    width: 60px;
-    height: 3px;
-    background-color: rgb(79, 205, 247);
-    margin: 10px auto 0;
-}
 
-
-/* Section Équipe */
+/* *** SECTION MEMBRES DE L'EQUIPE *** */
 .team-members {
     display: flex;
     flex-wrap: wrap;
@@ -91,7 +84,7 @@
     line-height: 1.5;
 }
 
-/* Section Mission */
+/* *** SECTION MISSION *** */
 .mission-text {
     text-align: justify;
     line-height: 1.7;
@@ -110,7 +103,7 @@
     margin-bottom: 1em;
 }
 
-/* Section Contact */
+/* *** SECTION MISSION *** */
 .contact-info {
     text-align: center;
 }
@@ -141,6 +134,7 @@
     color: rgb(79, 205, 247);
 }
 
+/* Responsivité */
 @media screen and (max-width: 768px) {
     .apropos-header h1 {
         font-size: 2.2em;

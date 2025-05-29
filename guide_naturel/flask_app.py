@@ -1,5 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, request, jsonify
 from flask_cors import CORS
+import uuid
+from thefuzz import process, fuzz
 
 from API_request.mongo_request import *
 from API_request.recherche import *

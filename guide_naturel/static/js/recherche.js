@@ -1,18 +1,36 @@
+// On attend que le document initial html soit complètement chargé...
 document.addEventListener('DOMContentLoaded', () => {
-    // --- CONSTANTES ET VARIABLES GLOBALES ---
+
+    // *** CONSTANTES ***
     const API_BASE_URL = 'http://localhost:5000';
+    // Définies dans le recherche.html avec leur ID
     const chatLog = document.getElementById('chat-log');
     const chatInput = document.getElementById('chat-input');
     const sendButton = document.getElementById('send-chat-button');
     const skipButton = document.getElementById('skip-chat-button');
     const finalResultsContentElement = document.getElementById('final-chatbot-results-content');
-    const MAX_CONSECUTIVE_SKIPS = 6;
-
     const resultsSearchBarContainer = document.getElementById('results-search-bar-container');
     const speciesSearchInput = document.getElementById('species-search-input');
     const speciesSearchButton = document.getElementById('species-search-button');
     const speciesSuggestionsList = document.getElementById('species-suggestions-list');
 
+    const MAX_CONSECUTIVE_SKIPS = 6; // Nombre de skips max avant de relancer le chatbot
+
+    // Icônes lors de l'affichage des résultats
+    const taxoIcons = {
+        "Amphibiens et reptiles": "🦎",
+        "Autres": "🪨",
+        "Crabes, crevettes, cloportes et mille-pattes": "🦐",
+        "Escargots et autres mollusques": "🐌",
+        "Insectes et araignées": "🐜",
+        "Mammifères": "🐻",
+        "Oiseaux": "🕊️",
+        "Poissons": "🐟",
+        "Champignons et lichens": "🍄",
+        "Plantes, mousses et fougères": "🌿"
+    };
+
+    /// *** VARIABLES GLOBALES ***
     let conversationId = null;
     let resultsConversationId = null;
     let currentQuestionIsSkippable = false;
@@ -23,55 +41,74 @@ document.addEventListener('DOMContentLoaded', () => {
     let originalFullItemsForCurrentPage = [];
     let isCurrentlyLocallyFiltered = false;
 
-    let currentAggregationType = 'unknown';
+    let currentAggregationType = "unknown";
     let infoboxElement = null;
     let currentlyDisplayedInfoboxItemIndex = null;
     let consecutiveSkips = 0;
 
-    const taxoIcons = {
-        "Amphibiens et reptiles": "🦎", "Autres": "🪨",
-        "Crabes, crevettes, cloportes et mille-pattes": "🦐",
-        "Escargots et autres mollusques": "🐌", "Insectes et araignées": "🐜",
-        "Mammifères": "🐻", "Oiseaux": "🕊️", "Poissons": "🐟",
-        "Champignons et lichens": "🍄", "Plantes, mousses et fougères": "🌿"
-    };
 
-    // --- FONCTIONS UTILITAIRES ---
+    // *** FONCTIONS UTILITAIRES ***
+
+    // Afficher un nouveau message dans le chat
+    // Paramètres : message (le message à envoyer), sender (la personne qui envoie), isHtml (interprétation d'un simple txt ou code html)
     const displayMessage = (message, sender, isHtml = false) => {
         const p = document.createElement('p');
-        if (isHtml) { p.innerHTML = message; } else { p.textContent = message; }
-        p.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
-        chatLog.appendChild(p);
+        if (isHtml) {
+            p.innerHTML = message; // Si par ex il y a du texte en italique ("Je ne sais pas")
+        }
+        else {
+            p.textContent = message; // Par défaut
+        }
+        p.classList.add(sender === 'user' ? 'user-message' : 'bot-message'); // Message de l'utilisateur ou du chatbot ?
+        chatLog.appendChild(p); // on ajoute le nouveau paragraphe créé dans le html (chat-log)
         requestAnimationFrame(() => requestAnimationFrame(() => p.classList.add('visible')));
         chatLog.scrollTop = chatLog.scrollHeight;
     };
 
+    // Gère l'état des éléments d'entrée de l'utilisateur
     const setInputState = (enable, isSkippable = false) => {
-        chatInput.disabled = !enable;
+        chatInput.disabled = !enable; // Pas activé par défaut
         sendButton.disabled = !enable;
-        currentQuestionIsSkippable = enable && isSkippable;
-        if (skipButton) skipButton.disabled = !currentQuestionIsSkippable;
-        if (enable) chatInput.focus();
+        currentQuestionIsSkippable = enable && isSkippable; // Nouvelle variable bool
+        if (skipButton) {
+            skipButton.disabled = !currentQuestionIsSkippable; // Active/désactive le bouton skip en fonction de la situation
+        }
+        if (enable) {
+            chatInput.focus(); // "Active" le chat input
+        }
     };
 
-    const errorHandler = async (error, message = "Oups, une erreur s'est produite.", retry = null) => {
+    // Message d'erreur envoyé dans le chat
+    const errorHandler = async (error, message = "Oups, une erreur s'est produite !", retry = null) => {
         console.error(message, error);
         displayMessage(`${message} ${error.message || error}`, 'bot');
-        if (retry) setTimeout(retry, 5000);
+        if (retry) {
+            setTimeout(retry, 5000);
+        }
     };
 
+    // Nettoyage complet de la zone des résultats de la recherche
     const clearResultDisplayArea = () => {
-        if (finalResultsContentElement) finalResultsContentElement.innerHTML = '';
+        // Si l'élément existe bien :
+        if (finalResultsContentElement) {
+            finalResultsContentElement.innerHTML = ''; // Tous les enfants de l'élement sont retirés du DOM
+        }
         hideInfobox();
-        if (resultsSearchBarContainer) resultsSearchBarContainer.style.display = 'none';
-        if (speciesSearchInput) speciesSearchInput.value = '';
+        if (resultsSearchBarContainer) {
+            resultsSearchBarContainer.style.display = 'none'; // Cache la barre de recherche
+        }
+        if (speciesSearchInput) {
+            speciesSearchInput.value = '';
+        }
         if (speciesSuggestionsList) {
             speciesSuggestionsList.innerHTML = '';
             speciesSuggestionsList.style.display = 'none';
         }
-        isCurrentlyLocallyFiltered = false;
+        isCurrentlyLocallyFiltered = false; // Réinitialisationd de cette variable
     };
 
+    // Fonction qui prend une URL et des options de requête et qui utilise fetch pour envoyer une requête au serveur
+    // de manièer asynchrone
     const fetchAPI = async (url, options = {}) => {
         try {
             const response = await fetch(url, options);
@@ -86,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // NOUVELLES FONCTIONS POUR LE CURSEUR DE CHARGEMENT CSS
+    // Curseur de chargement CSS (show et hide)
     const showLoadingCursor = () => {
         document.body.style.cursor = 'wait';
     };
@@ -95,102 +132,146 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.cursor = 'default';
     };
 
-    // --- GESTION DE L'AFFICHAGE DES RESULTATS (LISTE + INFOS) ---
-    const displayPaginatedResults = (resultsData, convIdForTheseResults) => {
-        if (!finalResultsContentElement) {
-            errorHandler(new Error("Zone d'affichage des résultats non trouvée."), "Erreur critique d'interface.");
-            return;
-        }
+// *** GESTION DE L'AFFICHAGE DES RESULTATS (LISTE + INFOS) ***
+//   * resultsData: un objet contenant les données des résultats (items, message, infos de pagination)
+//   * convIdForTheseResults: L'ID de conversation associé à ces résultats (pour la pagination backend)
+const displayPaginatedResults = (resultsData, convIdForTheseResults) => {
+    // Vérifie si l'élément HTML principal pour afficher les résultats existe
+    if (!finalResultsContentElement) {
+        errorHandler(new Error("Zone d'affichage des résultats non trouvée."), "Erreur critique d'interface.");
+        return;
+    }
 
-        if (!isCurrentlyLocallyFiltered) {
-            clearResultDisplayArea();
-            resultsConversationId = convIdForTheseResults;
+    // Si isCurrentlyLocallyFiltered est FAUX, cela signifie qu'on affiche
+    // des résultats "frais" venant du backend (pas un filtre local)
+    if (!isCurrentlyLocallyFiltered) {
+        clearResultDisplayArea();
+        // Met à jour l'ID de conversation global pour les résultats, utilisé par la pagination backend
+        resultsConversationId = convIdForTheseResults;
+    } else {
+        // Affichage des résultats d'un filtre local.
+        // On cible et supprime spécifiquement la liste des résultats précédente
+        const listToClear = finalResultsContentElement.querySelector('.results-list');
+        if (listToClear) {
+            listToClear.remove();
+        }
+        // On cible et supprime le message spécifique "aucun résultat local trouvé" s'il existe
+        const noLocalMsg = finalResultsContentElement.querySelector('.no-local-results-message');
+        if (noLocalMsg) noLocalMsg.remove();
+    }
+
+    // Met à jour le type d'agrégation actuel basé sur les données reçues
+    currentAggregationType = resultsData.aggregation_type || 'unknown'; // Utilise 'unknown' si 'aggregation_type' n'est pas fourni dans 'resultsData'
+
+    // Extrait les propriétés de l'objet 'resultsData' dans des constantes locales pour un accès facile
+    const { items, message, page, total_pages, total_items } = resultsData;
+
+    // Si on n'est PAS en mode filtre local (on affiche des données du backend)
+    if (!isCurrentlyLocallyFiltered) {
+        // Met à jour les variables globales de pagination avec les informations de la page actuelle du backend
+        currentPage = parseInt(page, 10); // Numéro de la page actuelle
+        totalPages = parseInt(total_pages, 10); // Nombre total de pages disponibles
+        totalItemsOverall = parseInt(total_items, 10); // Nombre total d'items pour cette recherche
+
+        fullItemsForCurrentPage = items || []; // Stocke les items à afficher sur la page actuelle, utilise un tableau vide si "items" est null/undefined
+
+        originalFullItemsForCurrentPage = [...fullItemsForCurrentPage]; // Crée une nouvelle copie du tableau fullItemsForCurrentPage
+    }
+    else {
+        fullItemsForCurrentPage = items || [];
+    }
+
+    // Gestion de visibilité de la barre de recherche locale
+    if (resultsSearchBarContainer) {
+        resultsSearchBarContainer.style.display = originalFullItemsForCurrentPage.length > 0 ? 'flex' : 'none';
+    }
+
+    // Supprime les éventuels messages de résumé ou de "pas de résultats" des affichages précédents
+    const existingSummary = finalResultsContentElement.querySelector('.results-summary');
+    if(existingSummary) existingSummary.remove();
+    const existingNoResults = finalResultsContentElement.querySelector('.results-message.no-results-message');
+    if(existingNoResults) existingNoResults.remove();
+
+
+    // Si la liste des items à afficher (rappel "fullItemsForCurrentPage") est vide.
+    if (fullItemsForCurrentPage.length === 0) {
+        const messageDiv = document.createElement('div'); // Crée un élément 'div' pour afficher un message
+
+        messageDiv.className = 'results-message no-results-message'; // Class CSS pour le style
+
+        if (isCurrentlyLocallyFiltered) {
+            messageDiv.textContent = `Aucune espèce trouvée pour "${speciesSearchInput.value.trim()}" dans les résultats de cette page... Cherche peut-être sur une autre page ?`;
         } else {
-            const listToClear = finalResultsContentElement.querySelector('.results-list');
-            if (listToClear) listToClear.remove();
-            const noLocalMsg = finalResultsContentElement.querySelector('.no-local-results-message');
-            if (noLocalMsg) noLocalMsg.remove();
+            messageDiv.textContent = message || "Aucun résultat trouvé pour ces critères !";
         }
+        // Ajoute ce message à la zone des résultats
+        finalResultsContentElement.appendChild(messageDiv);
+    }
 
-        currentAggregationType = resultsData.aggregation_type || 'unknown';
-        const { items, message, page, total_pages, total_items } = resultsData;
 
-        if (!isCurrentlyLocallyFiltered) {
-            currentPage = parseInt(page, 10);
-            totalPages = parseInt(total_pages, 10);
-            totalItemsOverall = parseInt(total_items, 10);
-            fullItemsForCurrentPage = items || [];
-            originalFullItemsForCurrentPage = [...fullItemsForCurrentPage];
-        } else {
-            fullItemsForCurrentPage = items || [];
-        }
+    // Si la liste des items à afficher n'est PAS vide
+    if (fullItemsForCurrentPage.length > 0) {
 
-        if (resultsSearchBarContainer) {
-            resultsSearchBarContainer.style.display = originalFullItemsForCurrentPage.length > 0 ? 'flex' : 'none';
-        }
+        // Crée un élément de liste non ordonnée (<ul>) pour afficher les résultats
+        const resultsList = document.createElement('ul');
+        resultsList.className = 'results-list'; // Class CSS
 
-        const existingSummary = finalResultsContentElement.querySelector('.results-summary');
-        if(existingSummary) existingSummary.remove();
-        const existingNoResults = finalResultsContentElement.querySelector('.results-message.no-results-message');
-        if(existingNoResults) existingNoResults.remove();
+        // Boucle sur chaque item dans fullItemsForCurrentPage.
+        fullItemsForCurrentPage.forEach((item) => {
+            const li = document.createElement('li'); // Création d'un élément de liste (<li>)
+            li.className = 'result-item-clickable'; // Class CSS pour le style
 
-        if (fullItemsForCurrentPage.length === 0) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'results-message no-results-message';
-            if (isCurrentlyLocallyFiltered) {
-                messageDiv.textContent = `Aucune espèce trouvée pour "${speciesSearchInput.value.trim()}" dans les résultats de cette page... Cherche peut-être sur une autre page ?`;
+            // Récupère le nom vernaculaire et scientifique, avec "N/A" par défaut si non présents
+            const nomVern = item.nomVernaculaire;
+            const nomSci = item.nomScientifiqueRef || 'N/A';
+            const groupeTaxoSimple = item.groupeTaxoSimple || "Autres";
+            const taxoIcon = taxoIcons[groupeTaxoSimple] || taxoIcons["Autres"];
+
+            li.textContent = `${taxoIcon} ${nomVern} (${nomSci})`; // Formattage de l'élément de la liste
+
+            // Trouve l'index de cet item dans la liste originalFullItemsForCurrentPage.
+            const originalIndex = originalFullItemsForCurrentPage.findIndex(origItem =>
+                (origItem.nomScientifiqueRef === item.nomScientifiqueRef && origItem.nomVernaculaire === item.nomVernaculaire) ||
+                (origItem._id && item._id && origItem._id === item._id) // Utilise _id si disponible (plus robuste)
+            );
+
+            // Si l'item a été trouvé dans la liste originale
+            if (originalIndex !== -1) {
+                li.dataset.itemOriginalIndex = originalIndex.toString();
+                li.addEventListener('click', (event) => {
+                    event.stopPropagation(); // Empêche le clic de se propager à des éléments parents (comme le document qui ferme l'infobox)
+                    toggleInfobox(originalIndex, li); // Afficher/cacher l'infobox
+                });
             } else {
-                messageDiv.textContent = message || "Aucun résultat trouvé pour ces critères.";
+                console.warn("Item filtré non trouvé dans la liste originale:", item);
+                li.style.opacity = "0.5";
             }
-            finalResultsContentElement.appendChild(messageDiv);
-        }
+            // Ajoute l'élément li (l'espèce) à la liste ul
+            resultsList.appendChild(li);
+        });
+        finalResultsContentElement.appendChild(resultsList);
+    }
 
-        if (fullItemsForCurrentPage.length > 0) {
-            const resultsList = document.createElement('ul');
-            resultsList.className = 'results-list';
-            fullItemsForCurrentPage.forEach((item) => {
-                const li = document.createElement('li');
-                li.className = 'result-item-clickable';
-                const nomVern = item.nomVernaculaire || 'N/A';
-                const nomSci = item.nomScientifiqueRef || 'N/A';
-                const groupeTaxoSimple = item.groupeTaxoSimple || "Plantes";
-                const taxoIcon = taxoIcons[groupeTaxoSimple] || taxoIcons["Plantes, mousses et fougères"];
+    // Affiche le message de résumé (ex: "Page X sur Y...") si on n'est PAS en mode filtre local
+    if (message && !isCurrentlyLocallyFiltered && (originalFullItemsForCurrentPage.length > 0 || totalItemsOverall > 0)) {
+        const summaryDiv = document.createElement('div');
+        summaryDiv.className = 'results-summary';
+        summaryDiv.textContent = message;
+        finalResultsContentElement.appendChild(summaryDiv);
+    }
 
-                li.textContent = `${taxoIcon} ${nomVern} (${nomSci})`;
-                const originalIndex = originalFullItemsForCurrentPage.findIndex(origItem =>
-                    (origItem.nomScientifiqueRef === item.nomScientifiqueRef && origItem.nomVernaculaire === item.nomVernaculaire) ||
-                    (origItem._id && item._id && origItem._id === item._id)
-                );
-                if (originalIndex !== -1) {
-                    li.dataset.itemOriginalIndex = originalIndex.toString();
-                    li.addEventListener('click', (event) => {
-                        event.stopPropagation();
-                        toggleInfobox(originalIndex, li);
-                    });
-                } else {
-                    console.warn("Item filtré non trouvé dans la liste originale:", item);
-                    li.style.opacity = "0.5";
-                }
-                resultsList.appendChild(li);
-            });
-            finalResultsContentElement.appendChild(resultsList);
-        }
+    // Gère l'affichage des contrôles de pagination
+    if (!isCurrentlyLocallyFiltered) {
+        // Si on n'est pas en mode filtre local, affiche la pagination normale (basée sur les données du backend)
+        renderPaginationControls(totalItemsOverall > 0);
+    } else {
+        // Si on est en mode filtre local, on cache la pagination globale
+        const pagination = finalResultsContentElement.querySelector('.pagination-controls');
+        if (pagination) pagination.style.display = 'none';
+    }
+};
 
-        if (message && !isCurrentlyLocallyFiltered && (originalFullItemsForCurrentPage.length > 0 || totalItemsOverall > 0)) {
-            const summaryDiv = document.createElement('div');
-            summaryDiv.className = 'results-summary';
-            summaryDiv.textContent = message;
-            finalResultsContentElement.appendChild(summaryDiv);
-        }
-
-        if (!isCurrentlyLocallyFiltered) {
-            renderPaginationControls(totalItemsOverall > 0);
-        } else {
-            const pagination = finalResultsContentElement.querySelector('.pagination-controls');
-            if (pagination) pagination.style.display = 'none';
-        }
-    };
-
+    // Création de l'infobox des espèces
     const createInfoboxElement = () => {
         if (!infoboxElement) {
             infoboxElement = document.createElement('div');
@@ -204,6 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Réglage de la positiond de l'infobox
     const positionInfobox = (targetLiElement) => {
         if (!infoboxElement || !targetLiElement) return;
         const targetRect = targetLiElement.getBoundingClientRect();
@@ -240,17 +322,21 @@ document.addEventListener('DOMContentLoaded', () => {
         infoboxElement.style.left = `${Math.max(0, left)}px`;
     };
 
+    // Afficher/retirer l'infobox
     const toggleInfobox = (itemOriginalIndex, targetLiElement) => {
-        createInfoboxElement();
+
+        createInfoboxElement(); // Création de l'infobox
+
         const item = originalFullItemsForCurrentPage[itemOriginalIndex];
         if (!item) {
             errorHandler(new Error(`Infobox: Item non trouvé à l'index original ${itemOriginalIndex}.`));
             return;
         }
         if (infoboxElement.classList.contains('infobox-visible') && currentlyDisplayedInfoboxItemIndex === itemOriginalIndex) {
-            hideInfobox();
+            hideInfobox(); // Masquage de l'infobox
             return;
         }
+
         const contentDiv = infoboxElement.querySelector('#infobox-content-details');
         if (!contentDiv) return;
         contentDiv.innerHTML = '';
@@ -260,10 +346,12 @@ document.addEventListener('DOMContentLoaded', () => {
         contentDiv.appendChild(detailsTitle);
         const detailsList = document.createElement('ul');
         detailsList.className = 'infobox-details-list';
+
         const commonFieldsToShow = {
             nomScientifiqueRef: "Nom scientifique", regne: "Règne", groupeTaxoSimple: "Groupe taxonomique",
             totalObservationsEspece: "Total observations", departements: "Départements d'observation", statuts: "Statuts observés"
-        };
+        }; // Catégories à afficher dans l'infobox
+
         for (const [key, label] of Object.entries(commonFieldsToShow)) {
             if (item.hasOwnProperty(key) && item[key] !== undefined && item[key] !== null) {
                 const li = document.createElement('li');
@@ -284,9 +372,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 detailsList.appendChild(li);
             }
         }
+
+        // Agrégation de certaines informations (on récupère l'aggregation_type s'il existe)
         const aggregationTypeForItem = item.aggregation_type || currentAggregationType;
+
+        // Si on doit afficher les détails des communes
         if (aggregationTypeForItem === "departement_specifique" && item.hasOwnProperty("communesDetails")) {
+
             if (Array.isArray(item.communesDetails) && item.communesDetails.length > 0) {
+
                 const li = document.createElement('li');
                 const keySp = document.createElement('span');
                 keySp.className = 'infobox-detail-key';
@@ -307,6 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentlyDisplayedInfoboxItemIndex = itemOriginalIndex;
     };
 
+    // Masquage de l'infobox (si elle existe)
     const hideInfobox = () => {
         if (infoboxElement) {
             infoboxElement.classList.remove('infobox-visible');
@@ -314,6 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Formattage pour l'infobox
     const formatFieldKey = (key, defaultLabel = null) => {
         if (defaultLabel) return defaultLabel;
         let formatted = key.replace(/([A-Z])/g, ' $1').toLowerCase();
@@ -321,82 +417,172 @@ document.addEventListener('DOMContentLoaded', () => {
         formatted = formatted.replace(/id$/i, "ID").replace(/^Cd /i, "Code ").replace(/Lb /i, "");
         formatted = formatted.replace("code Insee", "Code INSEE");
         const replacements = {
-            nomVernaculaire: "Nom vernaculaire", nomScientifiqueRef: "Nom scientifique",
-            totalObservationsEspece: "Total observations", departements: "Départements",
-            communesDetails: "Lieux (Commune (Dépt.))", statuts: "Statuts"
+            nomVernaculaire: "Nom vernaculaire",
+            nomScientifiqueRef: "Nom scientifique",
+            totalObservationsEspece: "Total observations",
+            departements: "Départements",
+            communesDetails: "Lieux (Commune (Dépt.))",
+            statuts: "Statuts"
         };
         return replacements[key] || formatted.trim();
     };
 
-    // --- GESTION DE LA PAGINATION ---
-    const renderPaginationControls = (hasResults) => {
-        const existingPagination = finalResultsContentElement.querySelector('.pagination-controls');
-        if (existingPagination) existingPagination.remove();
-        if (!hasResults || totalPages <= 1) return;
+    // *** GESTION DE LA PAGINATION ***
 
-        const paginationDiv = document.createElement('div');
-        paginationDiv.className = 'pagination-controls';
-        const createButton = (label, clickHandler, isDisabled = false, title = '', arrowImage = null) => {
-            const button = document.createElement('button');
-            if (arrowImage) {
-                const arrowImageEl = document.createElement('img');
-                arrowImageEl.src = arrowImage; arrowImageEl.alt = label; arrowImageEl.classList.add('pagination-arrow-icon');
-                button.appendChild(arrowImageEl);
-            } else { button.textContent = label; }
-            button.title = title; button.disabled = isDisabled;
-            button.addEventListener('click', () => { // Ne pas passer 'event' explicitement à showLoadingCursor ici
-                isCurrentlyLocallyFiltered = false;
-                if (speciesSearchInput) speciesSearchInput.value = '';
-                if (speciesSuggestionsList) { speciesSuggestionsList.innerHTML = ''; speciesSuggestionsList.style.display = 'none';}
-                hideInfobox();
-                showLoadingCursor(); // AFFICHER LE CURSEUR D'ATTENTE
-                clickHandler(); // Appeler le handler original (fetchPaginatedResults)
-            });
-            return button;
-        };
-        const prevButton = createButton('Précédent', () => fetchPaginatedResults(currentPage - 1), currentPage === 1, 'Page précédente', '../static/ressources/arrow/precedent.webp');
-        const nextButton = createButton('Suivant', () => fetchPaginatedResults(currentPage + 1), currentPage === totalPages, 'Page suivante', '../static/ressources/arrow/suivant.webp');
-        const pageInputContainer = document.createElement('div');
-        pageInputContainer.className = 'page-input-container';
-        const pageInputLabel = document.createElement('label');
-        pageInputLabel.htmlFor = 'page-number-input'; pageInputLabel.textContent = 'Page :'; pageInputLabel.className = 'page-input-label';
-        const pageInput = document.createElement('input');
-        pageInput.type = 'number'; pageInput.id = 'page-number-input'; pageInput.className = 'page-number-input';
-        pageInput.min = '1'; pageInput.max = totalPages.toString(); pageInput.value = currentPage.toString();
-        pageInput.setAttribute('aria-label', 'Numéro de page à atteindre');
-        const totalPagesSpan = document.createElement('span');
-        totalPagesSpan.className = 'total-pages-indicator'; totalPagesSpan.textContent = `/ ${totalPages}`;
-        const goToPageButton = createButton('OK', () => {
-            const pageNum = parseInt(pageInput.value, 10);
+// hasResults: un bool qui est VRAI s'il y a des résultats à paginer
+const renderPaginationControls = (hasResults) => {
+    // Recherche dans finalResultsContentElement (la zone des résultats) un élément existant
+    // avec la class CSS .pagination-controls
+    const existingPagination = finalResultsContentElement.querySelector('.pagination-controls');
+    if (existingPagination) {
+        existingPagination.remove(); // les supprime pour éviter les duplications
+    }
+
+    if (!hasResults || totalPages <= 1) { // S'il n'y a aucun résultat ou qu'il n'y a qu'une seule page ou moins
+        return;
+    }
+
+    const paginationDiv = document.createElement('div');
+    paginationDiv.className = 'pagination-controls';
+
+    // Fonction interne nommée createButton :
+    const createButton = (label, clickHandler, isDisabled = false, title = '', arrowImage = null) => {
+        const button = document.createElement('button');
+        if (arrowImage) {
+            const arrowImageEl = document.createElement('img');
+            arrowImageEl.src = arrowImage;
+            arrowImageEl.alt = label;
+            arrowImageEl.classList.add('pagination-arrow-icon'); // Class CSS pour le style de l'icône
+            button.appendChild(arrowImageEl); // Ajoute l'image à l'intérieur du bouton
+        } else {
+            button.textContent = label;
+        }
+        button.title = title;
+        button.disabled = isDisabled;
+
+        // Ecouteur d'événement pour le clic sur le bouton
+        button.addEventListener('click', () => {
+            isCurrentlyLocallyFiltered = false;
+            if (speciesSearchInput){
+                speciesSearchInput.value = '';
+            }
+            if (speciesSuggestionsList) {
+                speciesSuggestionsList.innerHTML = '';
+                speciesSuggestionsList.style.display = 'none';
+            }
+            hideInfobox(); // Cache l'infobox
+
+
+            showLoadingCursor();
+
+            clickHandler(); // Exécute la fonction 'clickHandler' passée en argument (ex: fetchPaginatedResults).
+        });
+        return button; // Renvoie le bouton créé.
+    };
+
+    // BOUTON PRECEDENT - Lorsqu'il est cliqué, il appelle 'fetchPaginatedResults' pour la page précédente
+    const prevButton = createButton(
+        'Précédent',
+        () => fetchPaginatedResults(currentPage - 1),
+        currentPage === 1,
+        'Page précédente',
+        '../static/ressources/arrow/precedent.webp'
+    );
+
+    // BOUTON SUIVANT : Appelle 'fetchPaginatedResults' pour la page suivante.
+    const nextButton = createButton(
+        'Suivant',
+        () => fetchPaginatedResults(currentPage + 1),
+        currentPage === totalPages,
+        'Page suivante',
+        '../static/ressources/arrow/suivant.webp'
+    );
+
+    // Champ de saisie du numéro de page
+    const pageInputContainer = document.createElement('div');
+    pageInputContainer.className = 'page-input-container'; // Class CSS
+
+    // Label pour le champ de saisie
+    const pageInputLabel = document.createElement('label');
+    pageInputLabel.htmlFor = 'page-number-input'; // Lie le label à l'input par son ID
+    pageInputLabel.textContent = 'Page :';
+    pageInputLabel.className = 'page-input-label';
+
+    // Pour la saisie du n° de page
+    const pageInput = document.createElement('input');
+    pageInput.type = 'number';
+    pageInput.id = 'page-number-input'; // ID pour le lier au label et pour le JS
+    pageInput.className = 'page-number-input';
+    pageInput.min = '1';
+    pageInput.max = totalPages.toString();
+    pageInput.value = currentPage.toString();
+    pageInput.setAttribute('aria-label', 'Numéro de page à atteindre');
+
+    // Crée un span pour afficher le nombre total de pages (ex: "/ 10").
+    const totalPagesSpan = document.createElement('span');
+    totalPagesSpan.className = 'total-pages-indicator';
+    totalPagesSpan.textContent = `/ ${totalPages}`;
+
+    // Bouton "OK" pour valider la saisie du numéro de page.
+    const goToPageButton = createButton(
+        "OK",
+        () => {
+            const pageNum = parseInt(pageInput.value, 10); // Convertit la valeur de l'input en nombre
             if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
-                fetchPaginatedResults(pageNum);
+                fetchPaginatedResults(pageNum); // Charge la page demandée
             } else {
                 pageInput.value = currentPage.toString();
                 alert(`Veuillez entrer un numéro de page valide entre 1 et ${totalPages}.`);
             }
-        }, false, 'Aller à la page spécifiée');
-        pageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); goToPageButton.click(); } });
-        pageInputContainer.appendChild(pageInputLabel); pageInputContainer.appendChild(pageInput); pageInputContainer.appendChild(totalPagesSpan);
-        paginationDiv.appendChild(prevButton); paginationDiv.appendChild(pageInputContainer); paginationDiv.appendChild(goToPageButton); paginationDiv.appendChild(nextButton);
-        finalResultsContentElement.appendChild(paginationDiv);
-    };
+        },
+        false,
+        "Aller à la page spécifiée"
+    );
 
+    // Ecouteur si une touche du clavier est pressée
+    pageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Empêche le comportement par défaut
+            goToPageButton.click();
+        }
+    });
+
+    // Assemble les éléments du conteneur de saisie de page
+    pageInputContainer.appendChild(pageInputLabel);
+    pageInputContainer.appendChild(pageInput);
+    pageInputContainer.appendChild(totalPagesSpan);
+
+    // Assemble tous les contrôles dans le conteneur principal 'paginationDiv'
+    paginationDiv.appendChild(prevButton);
+    paginationDiv.appendChild(pageInputContainer);
+    paginationDiv.appendChild(goToPageButton);
+    paginationDiv.appendChild(nextButton);
+
+    // Ajoute le conteneur de pagination complet à la zone d'affichage des résultats
+    if(finalResultsContentElement) {
+        finalResultsContentElement.appendChild(paginationDiv);
+    }
+};
+
+    // LA fonction qui permet de charger une nouvelle page (param : la page à afficher)
     const fetchPaginatedResults = async (page) => {
         if (!resultsConversationId) {
             displayMessage("Session de résultats invalide. Relance d'une recherche...", "bot");
             clearResultDisplayArea();
             setTimeout(() => startConversation(false), 2000);
-            hideLoadingCursor(); // CACHER LE CURSEUR EN CAS DE SORTIE ANTICIPEE
+            hideLoadingCursor();
             return;
         }
+
         const requestedPage = parseInt(page, 10);
+
         if (isNaN(requestedPage) || requestedPage < 1 || (totalPages > 0 && requestedPage > totalPages && totalPagesOverall > 0)) {
             const pageNumInput = document.getElementById('page-number-input');
             if (pageNumInput) pageNumInput.value = currentPage.toString();
             if (totalPages > 0 && totalPagesOverall > 0) {
                 alert(`Numéro de page invalide. Entrez un nombre entre 1 et ${totalPages}.`);
             }
-            hideLoadingCursor(); // CACHER LE CURSEUR EN CAS DE SORTIE ANTICIPEE
+            hideLoadingCursor();
             return;
         }
 
@@ -413,11 +599,12 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             errorHandler(error, 'Erreur pagination:', () => renderPaginationControls(totalItemsOverall > 0));
         } finally {
-            hideLoadingCursor(); // TOUJOURS CACHER LE CURSEUR APRES LA TENTATIVE
+            hideLoadingCursor();
         }
     };
 
-    // --- AJOUT: FONCTIONS POUR LA RECHERCHE LOCALE DANS LES RÉSULTATS ---
+
+    // *** FONCTIONS POUR LA RECHERCHE LOCALE DANS LES RÉSULTATS ***
     const filterAndDisplayLocalSpeciesResults = () => {
         if (!speciesSearchInput) return;
         const searchTerm = speciesSearchInput.value.trim().toLowerCase();
@@ -452,7 +639,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }, resultsConversationId);
     };
 
-    // --- GESTION DU CHATBOT (QUESTIONS/REPONSES) ---
+
+    // *** GESTION DU CHATBOT (QUESTIONS/REPONSES) ***
     const startConversation = async (isInitialLoad = false) => {
         if (isInitialLoad) {
             clearResultDisplayArea();
@@ -474,9 +662,9 @@ document.addEventListener('DOMContentLoaded', () => {
         consecutiveSkips = 0;
         displayMessage('Coucou 👋🏻 Prêt(e) pour une nouvelle recherche ? Plus tu es précis(e), plus je pourrai t\'aider !', "bot");
 
-        showLoadingCursor(); // AFFICHER LE CURSEUR D'ATTENTE
+        showLoadingCursor(); // Curseur d'attente
         try {
-            const data = await fetchAPI(`${API_BASE_URL}/chat/start`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+            const data = await fetchAPI(`${API_BASE_URL}/chat/start`,{ method: 'POST', headers: { 'Content-Type': 'application/json' } });
             if (data.error) throw new Error(data.error);
             conversationId = data.conversation_id;
             if (data.question && data.question.text) {
@@ -489,10 +677,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             errorHandler(error, "Oups, j'ai une petite erreur. Nouvelle tentative...", () => startConversation(isInitialLoad));
         } finally {
-            hideLoadingCursor(); // TOUJOURS CACHER LE CURSEUR APRES LA TENTATIVE
+            hideLoadingCursor();
         }
     };
 
+    // Envoi des messages et génération des résultats
     const handleSend = async (messageToSend) => {
         if (!conversationId) {
             displayMessage("Session de questions non active. Relance...", 'bot');
@@ -515,17 +704,20 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        showLoadingCursor(); // AFFICHER LE CURSEUR D'ATTENTE
+        showLoadingCursor();
         try {
             const data = await fetchAPI(`${API_BASE_URL}/chat/send`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: messageToSend, conversation_id: conversationId }),
             });
+
             if (data.error) {
                 displayMessage(`Erreur serveur: ${data.error}`, 'bot');
                 setInputState(true, currentQuestionIsSkippable);
-            } else if (data.is_final_questions && data.results_data) {
+            }
+            else if (data.is_final_questions && data.results_data) {
+
                 consecutiveSkips = 0;
                 displayMessage("J'ai cherché pour toi, voici les résultats à droite !", "bot");
                 isCurrentlyLocallyFiltered = false;
@@ -533,21 +725,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 displayPaginatedResults(data.results_data, data.conversation_id);
                 displayMessage("C'est affiché ! Je reviens dans un instant...", "bot");
                 setTimeout(() => startConversation(false), 3000);
-            } else if (data.question && data.question.text) {
+            }
+            else if (data.question && data.question.text) {
                 displayMessage(data.question.text, 'bot');
                 setInputState(true, data.question.is_skippable || false);
-            } else {
+            }
+            else {
                 displayMessage("Oups, réponse inattendue. Relance...", 'bot');
                 setTimeout(() => startConversation(false), 2000);
             }
-        } catch (error) {
+        }
+
+        catch (error) {
             errorHandler(error, 'Erreur envoi message:', () => setInputState(true, currentQuestionIsSkippable));
-        } finally {
-            hideLoadingCursor(); // TOUJOURS CACHER LE CURSEUR APRES LA TENTATIVE
+        }
+        finally {
+            hideLoadingCursor();
         }
     };
 
-    // --- EVENEMENTS UTILISATEUR ---
+    // ****** FIN DES FONCTIONS UTILITAIRES *****
+
+    // ********** EVENEMENTS UTILISATEUR ************
     document.addEventListener('click', (event) => {
         if (infoboxElement && infoboxElement.classList.contains('infobox-visible')) {
             if (!infoboxElement.contains(event.target) && !event.target.closest('.result-item-clickable')) {
@@ -628,7 +827,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- INITIALISATION ---
+    // ***** INITIALISATION *****
     startConversation(true);
-    hideLoadingCursor(); // Assurer que le curseur est par défaut au démarrage initial
+    hideLoadingCursor();
 });

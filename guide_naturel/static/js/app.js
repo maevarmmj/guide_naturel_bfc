@@ -1,14 +1,13 @@
 // On attend que le document initial html soit complètement chargé...
-
 document.addEventListener("DOMContentLoaded", function() {
 
     // ***** CHARGEMENT DU HEADER ****
     fetch('header.html')
-        // Une fois la réponse du serveur reçue (.then), on traite cette réponse.
+        // Une fois la réponse du serveur reçue), on traite cette réponse.
         // Si réponse http ok, 'response.text()' lit le corps de la réponse comme du texte brut (le contenu HTML du header)
         .then(response => response.ok ? response.text() : Promise.reject(response.status + " " + response.statusText))
 
-        // Si la lecture du texte a réussi (.then), 'data' contient le HTML du header
+        // Si la lecture du texte a réussi, 'data' contient le HTML du header
         .then(data => {
             // Sélectionne l'élément HTML dans la page actuelle qui a l'ID 'header-placeholder'
             const headerPlaceholder = document.getElementById('header-placeholder');

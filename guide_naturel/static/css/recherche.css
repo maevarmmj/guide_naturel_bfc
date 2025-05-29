@@ -1,3 +1,6 @@
+/* PARTIE 1 DU STYLESHEET DE RECHERCHE.HTML */
+/* (Pour lighthouse) */
+
 .content-below-recherche{
   display:flex;
   flex-direction:row;
@@ -12,17 +15,17 @@
 
 .chatbot-container{
   flex:1 1 0;
-  background-color:rgba(53,161,84,.5);
+  background-color:rgba(53,161,84,0.5);
   border-radius:10px;
   padding:20px;
-  box-shadow:0 4px 12px rgba(0,0,0,.1);
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
   min-height:430px;
   max-height:430px;
   display:flex;
   flex-direction:column
 }
 
-/* --- En-tête du Profil Chatbot --- */
+/* *** En-tête du Chatbot (Anna) *** */
 .chatbot-profile-header{
   display:flex;
   flex-direction:column;
@@ -30,7 +33,7 @@
   text-align:center;
   padding-bottom:10px;
   margin-bottom:10px;
-  border-bottom:1px solid rgba(255,255,255,.2);
+  border-bottom:1px solid rgba(255,255,255,0.2);
   flex-shrink:0
 }
 
@@ -40,8 +43,8 @@
   border-radius:50%;
   overflow:hidden;
   margin-bottom:8px;
-  border:2px solid rgba(255,255,255,.5);
-  background-color:rgba(255,255,255,.3)
+  border:2px solid rgba(255,255,255,0.5);
+  background-color:rgba(255,255,255,0.3)
 }
 
 #chatbot-avatar{
@@ -58,7 +61,7 @@
   text-shadow: 1px 1px #154211
 }
 
-/* --- Zone de Log du Chat --- */
+/* --- Zone de log du Chat --- */
 .chat-log-area{
   flex-grow:1;
   overflow-y:auto;
@@ -79,7 +82,7 @@
   line-height:1.2;
   opacity:0;
   transform:translateY(15px);
-  transition:opacity .4s ease-out,transform .4s ease-out
+  transition:opacity 0.4s ease-out,transform 0.4s ease-out
 }
 
 .chat-log-area p.visible{
@@ -87,12 +90,14 @@
   transform:translateY(0)
 }
 
+/* Messages du bot */
 .bot-message{
   background-color:#0D633A;
   align-self:flex-start;
   color:#fff
 }
 
+/* Messages de l'utilisateur */
 .user-message{
   background-color:#7ae872;
   margin-left:auto;
@@ -104,6 +109,7 @@
     color:#1e4620
 }
 
+/* Zone d'écriture */
 .chat-input-area{
   display:flex;
   gap:10px;
@@ -125,6 +131,7 @@
     color:#888
 }
 
+/* Boutons "Envoyer" (send) et "Je ne sais pas" (skip) */
 #send-chat-button,
 #skip-chat-button{
   padding:8px 15px;
@@ -132,8 +139,8 @@
   border:none;
   border-radius:20px;
   cursor:pointer;
-  font-size:.9em;
-  transition:background-color .2s;
+  font-size:0.9em;
+  transition:background-color 0.2s;
   white-space:nowrap
 }
 
@@ -159,41 +166,3 @@
   cursor:not-allowed
 }
 
-/* ******* RESULTATS DU CHATBOT *********/
-
-.chatbot-results{
-  flex:1 1 0;
-  background-color:rgba(53,161,84,.5);
-  border-radius:10px;
-  padding:20px;
-  box-shadow:0 4px 12px rgba(0,0,0,.1);
-  min-height:430px;
-  max-height:430px;
-  display:flex;
-  flex-direction:column;
-  color:rgba(255,255,255,.4);
-  position:relative
-}
-
-/* --- Anna (à côté des résultats) --- */
-#results-character{
-  position:absolute;
-  width:240px;
-  height:auto;
-  right:-160px;
-  bottom:10px;
-  z-index:10
-}
-
-/* --- Contenu des résultats finaux --- */
-#final-chatbot-results-content{
-    background-color: rgba(200, 255, 161, 0.85);
-    color:#333;
-    padding:15px;
-    border-radius:5px;
-    height:100%;
-    overflow-y:auto;
-    display:flex;
-    flex-direction:column;
-    line-height:1.6
-}
