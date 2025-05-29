@@ -9,7 +9,7 @@ from API_request.recherche import *
 app = Flask(__name__)
 CORS(app)
 
-# Configuration MongoDB (comme avant)
+# Configuration MongoDB
 MONGO_URI = "mongodb+srv://guest:guestpass@big-data.640be.mongodb.net/?retryWrites=true&w=majority&appName=Big-Data"
 DB_NAME = 'LeGuideNaturel'
 COLLECTION_NAME = 'Nature'
@@ -19,6 +19,7 @@ collection_instance = None
 
 departements_a_analyser = [21, 25, 39, 58, 70, 71, 89, 90]
 
+# connexion à la base de donnée
 try:
     collection_instance = get_mongo_collection(MONGO_URI, DB_NAME, COLLECTION_NAME)
     mongo_client_instance = collection_instance.database.client
@@ -54,6 +55,7 @@ def apropos():
     return render_template('apropos.html')
 
 
+#route pour récupérer les informations des graphiques
 @app.route('/get_chart_data')
 def get_chart_data():
     info_key = request.args.get('info')
@@ -86,6 +88,7 @@ def get_footer_html_fragment():
     return render_template('footer.html')
 
 
+# routes pour faire des requêtes dans la barre de recherche
 @app.route('/chat/start', methods=['POST'])
 def start_chat():
     conversation_id = str(uuid.uuid4())
@@ -146,8 +149,8 @@ def handle_message():
 
             print(f"Fuzzy score too low for '{user_answer_processed}'. Storing original (or consider re-prompting).")
 
-    # Stockage de la réponse (originale ou corrigée par fuzzy)
-    if not (is_current_question_skippable_by_config and  (user_answer_processed.lower() in SKIP_KEYWORDS or not user_answer_processed)):
+    if not (is_current_question_skippable_by_config
+            and (user_answer_processed.lower() in SKIP_KEYWORDS or not user_answer_processed)):
         if param_to_store:
             conv_data["answers"][param_to_store] = value_to_store
 
@@ -197,7 +200,6 @@ def get_paginated_results(conversation_id, page_num):
 
 
 if __name__ == '__main__':
-    # Ne pas exécuter app.run() si l'initialisation a échoué gravement
     if collection_instance is not None:
         app.run(debug=True)
     else:
