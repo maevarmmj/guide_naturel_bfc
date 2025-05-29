@@ -14,24 +14,23 @@
 
 <div id="header-placeholder"></div>
 
-<main class="container"> <!-- <main> pour le contenu principal de la page -->
+<main class="container">
 
   <div class="text-container">
-      <!-- Utilisation de balises de titre sémantiques -->
       <h2 class="bfc_subtitle">B O U R G O G N E - F R A N C H E - C O M T É</h2>
       <h1 class="bfc_title">LE GUIDE NATUREL</h1>
   </div>
 
   <div class="content-below">
-    <section class="Carte"> <!-- <section> pour une section thématique -->
+    <section class="Carte">
       <div class="image-container">
         <img src="../static/ressources/carte_bfc.webp" alt="Carte de la région Bourgogne-Franche-Comté avec ses départements cliquables" usemap="#departements_bfc">
-        <!-- Ces images sont prévues pour être mises à jour par JavaScript au survol des départements -->
+        <!-- Images des départements, mises à jour par index.js  -->
         <img src="" alt="" class="overlay-image">
         <img src="" alt="" class="overlay-text">
       </div>
       <map name="departements_bfc">
-        <!-- href="#" est un placeholder. S'ils ne naviguent pas, JS devrait gérer event.preventDefault() -->
+        <!-- href="#" : placeholder. S'ils ne naviguent pas, index.js devrait gérer event.preventDefault() -->
         <area
             shape="poly"
             coords="422,374,456,271,471,227,449,187,394,200,298,60,213,69,196,127,226,181,202,243,174,258,197,304"
@@ -84,7 +83,7 @@
       </map>
     </section>
 
-    <aside class="contenu-droite"> <!-- <aside> pour contenu tangentiel, comme une barre latérale -->
+    <aside class="contenu-droite">
       <div class="chart-carousel-container">
           <button class="carousel-arrow carousel-prev">◀</button> <!-- Flèche gauche -->
           <canvas id="camembert"></canvas>
@@ -92,17 +91,17 @@
       </div>
       <div class="chart-dots-container"></div>
     </aside>
-  </div> <!-- Fin de .content-below -->
-      <div class="buttons_right">
-        <!-- Remplacé <button> par <a> pour la navigation -->
+  </div>
+
+      <div class="buttons_right"> <!-- Les boutons en bas des graphiques (initialement à droite) -->
+
         <a href="" class="button_base button_right1" data-chartkey="especesParRegne">Nombre d'espèces par règne</a>
         <a href="" class="button_base button_right1" data-chartkey="especesParStatutConservation">Nombre d'espèces par statut de conservation</a>
         <a href="" class="button_base button_right1" data-chartkey="statutsConservationParRegne">Statuts de conservation par règne</a>
       </div>
-  <!-- La div fermante en trop a été supprimée ici -->
-</main> <!-- Fin de .container / <main> -->
+</main>
 
-
+<!-- Partie sur les mini-camemberts -->
 <div id="departement-chart-container"
      style="display: none;
      position: absolute;
@@ -113,9 +112,9 @@
      z-index: 1200;">
             <canvas id="mini-departement-chart"></canvas>
     <div style="display: flex; justify-content: center; align-items: center">
-          <button class="carousel-arrow mini-carousel-prev" style="transform: scale(0.8)">◀</button> <!-- Flèche gauche -->
+          <button class="carousel-arrow mini-carousel-prev" style="transform: scale(0.8)">◀</button>
             <div class="mini-chart-dots-container"></div>
-          <button class="carousel-arrow mini-carousel-next" style="transform: scale(0.8)">▶</button> <!-- Flèche droite -->
+          <button class="carousel-arrow mini-carousel-next" style="transform: scale(0.8)">▶</button>
       </div>
 </div>
 
@@ -123,9 +122,8 @@
 
 <div id="footer-placeholder"></div>
 
-<script>
-  window.initial_info = {{ initial_info | tojson }};
-</script>
+<!-- Infos initiales envoyées au index.js-->
+<script>window.initial_info = {{ initial_info | tojson }};</script>
 
 <script src="../static/js/index.js"></script>
 <script src="https://unpkg.com/image-map-resizer@1.0.10/js/imageMapResizer.min.js"></script>
