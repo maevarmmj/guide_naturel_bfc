@@ -1,4 +1,4 @@
-# 🌳 Le Guide Naturel BFC - Application Web Interactive 🌳
+# 🌳 Site Web - Le Guide Naturel BFC 🌳
 
 
 ### Créé en :
