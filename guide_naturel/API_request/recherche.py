@@ -3,6 +3,8 @@ import math
 RESULTS_PER_PAGE = 50
 FUZZY_MATCH_THRESHOLD = 20  # Seuil d'acceptation de correction
 
+
+
 conversations = {}
 
 # Liste des questions du chatbot
@@ -13,9 +15,9 @@ QUESTIONS_FLOW = {
     },
     "q_groupe_taxo": {
         "text": "Quel groupe taxonomique simple t'intéresse ? (Oiseaux, Mammifères, Insectes, Plantes à fleurs...)",
-        "next_question_id": "q2", "param_to_store": "groupeTaxoSimple", "skippable": True,
+        "next_question_id": "q_dept", "param_to_store": "groupeTaxoSimple", "skippable": True,
     },
-    "q2": {
+    "q_dept": {
         "text": "Hum, je vois ! Et ce serait dans quel département ? (Le 21, 25, 70, 39, 58, 71, 90, ou 89)",
         "next_question_id": "q_commune", "param_to_store": "codeInseeDepartement", "skippable": True
     },
