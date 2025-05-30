@@ -53,5 +53,5 @@ Le Guide Naturel BFC est un site web interactif conçu dans le cadre d'un projet
     *   Manipulation dynamique du DOM pour afficher les messages, les résultats, la pagination, et les infobox
     *   Gestion des événements utilisateur
 
-### Business Intelligence 
+### Business Intelligence (sur MongoDB Charts)
 *   **Analyse des statistiques de recherche pour adapter les futurs améliorations (focus sur une catégorie, reformulation de questions, etc.)
